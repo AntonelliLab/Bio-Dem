@@ -127,6 +127,10 @@ class App extends Component {
     await this.initData();
   }
 
+  onDataReceived(data) {
+    console.log('onDataReceived', data);
+  };
+
   renderChart() {
     const { birdData, vdemData } = this.state;
     
@@ -211,6 +215,7 @@ class App extends Component {
           <div id="chart"/>
           <div id="chart2"/>
         </div>
+        <DataFetcher onDataReceived={data => this.onDataReceived(data)} />
       </div>
     );
   }
