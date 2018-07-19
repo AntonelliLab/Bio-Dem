@@ -13,7 +13,6 @@ import DualChart from './d3/DualChart';
 import { csv } from 'd3-fetch';
 import { byAlpha3 } from "iso-country-codes";
 
-import DataFetcher from './components/DataFetcher';
 import { queryGBIF } from "./api/gbif";
 
 /**
@@ -30,7 +29,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      birdData: [],
+      gbifData: [],
       vdemData: [],
       loaded: false,
       fetching: false,
@@ -47,6 +46,7 @@ class App extends Component {
     this.setState({
       fetching: true,
     });
+    await this.makeQuery('SE');
     const vdemData = csv(vdemDataUrl, row => {
       const year = +row.year;
       if (Number.isNaN(year)) {
@@ -95,19 +95,23 @@ class App extends Component {
     // Get alpha2 ISO code for this country, as this is what GBIF requires as query
     // TODO: Catch cases where !byAlpha3[event.target.value]
     const alpha2 = byAlpha3[event.target.value].alpha2;
+    await this.makeQuery(alpha2);
+    // Set new country value to state
+    this.setState({ [event.target.name]: event.target.value }, () => {
+      this.renderChart();
+    });
+  }
+
+  makeQuery = async (country) => {
     // Query the GBIF API
-    const result = await queryGBIF(alpha2);
-    console.log('Backbone data: ', result);
+    this.setState({ fetching: true });
+    const result = await queryGBIF(country);
     if (result.error) {
       // TODO: request errored out => handle UI
       return;
     }
     this.onDataReceived(result.response.data);
-
-    // Set new country value to state
-    this.setState({ [event.target.name]: event.target.value }, () => {
-      this.renderChart();
-    });
+    this.setState({ fetching: false });
   }
 
   onDataReceived(data) {
@@ -180,7 +184,7 @@ class App extends Component {
           <div className="controls">
             <FormControl className="formControl" style={{ minWidth: 150, margin: 20 }}>
               <InputLabel htmlFor="country">Country</InputLabel>
-              <Select value={this.state.country} onChange={this.handleCountryChange} input={<Input name="country" id="country" />}>
+              <Select value={this.state.country} onChange={(event) => this.handleCountryChange(event)} input={<Input name="country" id="country" />}>
                 {this.state.countries.map(country => (
                   <MenuItem key={country} value={country}>
                     {country}
@@ -223,7 +227,6 @@ class App extends Component {
           <div id="chart" />
           <div id="chart2" />
         </div>
-        <DataFetcher onDataReceived={data => this.onDataReceived(data)} />
       </div>;
   }
 }
