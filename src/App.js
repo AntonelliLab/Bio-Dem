@@ -5,7 +5,6 @@ import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
@@ -14,15 +13,10 @@ import IconPerson from '@material-ui/icons/RecordVoiceOver';
 import './App.css';
 import DualChart from './d3/DualChart';
 import { csv } from 'd3-fetch';
+import { byAlpha3 } from "iso-country-codes";
 
-/**
- * Bird collections per year from GBIF
- * country,date,collections
- ABW,1908,5
- ABW,1944,1
- */
-const birdDataUrl = `${process.env.PUBLIC_URL}/data/ebird_collections_per_country_per_year.csv`;
-// const birdDataUrl = `https://raw.githubusercontent.com/AntonelliLab/Vdem-Biodiversity/master/analyses/input/ebird_collections_per_country_per_year.csv?token=AG-Yjp1YGlsR4_0uJUefhgpd-9EhfBV-ks5bV9v7wA%3D%3D`;
+import { queryGBIF } from "./api/gbif";
+
 /**
  * V-dem variables
  * country,year,v2x_regime,v2x_freexp_altinf,v2x_frassoc_thick,v2x_rule,v2xcl_dmove,v2xcs_ccsi,v2x_corr,v2x_clphy,e_area,e_regiongeo,e_peaveduc,e_migdppc,e_peginiwi,e_wri_pa,e_population,e_Civil_War,e_miinterc,confl
@@ -46,7 +40,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      birdData: [],
+      gbifData: [],
       vdemData: [],
       loaded: false,
       fetching: false,
@@ -63,18 +57,7 @@ class App extends Component {
     this.setState({
       fetching: true,
     });
-    const birdData = csv(birdDataUrl, row => {
-      const year = +row.date;
-      if (Number.isNaN(year)) {
-        return null;
-      }
-      return {
-        date: new Date(+row.date, 0),
-        year: +row.date,
-        country: row.country,
-        collections: +row.collections,
-      };
-    });
+    await this.makeQuery('SE');
     const vdemData = csv(vdemDataUrl, row => {
       const year = +row.year;
       if (Number.isNaN(year)) {
@@ -103,7 +86,7 @@ class App extends Component {
         conf: +row.confl,
       };
     });
-    const data = await Promise.all([birdData, vdemData]);
+    const data = await Promise.all([vdemData]);
     this.data = data;
     this.setState({
       loaded: true,
@@ -118,15 +101,49 @@ class App extends Component {
     });
   }
 
+  handleCountryChange = async (event) => {
+    console.log('querying for this country: ', event.target.value);
+    // Get alpha2 ISO code for this country, as this is what GBIF requires as query
+    // TODO: Catch cases where !byAlpha3[event.target.value]
+    const alpha2 = byAlpha3[event.target.value].alpha2;
+    await this.makeQuery(alpha2);
+    // Set new country value to state
+    this.setState({ [event.target.name]: event.target.value }, () => {
+      this.renderChart();
+    });
+  }
+
+  makeQuery = async (country) => {
+    // Query the GBIF API
+    this.setState({ fetching: true });
+    const result = await queryGBIF(country);
+    if (result.error) {
+      // TODO: request errored out => handle UI
+      return;
+    }
+    this.onDataReceived(result.response.data);
+    this.setState({ fetching: false });
+  }
+
+  onDataReceived(data) {
+    console.log('onDataReceived', data);
+    const gbifData = data.facets[0].counts.map(i => {
+      return {
+        year: i.name,
+        collections: i.count,
+      };
+    });
+    this.setState({ gbifData });
+  };
+
   async initData() {
     const data = await this.fetchData();
-    const [birdData, vdemData] = data;
+    const [vdemData] = data;
     const countries = {};
     vdemData.forEach(d => {
       countries[d.country] = 1;
     });
     this.setState({
-      birdData,
       vdemData,
       countries: Object.keys(countries),
     }, () => {
@@ -139,16 +156,13 @@ class App extends Component {
   }
 
   renderChart() {
-    const { birdData, vdemData } = this.state;
+    const { gbifData, vdemData } = this.state;
     
     const vdemFiltered = vdemData
       .filter(d => d.country === this.state.country)
-      // .sort((a,b) => a.year - b.year);
-    // console.log('vdemFiltered:', vdemFiltered);
-
     
     DualChart('#chart', {
-      data: birdData.filter(d => d.country === this.state.country),
+      data: gbifData,
       secondData: vdemFiltered,
       height: 300,
       xMin: 1960,
@@ -171,8 +185,7 @@ class App extends Component {
   }
 
   render() {
-    return (
-      <div className="App">
+    return <div className="App">
         <AppBar position="static" color="primary">
           <Toolbar>
             <BioDemLogo />
@@ -185,24 +198,26 @@ class App extends Component {
           <div className="controls">
             <FormControl className="formControl" style={{ minWidth: 150, margin: 20 }}>
               <InputLabel htmlFor="country">Country</InputLabel>
-              <Select
-                value={this.state.country}
-                onChange={this.handleChange}
-                input={<Input name="country" id="country" />}
-              >
-                { this.state.countries.map(country => <MenuItem key={country} value={country}>{country}</MenuItem>)}
+              <Select value={this.state.country} onChange={(event) => this.handleCountryChange(event)} input={<Input name="country" id="country" />}>
+                {this.state.countries.map(country => (
+                  <MenuItem key={country} value={country}>
+                    {country}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <FormControl className="formControl" style={{ minWidth: 150, margin: 20 }}>
-              <InputLabel htmlFor="vdemVariable">Political variable</InputLabel>
-              <Select
-                value={this.state.vdemVariable}
-                onChange={this.handleChange}
-                input={<Input name="vdemVariable" id="vdemVariable" />}
-              >
+              <InputLabel htmlFor="vdemVariable">
+                Political variable
+              </InputLabel>
+              <Select value={this.state.vdemVariable} onChange={this.handleChange} input={<Input name="vdemVariable" id="vdemVariable" />}>
                 <MenuItem value="v2x_regime">v2x_regime</MenuItem>
-                <MenuItem value="v2x_freexp_altinf">v2x_freexp_altinf</MenuItem>
-                <MenuItem value="v2x_frassoc_thick">v2x_frassoc_thick</MenuItem>
+                <MenuItem value="v2x_freexp_altinf">
+                  v2x_freexp_altinf
+                </MenuItem>
+                <MenuItem value="v2x_frassoc_thick">
+                  v2x_frassoc_thick
+                </MenuItem>
                 <MenuItem value="v2x_rule">v2x_rule</MenuItem>
                 <MenuItem value="v2xcl_dmove">v2xcl_dmove</MenuItem>
                 <MenuItem value="v2xcs_ccsi">v2xcs_ccsi</MenuItem>
@@ -221,12 +236,12 @@ class App extends Component {
               </Select>
             </FormControl>
           </div>
-          { this.renderProgress() }
-          <div id="chart"/>
-          <div id="chart2"/>
+          {this.renderProgress()}
+          <h1>{byAlpha3[this.state.country].name}</h1>
+          <div id="chart" />
+          <div id="chart2" />
         </div>
-      </div>
-    );
+      </div>;
   }
 }
 
