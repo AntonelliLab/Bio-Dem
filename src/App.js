@@ -129,8 +129,8 @@ class App extends Component {
     console.log('onDataReceived', data);
     const gbifData = data.facets[0].counts.map(i => {
       return {
-        year: i.name,
-        collections: i.count,
+        year: +i.name,
+        collections: +i.count,
       };
     });
     this.setState({ gbifData });
@@ -161,11 +161,18 @@ class App extends Component {
     const vdemFiltered = vdemData
       .filter(d => d.country === this.state.country)
     
+    const yearMin = 1960;
+    const yearMax = 2018;
+    
+    const gbifDataFiltered = gbifData
+      .filter(d => d.year >= yearMin && d.year <= yearMax)
+      .sort((a,b) => a.year - b.year)
+    
     DualChart('#chart', {
-      data: gbifData,
+      data: gbifDataFiltered,
       secondData: vdemFiltered,
       height: 300,
-      xMin: 1960,
+      xMin: yearMin,
       x: d => d.year,
       y: d => d.collections,
       x2: d => d.year,
