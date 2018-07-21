@@ -13,7 +13,7 @@ export default function DualChart(el, properties) {
     width: null, // null to set it to the width of the anchor element
     top: 20,
     right: 80,
-    bottom: 30,
+    bottom: 60,
     left: 80,
     height: 400,
     xMin: null,
@@ -24,6 +24,8 @@ export default function DualChart(el, properties) {
     y: d => d.y,
     x2: d => d.x,
     y2: d => d.y,
+    yLabel: "Value",
+    y2Label: "Value #2",
   }, properties);
 
   const anchorElement = d3.select(el);
@@ -60,13 +62,13 @@ export default function DualChart(el, properties) {
   const xMin = props.xMin || d3.min(data, d => props.x(d));
   const xMax = props.xMax || d3.max(data, d => props.x(d));
   const yExtent = d3.extent(data, d => props.y(d));
-
+  
   // For second axis
   const y2Extent = d3.extent(secondData, d => props.y2(d));
 
   // set the ranges
   const x = d3.scaleBand()
-            .domain(d3.range(xMin, xMax))
+            .domain(d3.range(xMin, xMax + 1))
             .range([0, width])
             .padding(0.1);
   const y = d3.scaleLinear()
@@ -117,7 +119,7 @@ export default function DualChart(el, properties) {
 
   // add the x Axis
   g.append("g")
-      .attr("transform", "translate(0," + height + ")")
+      .attr("transform", `translate(0,${height})`)
       .call(xAxis);
 
   // add the y Axis
@@ -127,7 +129,30 @@ export default function DualChart(el, properties) {
   // Add the second y Axis
   g.append("g")
       .attr("class", "y2axis")
-      .attr("transform", "translate( " + width + ", 0 )")
+      .attr("transform", `translate(${width}, 0)`)
       .call(y2Axis);
 
+  // text label for the x axis
+  g.append("text")             
+    .attr("transform", `translate(${width/2},${height+40})`)
+    .style("text-anchor", "middle")
+    .text("Year");
+  
+  // text label for the y axis
+  g.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - props.left)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text(props.yLabel);
+  
+  // text label for the second y axis
+  g.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", width + props.right)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "-1em")
+      .style("text-anchor", "middle")
+      .text(props.y2Label);
 }

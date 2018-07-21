@@ -9,6 +9,8 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import IconPublic from '@material-ui/icons/Public';
+import IconPerson from '@material-ui/icons/RecordVoiceOver';
 import './App.css';
 import DualChart from './d3/DualChart';
 import { csv } from 'd3-fetch';
@@ -29,6 +31,15 @@ AFG,1961,0,0.18535179976794,0.129522240943792,0.368635436412438,0.26609335715031
  */
 const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
 // const vdemDataUrl = `https://raw.githubusercontent.com/AntonelliLab/Vdem-Biodiversity/master/analyses/input/vdem_variables.csv?token=AG-YjnEhdZQC1HdaThLt5uEBQRmdT1zLks5bV-6-wA%3D%3D`;
+
+const BioDemLogo = () => (
+  <span style={{ position: 'relative', marginLeft: 5, marginRight: 5 }}>
+    <span style={{ position: 'absolute', left: 2, top: -11 }}>
+      <IconPerson />
+    </span>
+    <IconPublic />
+  </span>
+);
 
 class App extends Component {
 
@@ -145,6 +156,8 @@ class App extends Component {
       y: d => d.collections,
       x2: d => d.year,
       y2: d => d[this.state.vdemVariable],
+      yLabel: '#Records',
+      y2Label: this.state.vdemVariable,
     });
   }
 
@@ -162,8 +175,9 @@ class App extends Component {
       <div className="App">
         <AppBar position="static" color="primary">
           <Toolbar>
+            <BioDemLogo />
             <Typography variant="title" color="inherit">
-              V-dem - biodiversity
+              Bio-Dem&nbsp;&mdash;&nbsp;Biodiversity knowledge and political regimes
             </Typography>
           </Toolbar>
         </AppBar>
