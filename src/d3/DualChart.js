@@ -26,6 +26,7 @@ export default function DualChart(el, properties) {
     y2: d => d.y,
     yLabel: "Value",
     y2Label: "Value #2",
+    fetching: false,
   }, properties);
 
   const anchorElement = d3.select(el);
@@ -93,6 +94,9 @@ export default function DualChart(el, properties) {
       .data(data)
     .enter().append("rect")
       .attr("class", "bar")
+      .style("fill", d => {
+        return props.fetching ? '#aaa' : 'steelblue';
+      })
       .attr("x", d => x(props.x(d)))
       .attr("width", x.bandwidth())
       .attr("y", d => y(props.y(d)))

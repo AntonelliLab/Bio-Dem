@@ -4,16 +4,15 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import IconPublic from '@material-ui/icons/Public';
 import IconPerson from '@material-ui/icons/RecordVoiceOver';
 import './App.css';
 import DualChart from './d3/DualChart';
 import { csv } from 'd3-fetch';
 import { byAlpha3 } from "iso-country-codes";
+import AutoSelect from './components/AutoSelect';
 
 import { queryGBIF } from "./api/gbif";
 
@@ -25,6 +24,27 @@ AFG,1961,0,0.18535179976794,0.129522240943792,0.368635436412438,0.26609335715031
  */
 const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
 // const vdemDataUrl = `https://raw.githubusercontent.com/AntonelliLab/Vdem-Biodiversity/master/analyses/input/vdem_variables.csv?token=AG-YjnEhdZQC1HdaThLt5uEBQRmdT1zLks5bV-6-wA%3D%3D`;
+
+const vdemOptions = [
+  { value: 'v2x_regime', label: 'v2x_regime' },
+  { value: 'v2x_freexp_altinf', label: 'v2x_freexp_altinf' },
+  { value: 'v2x_frassoc_thick', label: 'v2x_frassoc_thick' },
+  { value: 'v2x_rule', label: 'v2x_rule' },
+  { value: 'v2xcl_dmove', label: 'v2xcl_dmove' },
+  { value: 'v2xcs_ccsi', label: 'v2xcs_ccsi' },
+  { value: 'v2x_corr', label: 'v2x_corr' },
+  { value: 'v2x_clphy', label: 'v2x_clphy' },
+  { value: 'e_area', label: 'e_area' },
+  { value: 'e_regiongeo', label: 'e_regiongeo' },
+  { value: 'e_peaveduc', label: 'e_peaveduc' },
+  { value: 'e_migdppc', label: 'e_migdppc' },
+  { value: 'e_peginiwi', label: 'e_peginiwi' },
+  { value: 'e_wri_pa', label: 'e_wri_pa' },
+  { value: 'e_population', label: 'e_population' },
+  { value: 'e_Civil_War', label: 'e_Civil_War' },
+  { value: 'e_miinterc', label: 'e_miinterc' },
+  { value: 'conf', label: 'conf' },
+];
 
 const BioDemLogo = () => (
   <span style={{ position: 'relative', marginLeft: 5, marginRight: 5 }}>
@@ -95,46 +115,22 @@ class App extends Component {
     return data;
   }
 
-  handleChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value }, () => {
-      this.renderChart();
-    });
-  }
-
-  handleCountryChange = async (event) => {
-    console.log('querying for this country: ', event.target.value);
-    // Get alpha2 ISO code for this country, as this is what GBIF requires as query
-    // TODO: Catch cases where !byAlpha3[event.target.value]
-    const alpha2 = byAlpha3[event.target.value].alpha2;
-    await this.makeQuery(alpha2);
-    // Set new country value to state
-    this.setState({ [event.target.name]: event.target.value }, () => {
-      this.renderChart();
-    });
-  }
-
   makeQuery = async (country) => {
     // Query the GBIF API
+    console.log('Query gbif...');
     this.setState({ fetching: true });
     const result = await queryGBIF(country);
+    console.log('received gbif data:', result);
     if (result.error) {
       // TODO: request errored out => handle UI
       return;
     }
-    this.onDataReceived(result.response.data);
-    this.setState({ fetching: false });
+    const gbifData = result.response.data.facets[0].counts.map(d => ({
+      year: +d.name,
+      collections: +d.count,
+    }));
+    this.setState({ gbifData, fetching: false });
   }
-
-  onDataReceived(data) {
-    console.log('onDataReceived', data);
-    const gbifData = data.facets[0].counts.map(i => {
-      return {
-        year: +i.name,
-        collections: +i.count,
-      };
-    });
-    this.setState({ gbifData });
-  };
 
   async initData() {
     const data = await this.fetchData();
@@ -151,12 +147,36 @@ class App extends Component {
     });
   }
 
+  handleChange = (event) => {
+    this.setState({ [event.target.name]: event.target.value }, () => {
+      this.renderChart();
+    });
+  }
+
+  handleCountryChange = async (event) => {
+    console.log('querying for this country: ', event.target.value);
+    this.setState({
+      [event.target.name]: event.target.value,
+      fetching: true,
+    });
+    // Get alpha2 ISO code for this country, as this is what GBIF requires as query
+    // TODO: Catch cases where !byAlpha3[event.target.value]
+    const alpha2 = byAlpha3[event.target.value].alpha2;
+    await this.makeQuery(alpha2);
+    // Set new country value to state
+    this.setState({
+      fetching: false,
+    }, () => {
+      this.renderChart();
+    });
+  }
+
   async componentDidMount() {
     await this.initData();
   }
 
   renderChart() {
-    const { gbifData, vdemData } = this.state;
+    const { gbifData, vdemData, fetching } = this.state;
     
     const vdemFiltered = vdemData
       .filter(d => d.country === this.state.country)
@@ -168,6 +188,7 @@ class App extends Component {
       .filter(d => d.year >= yearMin && d.year <= yearMax)
       .sort((a,b) => a.year - b.year)
     
+    console.log('renderChart with fethcing:', fetching);
     DualChart('#chart', {
       data: gbifDataFiltered,
       secondData: vdemFiltered,
@@ -179,6 +200,7 @@ class App extends Component {
       y2: d => d[this.state.vdemVariable],
       yLabel: '#Records',
       y2Label: this.state.vdemVariable,
+      fetching,
     });
   }
 
@@ -205,42 +227,23 @@ class App extends Component {
           <div className="controls">
             <FormControl className="formControl" style={{ minWidth: 150, margin: 20 }}>
               <InputLabel htmlFor="country">Country</InputLabel>
-              <Select value={this.state.country} onChange={(event) => this.handleCountryChange(event)} input={<Input name="country" id="country" />}>
-                {this.state.countries.map(country => (
-                  <MenuItem key={country} value={country}>
-                    {country}
-                  </MenuItem>
-                ))}
-              </Select>
+              <AutoSelect
+                input={<Input name="country" id="country" />}
+                value={this.state.country}
+                onChange={this.handleCountryChange}
+                options={this.state.countries.map(d => ({ value: d, label: d }))}
+              />
             </FormControl>
-            <FormControl className="formControl" style={{ minWidth: 150, margin: 20 }}>
+            <FormControl className="formControl" style={{ minWidth: 200, margin: 20 }}>
               <InputLabel htmlFor="vdemVariable">
                 Political variable
               </InputLabel>
-              <Select value={this.state.vdemVariable} onChange={this.handleChange} input={<Input name="vdemVariable" id="vdemVariable" />}>
-                <MenuItem value="v2x_regime">v2x_regime</MenuItem>
-                <MenuItem value="v2x_freexp_altinf">
-                  v2x_freexp_altinf
-                </MenuItem>
-                <MenuItem value="v2x_frassoc_thick">
-                  v2x_frassoc_thick
-                </MenuItem>
-                <MenuItem value="v2x_rule">v2x_rule</MenuItem>
-                <MenuItem value="v2xcl_dmove">v2xcl_dmove</MenuItem>
-                <MenuItem value="v2xcs_ccsi">v2xcs_ccsi</MenuItem>
-                <MenuItem value="v2x_corr">v2x_corr</MenuItem>
-                <MenuItem value="v2x_clphy">v2x_clphy</MenuItem>
-                <MenuItem value="e_area">e_area</MenuItem>
-                <MenuItem value="e_regiongeo">e_regiongeo</MenuItem>
-                <MenuItem value="e_peaveduc">e_peaveduc</MenuItem>
-                <MenuItem value="e_migdppc">e_migdppc</MenuItem>
-                <MenuItem value="e_peginiwi">e_peginiwi</MenuItem>
-                <MenuItem value="e_wri_pa">e_wri_pa</MenuItem>
-                <MenuItem value="e_population">e_population</MenuItem>
-                <MenuItem value="e_Civil_War">e_Civil_War</MenuItem>
-                <MenuItem value="e_miinterc">e_miinterc</MenuItem>
-                <MenuItem value="conf">confl</MenuItem>
-              </Select>
+              <AutoSelect
+                input={<Input name="vdemVariable" id="vdemVariable" />}
+                value={this.state.vdemVariable}
+                onChange={this.handleChange}
+                options={vdemOptions}
+              />
             </FormControl>
           </div>
           {this.renderProgress()}
