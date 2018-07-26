@@ -6,6 +6,8 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import IconPublic from '@material-ui/icons/Public';
 import IconPerson from '@material-ui/icons/RecordVoiceOver';
 import './App.css';
@@ -134,10 +136,11 @@ class App extends Component {
   }
 
   makeQuery = async (country) => {
+    const { onlyDomestic } = this.state;
     // Query the GBIF API
     console.log('Query gbif...');
     this.setState({ fetching: true });
-    const result = await queryGBIF(country);
+    const result = await queryGBIF(country, onlyDomestic);
     console.log('received gbif data:', result);
     if (result.error) {
       // TODO: request errored out => handle UI
@@ -342,6 +345,15 @@ class App extends Component {
                 }))}
               />
             </FormControl>
+            <FormControlLabel
+              control={
+              <Checkbox
+                checked={this.state.onlyDomestic}
+                onChange={() => this.setState({ onlyDomestic: !this.state.onlyDomestic })}
+              />
+              }
+              label="Only show records from domestic institutions"
+            />
           </div>
           <h1>{byAlpha3[this.state.country].name}</h1>
           <div id="dualChart" />
