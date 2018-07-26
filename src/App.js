@@ -4,8 +4,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import FormControl from '@material-ui/core/FormControl';
 import IconPublic from '@material-ui/icons/Public';
@@ -60,7 +58,6 @@ const BioDemLogo = () => (
 );
 
 class App extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
