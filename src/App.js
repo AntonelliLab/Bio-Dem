@@ -311,6 +311,7 @@ class App extends Component {
             </FormControl>
           </div>
           <div id="xyChart" />
+          {this.renderProgress()}
           <div className="controls">
             <FormControl className="formControl" style={{ minWidth: 150, margin: 20 }}>
               <InputLabel htmlFor="country">Country</InputLabel>
