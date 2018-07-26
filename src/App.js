@@ -4,6 +4,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import FormControl from '@material-ui/core/FormControl';
 import IconPublic from '@material-ui/icons/Public';
@@ -13,6 +15,7 @@ import DualChart from './d3/DualChart';
 import { csv } from 'd3-fetch';
 import { byAlpha3 } from "iso-country-codes";
 import AutoSelect from './components/AutoSelect';
+import { range } from 'd3';
 
 import { queryGBIF } from "./api/gbif";
 
@@ -67,6 +70,8 @@ class App extends Component {
       country: 'SWE',
       vdemVariable: 'v2x_freexp_altinf',
       countries: [],
+      yearMin: 1960,
+      yearMax: 2018,
     };
   }
 
@@ -176,13 +181,10 @@ class App extends Component {
   }
 
   renderChart() {
-    const { gbifData, vdemData, fetching } = this.state;
+    const { gbifData, vdemData, yearMin, yearMax, fetching } = this.state;
     
     const vdemFiltered = vdemData
-      .filter(d => d.country === this.state.country)
-    
-    const yearMin = 1960;
-    const yearMax = 2018;
+      .filter(d => d.country === this.state.country && d.year >= yearMin && d.year <= yearMax)
     
     const gbifDataFiltered = gbifData
       .filter(d => d.year >= yearMin && d.year <= yearMax)
@@ -243,6 +245,19 @@ class App extends Component {
                 value={this.state.vdemVariable}
                 onChange={this.handleChange}
                 options={vdemOptions}
+              />
+            </FormControl>
+            <FormControl className="formControl" style={{ minWidth: 100, margin: 20 }}>
+              <InputLabel htmlFor="yearMin">
+                From year
+              </InputLabel>
+              <AutoSelect
+                input={<Input name="yearMin" id="yearMin" />}
+                value={this.state.yearMin}
+                onChange={this.handleChange}
+                options={range(1960,2018).map(y => ({
+                  value: y, label: y
+                }))}
               />
             </FormControl>
           </div>

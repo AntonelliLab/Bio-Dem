@@ -114,7 +114,11 @@ class AutoSelect extends React.Component {
 
 AutoSelect.propTypes = {
   options: PropTypes.array.isRequired,
-  value: PropTypes.string.isRequired,
+  // value: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
   placeholder: PropTypes.string.isRequired,
   onChange: PropTypes.func,
   input: PropTypes.element,
