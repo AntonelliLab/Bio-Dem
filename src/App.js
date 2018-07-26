@@ -62,6 +62,7 @@ class App extends Component {
     super(props);
     this.state = {
       gbifData: [],
+      onlyDomestic: false,
       vdemData: [],
       loaded: false,
       fetching: false,
@@ -76,6 +77,15 @@ class App extends Component {
       xyYearMin: 1960,
       xyReduceFunction: 'mean',
     };
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    if (this.state.onlyDomestic !== prevState.onlyDomestic || this.state.country !== prevState.country) {
+      // Get alpha2 ISO code for this country, as this is what GBIF requires as query
+      // TODO: Catch cases where !byAlpha3[event.target.value]
+      const alpha2 = byAlpha3[this.state.country].alpha2;
+      await this.makeQuery(alpha2);
+    }
   }
 
   async fetchData() {
@@ -164,20 +174,7 @@ class App extends Component {
 
   handleCountryChange = async (event) => {
     console.log('querying for this country: ', event.target.value);
-    this.setState({
-      [event.target.name]: event.target.value,
-      fetching: true,
-    });
-    // Get alpha2 ISO code for this country, as this is what GBIF requires as query
-    // TODO: Catch cases where !byAlpha3[event.target.value]
-    const alpha2 = byAlpha3[event.target.value].alpha2;
-    await this.makeQuery(alpha2);
-    // Set new country value to state
-    this.setState({
-      fetching: false,
-    }, () => {
-      this.renderChart();
-    });
+    this.setState({ [event.target.name]: event.target.value });
   }
 
   async componentDidMount() {
