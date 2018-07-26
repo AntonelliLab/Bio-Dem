@@ -147,7 +147,12 @@ class App extends Component {
       year: +d.name,
       collections: +d.count,
     }));
-    this.setState({ gbifData, fetching: false });
+    // Fetching is complete rerender chart
+    this.setState({
+      gbifData, fetching: false,
+    }, () => {
+      this.renderChart();
+    });
   }
 
   async initData() {
