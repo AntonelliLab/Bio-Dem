@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { getExtent } from './helpers';
 import './DualChart.css';
 
 /**
@@ -60,16 +61,14 @@ export default function DualChart(el, properties) {
   const { data, secondData } = props;
 
   // Scale the range of the data in the domains
-  const xMin = props.xMin || d3.min(data, d => props.x(d));
-  const xMax = props.xMax || d3.max(data, d => props.x(d));
-  const yExtent = d3.extent(data, d => props.y(d));
-  
+  const xExtent = getExtent(data, props.x, props.xMin, props.xMax);
+  const yExtent = getExtent(data, props.y, props.yMin, props.yMax);
   // For second axis
-  const y2Extent = d3.extent(secondData, d => props.y2(d));
+  const y2Extent = getExtent(secondData, props.y2);
 
   // set the ranges
   const x = d3.scaleBand()
-            .domain(d3.range(xMin, xMax + 1))
+            .domain(d3.range(xExtent[0], xExtent[1] + 1))
             .range([0, width])
             .padding(0.1);
   const y = d3.scaleLinear()
@@ -77,7 +76,7 @@ export default function DualChart(el, properties) {
             .range([height, 0]);
 
   const x2 = d3.scaleLinear()
-            .domain([xMin, xMax])
+            .domain(xExtent)
             .range([0, width]);
   const y2 = d3.scaleLinear()
             .domain(y2Extent)

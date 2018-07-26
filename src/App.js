@@ -12,10 +12,11 @@ import IconPublic from '@material-ui/icons/Public';
 import IconPerson from '@material-ui/icons/RecordVoiceOver';
 import './App.css';
 import DualChart from './d3/DualChart';
+import ScatterPlot from './d3/ScatterPlot';
 import { csv } from 'd3-fetch';
 import { byAlpha3 } from "iso-country-codes";
 import AutoSelect from './components/AutoSelect';
-import { range } from 'd3';
+import * as d3 from 'd3';
 
 import { queryGBIF } from "./api/gbif";
 
@@ -72,6 +73,11 @@ class App extends Component {
       countries: [],
       yearMin: 1960,
       yearMax: 2018,
+      // XY Plot:
+      vdemX: 'v2x_freexp_altinf',
+      vdemY: 'v2x_frassoc_thick',
+      xyYearMin: 1960,
+      xyReduceFunction: 'mean',
     };
   }
 
@@ -153,6 +159,7 @@ class App extends Component {
   }
 
   handleChange = (event) => {
+    console.log('handleChange, key:', event.target.name, 'value:', event.target.value);
     this.setState({ [event.target.name]: event.target.value }, () => {
       this.renderChart();
     });
@@ -191,7 +198,7 @@ class App extends Component {
       .sort((a,b) => a.year - b.year)
     
     console.log('renderChart with fethcing:', fetching);
-    DualChart('#chart', {
+    DualChart('#dualChart', {
       data: gbifDataFiltered,
       secondData: vdemFiltered,
       height: 300,
@@ -203,6 +210,34 @@ class App extends Component {
       yLabel: '#Records',
       y2Label: this.state.vdemVariable,
       fetching,
+    });
+
+
+    const { vdemX, vdemY, xyYearMin, xyReduceFunction } = this.state;
+    
+    const vdemScatterData = vdemData
+      .filter(d => d.year >= xyYearMin);
+    const vdemGrouped = d3.nest()
+      .key(d => d.country)
+      .rollup(values => {
+        const x = d3[xyReduceFunction](values, d => d[vdemX]);
+        const y = d3[xyReduceFunction](values, d => d[vdemY]);
+        return { x, y };
+      })
+      .entries(vdemScatterData);
+    // console.log(vdemGrouped);
+
+    ScatterPlot('#xyChart', {
+      // data: vdemData,
+      // data: vdemFiltered,
+      data: vdemGrouped,
+      height: 300,
+      // x: d => d[vdemX],
+      // y: d => d[vdemY],
+      x: d => d.value.x,
+      y: d => d.value.y,
+      xLabel: vdemX,
+      yLabel: vdemY,
     });
   }
 
@@ -226,6 +261,54 @@ class App extends Component {
           </Toolbar>
         </AppBar>
         <div className="main">
+          {this.renderProgress()}
+          <div className="controls">
+            <FormControl className="formControl" style={{ minWidth: 200, margin: 20 }}>
+              <InputLabel htmlFor="vdemX">X axis</InputLabel>
+              <AutoSelect
+                input={<Input name="vdemX" id="vdemX" />}
+                value={this.state.vdemX}
+                onChange={this.handleChange}
+                options={vdemOptions}
+              />
+            </FormControl>
+            <FormControl className="formControl" style={{ minWidth: 200, margin: 20 }}>
+              <InputLabel htmlFor="vdemY">Y axis</InputLabel>
+              <AutoSelect
+                input={<Input name="vdemY" id="vdemY" />}
+                value={this.state.vdemY}
+                onChange={this.handleChange}
+                options={vdemOptions}
+              />
+            </FormControl>
+            <FormControl className="formControl" style={{ minWidth: 100, margin: 20 }}>
+              <InputLabel htmlFor="xyYearMin">
+                From year
+              </InputLabel>
+              <AutoSelect
+                input={<Input name="xyYearMin" id="xyYearMin" />}
+                value={this.state.xyYearMin}
+                onChange={this.handleChange}
+                options={d3.range(1960,2018).map(y => ({
+                  value: y, label: y
+                }))}
+              />
+            </FormControl>
+            <FormControl className="formControl" style={{ minWidth: 100, margin: 20 }}>
+              <InputLabel htmlFor="xyReduceFunction">
+                Reduce by
+              </InputLabel>
+              <AutoSelect
+                input={<Input name="xyReduceFunction" id="xyReduceFunction" />}
+                value={this.state.xyReduceFunction}
+                onChange={this.handleChange}
+                options={['mean', 'median'].map(d => ({
+                  value: d, label: d
+                }))}
+              />
+            </FormControl>
+          </div>
+          <div id="xyChart" />
           <div className="controls">
             <FormControl className="formControl" style={{ minWidth: 150, margin: 20 }}>
               <InputLabel htmlFor="country">Country</InputLabel>
@@ -255,16 +338,14 @@ class App extends Component {
                 input={<Input name="yearMin" id="yearMin" />}
                 value={this.state.yearMin}
                 onChange={this.handleChange}
-                options={range(1960,2018).map(y => ({
+                options={d3.range(1960,2018).map(y => ({
                   value: y, label: y
                 }))}
               />
             </FormControl>
           </div>
-          {this.renderProgress()}
           <h1>{byAlpha3[this.state.country].name}</h1>
-          <div id="chart" />
-          <div id="chart2" />
+          <div id="dualChart" />
         </div>
       </div>;
   }
