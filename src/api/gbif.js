@@ -2,6 +2,7 @@ import axios from "axios";
 
 const baseURL = "http://api.gbif.org/v1/";
 const occ = "occurrence/search";
+const autoc = "species/suggest";
 
 export const queryGBIFYearFacet = async (country, onlyDomestic) => {
   // Construct the GBIF occurrences API url with facets for year counts
@@ -41,7 +42,6 @@ export const queryGBIFCountryFacet = async (year) => {
     facet: 'country',
     'country.facetLimit': 200
   }
-
   // GET request to the GBIF-API
   return axios
     .get(url, { params })
@@ -54,5 +54,27 @@ export const queryGBIFCountryFacet = async (year) => {
         error
       );
       return { error };
+    });
+  };
+
+export const queryAutocompletesGBIF = async (q) => {
+  // Construct the GBIF Autocompletes url with query text
+  // Restrict to results from the GBIF taxonomic backbone only (i.e. not from other providers)
+  const url = `${baseURL}${autoc}`;
+  const params = {
+    q,
+    // Restrict to GBIF backbone taxonomy
+    datasetKey: 'd7dddbf4-2cf0-4f39-9b2a-bb099caae36c',
+  };
+
+  // GET request to the GBIF-API
+  return axios
+    .get(url, { params })
+    .then((response) => {
+      return ({ response });
+    })
+    .catch((error) => {
+      console.log('Error in fetching autocomplete suggestions from GBIF suggest API', error);
+      return ({ error });
     });
 };
