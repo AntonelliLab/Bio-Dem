@@ -137,6 +137,10 @@ class App extends Component {
 
   makeQuery = async (country) => {
     const { onlyDomestic } = this.state;
+    
+    const response = await queryAutocompletesGBIF('Crassul');
+    console.log('response', response);
+
     // Query the GBIF API
     console.log('Query gbif...');
     this.setState({ fetching: true });
