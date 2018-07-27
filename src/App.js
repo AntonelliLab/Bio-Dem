@@ -26,6 +26,9 @@ import Notice from './components/Notice';
 import IconGithub from './components/Github';
 import './App.css';
 import './d3/d3.css';
+import * as d3 from 'd3';
+
+import { queryGBIF, queryAutocompletesGBIF } from "./api/gbif";
 
 /**
  * V-dem variables
