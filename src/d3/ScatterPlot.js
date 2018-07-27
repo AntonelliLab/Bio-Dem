@@ -1,4 +1,6 @@
 import * as d3 from 'd3';
+import { byAlpha3 } from "iso-country-codes";
+
 // import './ScatterPlot.css';
 import { getExtent } from './helpers';
 
@@ -113,6 +115,11 @@ export default function ScatterPlot(el, properties) {
       .style("text-anchor", "middle")
       .text(props.yLabel);
 
+  // add the tooltip area to the webpage
+  let tooltip = anchorElement.append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
   // scatter dots
   g.selectAll(".dot")
       .data(data)
@@ -122,6 +129,17 @@ export default function ScatterPlot(el, properties) {
       .attr("cx", d => x(props.x(d)))
       .attr("cy", d => y(props.y(d)))
       // .style("fill", d => color(props.value(d)));
+      .on("mouseover", function (d) {
+        tooltip.transition()
+          .duration(200)
+          .style("opacity", .9);
+        tooltip.html(byAlpha3[d.key].name);
+      })
+      .on("mouseout", function (d) {
+        tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+      });
 
   // var legend = g.selectAll(".legend")
   //     .data(color.domain())

@@ -227,7 +227,7 @@ class App extends Component {
         return { x, y };
       })
       .entries(vdemScatterData);
-    // console.log(vdemGrouped);
+    //console.log('vdemGrouped', vdemGrouped);
 
     ScatterPlot('#xyChart', {
       // data: vdemData,
