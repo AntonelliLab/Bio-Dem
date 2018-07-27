@@ -18,7 +18,7 @@ import { byAlpha3 } from "iso-country-codes";
 import AutoSelect from './components/AutoSelect';
 import * as d3 from 'd3';
 
-import { queryGBIF } from "./api/gbif";
+import { queryGBIF, queryAutocompletesGBIF } from "./api/gbif";
 
 /**
  * V-dem variables
