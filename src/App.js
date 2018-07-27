@@ -146,6 +146,7 @@ class App extends Component {
     this.setState({ fetching: true });
     const result = await queryGBIF(country, onlyDomestic);
     console.log('received gbif data:', result);
+    console.log('received gbif data:', result.response.data.count);
     if (result.error) {
       // TODO: request errored out => handle UI
       return;
