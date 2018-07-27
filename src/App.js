@@ -121,6 +121,7 @@ class App extends Component {
       fetching: false,
       country: 'SWE',
       vdemVariable: 'v2x_freexp_altinf',
+      filterTaxon: undefined,
       countries: [],
       yearMin: 1960,
       yearMax: 2018,
