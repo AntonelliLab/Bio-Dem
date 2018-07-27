@@ -3,7 +3,7 @@ import axios from "axios";
 const baseURL = "http://api.gbif.org/v1/";
 const occ = "occurrence/search";
 
-export const queryGBIF = async (country) => {
+export const queryGBIF = async (country, onlyDomestic) => {
   // Construct the GBIF occurrences API url with facets for year counts
   // Query for results that have images associated only
   const url = `${baseURL}${occ}`;
@@ -11,7 +11,10 @@ export const queryGBIF = async (country) => {
     country: country || 'SE',
     limit: 1,
     facet: 'year',
-    'year.facetLimit': 150
+    'year.facetLimit': 80
+  }
+  if (onlyDomestic) {
+    params.publishingCountry = country;
   }
 
   // GET request to the GBIF-API

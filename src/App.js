@@ -4,10 +4,10 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import IconPublic from '@material-ui/icons/Public';
 import IconPerson from '@material-ui/icons/RecordVoiceOver';
 import './App.css';
@@ -60,11 +60,11 @@ const BioDemLogo = () => (
 );
 
 class App extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
       gbifData: [],
+      onlyDomestic: false,
       vdemData: [],
       loaded: false,
       fetching: false,
@@ -79,6 +79,15 @@ class App extends Component {
       xyYearMin: 1960,
       xyReduceFunction: 'mean',
     };
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    if (this.state.onlyDomestic !== prevState.onlyDomestic || this.state.country !== prevState.country) {
+      // Get alpha2 ISO code for this country, as this is what GBIF requires as query
+      // TODO: Catch cases where !byAlpha3[event.target.value]
+      const alpha2 = byAlpha3[this.state.country].alpha2;
+      await this.makeQuery(alpha2);
+    }
   }
 
   async fetchData() {
@@ -127,10 +136,11 @@ class App extends Component {
   }
 
   makeQuery = async (country) => {
+    const { onlyDomestic } = this.state;
     // Query the GBIF API
     console.log('Query gbif...');
     this.setState({ fetching: true });
-    const result = await queryGBIF(country);
+    const result = await queryGBIF(country, onlyDomestic);
     console.log('received gbif data:', result);
     if (result.error) {
       // TODO: request errored out => handle UI
@@ -140,7 +150,12 @@ class App extends Component {
       year: +d.name,
       collections: +d.count,
     }));
-    this.setState({ gbifData, fetching: false });
+    // Fetching is complete rerender chart
+    this.setState({
+      gbifData, fetching: false,
+    }, () => {
+      this.renderChart();
+    });
   }
 
   async initData() {
@@ -167,20 +182,7 @@ class App extends Component {
 
   handleCountryChange = async (event) => {
     console.log('querying for this country: ', event.target.value);
-    this.setState({
-      [event.target.name]: event.target.value,
-      fetching: true,
-    });
-    // Get alpha2 ISO code for this country, as this is what GBIF requires as query
-    // TODO: Catch cases where !byAlpha3[event.target.value]
-    const alpha2 = byAlpha3[event.target.value].alpha2;
-    await this.makeQuery(alpha2);
-    // Set new country value to state
-    this.setState({
-      fetching: false,
-    }, () => {
-      this.renderChart();
-    });
+    this.setState({ [event.target.name]: event.target.value });
   }
 
   async componentDidMount() {
@@ -309,6 +311,7 @@ class App extends Component {
             </FormControl>
           </div>
           <div id="xyChart" />
+          {this.renderProgress()}
           <div className="controls">
             <FormControl className="formControl" style={{ minWidth: 150, margin: 20 }}>
               <InputLabel htmlFor="country">Country</InputLabel>
@@ -343,6 +346,15 @@ class App extends Component {
                 }))}
               />
             </FormControl>
+            <FormControlLabel
+              control={
+              <Checkbox
+                checked={this.state.onlyDomestic}
+                onChange={() => this.setState({ onlyDomestic: !this.state.onlyDomestic })}
+              />
+              }
+              label="Only show records from domestic institutions"
+            />
           </div>
           <h1>{byAlpha3[this.state.country].name}</h1>
           <div id="dualChart" />
