@@ -73,10 +73,10 @@ export default function ScatterPlot(el, properties) {
   const y = d3.scaleLinear()
             .domain(yExtent)
             .range([height, 0]);
-  const value = d3.scaleSqrt()
+  const value = d3.scaleLog()
             // .domain(valueExtent)
             .domain(valueExtent)
-            .range([1, 50]);
+            .range([1, 30]);
 
   const color = (value) => {
     return '#000';

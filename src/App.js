@@ -3,15 +3,12 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import IconPublic from '@material-ui/icons/Public';
-import IconPerson from '@material-ui/icons/RecordVoiceOver';
 import logo from './logo.svg';
 import DualChart from './d3/DualChart';
 import ScatterPlot from './d3/ScatterPlot';
@@ -60,15 +57,6 @@ const vdemOptions = [
   // { value: 'e_miinterc' },
   // { value: 'conf' },
 ];
-
-// const BioDemLogo = () => (
-//   <span style={{ position: 'relative', marginLeft: 5, marginRight: 5 }}>
-//     <span style={{ position: 'absolute', left: 2, top: -11 }}>
-//       <IconPerson />
-//     </span>
-//     <IconPublic />
-//   </span>
-// );
 
 const BioDemLogo = ({ className = "logo", alt="logo" }) => (
   <img src={logo} className={className} alt={alt} />
@@ -178,10 +166,10 @@ class App extends Component {
   makeYearFacetQuery = async (country) => {
     const { onlyDomestic } = this.state;
     // Query the GBIF API
-    console.log('Query gbif...');
+    console.log('Query gbif with year facet...');
     this.setState({ fetching: true });
     const result = await queryGBIFYearFacet(country, onlyDomestic);
-    console.log('received gbif year facet data:', result);
+    // console.log('received gbif year facet data:', result);
     if (result.error) {
       // TODO: request errored out => handle UI
       return;
@@ -200,10 +188,10 @@ class App extends Component {
 
   makeCountryFacetQuery = async () => {
     // Query the GBIF API
-    console.log('Query gbif...');
+    console.log('Query gbif with country facet...');
     this.setState({ fetching: true });
     const result = await queryGBIFCountryFacet(this.state.xyYearMin);
-    console.log('received gbif country facet data:', result);
+    // console.log('received gbif country facet data:', result);
     if (result.error) {
       // TODO: request errored out => handle UI
       return;
@@ -258,14 +246,14 @@ class App extends Component {
   }
 
   handleChange = (event) => {
-    console.log('handleChange, key:', event.target.name, 'value:', event.target.value);
+    // console.log('handleChange, key:', event.target.name, 'value:', event.target.value);
     this.setState({ [event.target.name]: event.target.value }, () => {
       this.renderChart();
     });
   }
 
   handleCountryChange = async (event) => {
-    console.log('querying for this country: ', event.target.value);
+    // console.log('querying for this country: ', event.target.value);
     this.setState({ [event.target.name]: event.target.value });
   }
 
@@ -281,13 +269,15 @@ class App extends Component {
       .filter(d => d.year >= yearMin && d.year <= yearMax)
       .sort((a,b) => a.year - b.year)
     
-    console.log('renderChart with fethcing:', fetching);
+    // console.log('renderChart with fethcing:', fetching);
     DualChart('#dualChart', {
       data: gbifDataFiltered,
       secondData: vdemFiltered,
       height: 300,
       left: 110,
       xMin: yearMin,
+      yMin: 1,
+      yMax: 50000000,
       x: d => d.year,
       y: d => d.collections,
       x2: d => d.year,
@@ -328,7 +318,8 @@ class App extends Component {
     ScatterPlot('#xyChart', {
       // data: vdemData,
       // data: vdemFiltered,
-      data: vdemGrouped,
+      // data: vdemGrouped,
+      data: vdemGrouped.filter(d => d.value.records > 0), // Log safe
       height: 300,
       // x: d => d[vdemX],
       // y: d => d[vdemY],
@@ -363,7 +354,7 @@ class App extends Component {
         </AppBar>
 
         <Grid container>
-          <Grid item className="grid-item" xs={12} className="intro section section-0">
+          <Grid item className="grid-item intro section section-0" xs={12}>
             <Grid container direction="column" alignItems="center">
               <Grid item>
                 <BioDemLogo className="intro-logo" alt="intro-logo" />
@@ -386,14 +377,14 @@ class App extends Component {
           </Grid>
 
           
-          <Grid item className="grid-item" xs={12} className="section section-1">
+          <Grid item className="grid-item section section-1" xs={12}>
             <Grid container>
               <Grid item className="grid-item" xs={12} md={4}>
                 <Typography variant="headline" gutterBottom className="heading">
                   Biodiversity knowledge &amp; political regimes
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  The scatter plot shows the number of public species records for each country and their mean or median value on two selected dimensions of democracy. Use the drop down menus to customize your search. You can directly move to some particularly exciting results with the highlight buttons below; find explanation of  the plots and the features of Bio-Dem in our <a href="#">video tutorials</a>, 
+                  The scatter plot shows the number of public species records for each country and their mean or median value on two selected dimensions of democracy. Use the drop down menus to customize your search. You can directly move to some particularly exciting results with the highlight buttons below; find explanation of  the plots and the features of Bio-Dem in our <a href="#video">video tutorials</a>, 
                   and learn more about the underlying data and included variables 
                   at <a href="#about">About</a>.
                 </Typography>
@@ -454,7 +445,7 @@ class App extends Component {
           </Grid>
           
 
-          <Grid item className="grid-item" xs={12} className="section section-2">
+          <Grid item className="grid-item section-2" xs={12}>
             <Grid container>
 
               <Grid item className="grid-item" xs={12} md={4}>
@@ -522,7 +513,7 @@ class App extends Component {
 
         </Grid>
 
-        <Grid item className="grid-item" xs={12} className="section section-3">
+        <Grid item className="grid-item section-3" xs={12}>
           <About vdemExplanations={this.state.vdemExplanations}/>
         </Grid>
       </div>

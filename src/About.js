@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import './About.css';
 
@@ -8,7 +7,6 @@ class About extends React.Component {
   render() {
     const { vdemExplanations : vdem } = this.props;
     const vdemExplanations = Object.keys(vdem).map(d => vdem[d]);
-    console.log('vdemExplanations:', vdemExplanations);
 
     return (
       <Grid container>

@@ -76,9 +76,15 @@ export default function DualChart(el, properties) {
             .domain(d3.range(xExtent[0], xExtent[1] + 1))
             .range([0, width])
             .padding(0.1);
-  const y = d3.scaleLinear()
+  
+  const y = d3.scaleLog()
             .domain(yExtent)
             .range([height, 0]);
+  
+  const yLogFriendlyAccessor = (d) => {
+    const y = props.y(d);
+    return Math.max(1, y);
+  }
 
   const x2 = d3.scaleLinear()
             .domain(xExtent)
@@ -98,6 +104,10 @@ export default function DualChart(el, properties) {
     .x(d => x2(props.x2(d)))
     .y(d => y2(props.y2(d)))
   
+  const barColor = (d) => {
+    // console.log('barColor on d:', d); // { year, collections }
+    return props.fetching ? '#aaa' : 'steelblue';
+  }
 
   // add the x Axis
   g.append("g")
@@ -154,13 +164,11 @@ export default function DualChart(el, properties) {
       .data(data)
     .enter().append("rect")
       .attr("class", "bar")
-      .style("fill", d => {
-        return props.fetching ? '#aaa' : 'steelblue';
-      })
+      .style("fill", barColor)
       .attr("x", d => x(props.x(d)))
       .attr("width", x.bandwidth())
-      .attr("y", d => y(props.y(d)))
-      .attr("height", d => height - y(props.y(d)))
+      .attr("y", d => y(yLogFriendlyAccessor(d)))
+      .attr("height", d => height - y(yLogFriendlyAccessor(d)))
   
 
   // Add second line
