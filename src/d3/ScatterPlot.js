@@ -88,7 +88,9 @@ export default function ScatterPlot(el, properties) {
     return 0.5;
   }
             
-  const xAxis = d3.axisBottom(x).ticks(totalWidth / props.xTickGap);  
+  const xAxis = d3.axisBottom(x)
+    .tickSizeOuter(0)
+    .ticks(totalWidth / props.xTickGap);
   const yAxis = d3.axisLeft(y);
 
   // x axis

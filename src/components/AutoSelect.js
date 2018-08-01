@@ -34,14 +34,14 @@ const customStyles = {
 };
 
 const Option = (props) => {
-  const { innerProps, children, isFocused, isSelected, onFocus } = props;
-  
+  const { innerProps, children, /*isFocused,*/ isSelected, onFocus, data } = props;
   return (
     <MenuItem
       // ref={innerRef}
       // {...innerProps}
+      disabled={data.disabled}
       onFocus={onFocus}
-      selected={isFocused}
+      selected={isSelected}
       onClick={innerProps.onClick}
       // component={React.createElement('div', innerProps)}
       component="div"

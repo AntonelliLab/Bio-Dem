@@ -94,14 +94,12 @@ export default function DualChart(el, properties) {
     return Math.max(1, y);
   }
 
-  const x2 = d3.scaleLinear()
-            .domain(xExtent)
-            .range([0, width]);
   const y2 = d3.scaleLinear()
             .domain(y2Extent)
             .range([height, 0]);
   
   const xAxis = d3.axisBottom(x)
+    .tickSizeOuter(0)
     .tickValues(d3.ticks(xExtent[0], xExtent[1], totalWidth / props.xTickGap));
   
   const yAxis = d3.axisLeft(y);
@@ -109,7 +107,7 @@ export default function DualChart(el, properties) {
   
   // Second y data
   const y2line = d3.line()
-    .x(d => x2(props.x(d)))
+    .x(d => x(props.x(d)))
     .y(d => y2(props.y2(d)))
   
   // const color = d3.scaleSequential(d3.interpolateViridis)
@@ -158,7 +156,7 @@ export default function DualChart(el, properties) {
       .attr("transform", "rotate(-90)")
       .attr("y", width + props.right)
       .attr("x", 0 - (height / 2))
-      .attr("dy", "-1em")
+      .attr("dy", "-0.5em")
       .style("text-anchor", "middle")
       .text(props.y2Label);
   
@@ -202,16 +200,18 @@ export default function DualChart(el, properties) {
       .attr("height", d => height - y(yLogFriendlyAccessor(d)))
   
 
+  const cleanData = data.filter(d => !Number.isNaN(props.y2(d)));
+
   // Add second line
   g.append("path")
-    .datum(data)
+    .datum(cleanData)
     .attr("class", "y2line")
     .style("stroke", "red")
     .attr("d", y2line);
 
   // Dots for second line
   g.selectAll(".dot")
-    .data(data)
+    .data(cleanData)
   .enter().append("circle") // Uses the enter().append() method
     .attr("class", "dot") // Assign a class for styling
     .attr("cx", d => x(props.x(d)))
