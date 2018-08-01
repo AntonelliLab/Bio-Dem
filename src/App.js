@@ -16,11 +16,11 @@ import logo from './logo.svg';
 import DualChart from './d3/DualChart';
 import ScatterPlot from './d3/ScatterPlot';
 import { csv } from 'd3-fetch';
-import { byAlpha3 } from "iso-country-codes";
+import { byAlpha2, byAlpha3 } from "iso-country-codes";
 import AutoSelect from './components/AutoSelect';
 import * as d3 from 'd3';
 import About from './About';
-import { queryGBIF } from "./api/gbif";
+import { queryGBIFYearFacet, queryGBIFCountryFacet } from "./api/gbif";
 
 import './App.css';
 import './d3/d3.css';
@@ -97,6 +97,28 @@ class App extends Component {
     };
   }
 
+  async componentDidMount() {
+    await this.initData();
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    const fetchNewCountryCondition = this.state.onlyDomestic !== prevState.onlyDomestic
+      || this.state.country !== prevState.country;
+    
+    if (fetchNewCountryCondition) {
+      // Get alpha2 ISO code for this country, as this is what GBIF requires as query
+      // TODO: Catch cases where !byAlpha3[event.target.value]
+      const alpha2 = byAlpha3[this.state.country].alpha2;
+      await this.makeYearFacetQuery(alpha2);
+    }
+
+    const fetchNewYearCondition = this.state.xyYearMin !== prevState.xyYearMin;
+
+    if (fetchNewYearCondition) {
+      await this.makeCountryFacetQuery();
+    }
+  }
+
   async fetchData() {
     if (this.data) {
       return this.data;
@@ -104,7 +126,8 @@ class App extends Component {
     this.setState({
       fetching: true,
     });
-    await this.makeQuery('SE');
+    await this.makeYearFacetQuery('SE');
+    await this.makeCountryFacetQuery();
     const vdemData = csv(vdemDataUrl, row => {
       const year = +row.year;
       if (Number.isNaN(year)) {
@@ -152,13 +175,13 @@ class App extends Component {
     return data;
   }
 
-  makeQuery = async (country) => {
+  makeYearFacetQuery = async (country) => {
     const { onlyDomestic } = this.state;
     // Query the GBIF API
     console.log('Query gbif...');
     this.setState({ fetching: true });
-    const result = await queryGBIF(country, onlyDomestic);
-    console.log('received gbif data:', result);
+    const result = await queryGBIFYearFacet(country, onlyDomestic);
+    console.log('received gbif year facet data:', result);
     if (result.error) {
       // TODO: request errored out => handle UI
       return;
@@ -173,6 +196,37 @@ class App extends Component {
     }, () => {
       this.renderChart();
     });
+  }
+
+  makeCountryFacetQuery = async () => {
+    // Query the GBIF API
+    console.log('Query gbif...');
+    this.setState({ fetching: true });
+    const result = await queryGBIFCountryFacet(this.state.xyYearMin);
+    console.log('received gbif country facet data:', result);
+    if (result.error) {
+      // TODO: request errored out => handle UI
+      return;
+    }
+    const gbifCountryFacetData = {};
+    result.response.data.facets[0].counts.map(d => {
+      const alpha2Country = byAlpha2[d.name];
+      gbifCountryFacetData[alpha2Country ? alpha2Country.alpha3 : null] = {
+        collections: d.count,
+      };
+      return true;
+    });
+
+    // Fetching is complete rerender chart
+    this.setState(
+      {
+        gbifCountryFacetData,
+        fetching: false
+      },
+      () => {
+        this.renderChart();
+      }
+    );
   }
 
   async initData() {
@@ -215,19 +269,6 @@ class App extends Component {
     this.setState({ [event.target.name]: event.target.value });
   }
 
-  async componentDidMount() {
-    await this.initData();
-  }
-
-  async componentDidUpdate(prevProps, prevState) {
-    if (this.state.onlyDomestic !== prevState.onlyDomestic || this.state.country !== prevState.country) {
-      // Get alpha2 ISO code for this country, as this is what GBIF requires as query
-      // TODO: Catch cases where !byAlpha3[event.target.value]
-      const alpha2 = byAlpha3[this.state.country].alpha2;
-      await this.makeQuery(alpha2);
-    }
-  }
-
   renderChart() {
     const { gbifData, vdemData, yearMin, yearMax, fetching, vdemVariable, vdemExplanations } = this.state;
     
@@ -261,12 +302,13 @@ class App extends Component {
     });
 
 
-    const { vdemX, vdemY, xyYearMin, xyReduceFunction } = this.state;
+    const { vdemX, vdemY, xyYearMin, xyReduceFunction, gbifCountryFacetData } = this.state;
     const vdemXLabel = vdemExplanations[vdemX] ? vdemExplanations[vdemX].short_name : vdemX;
     const vdemYLabel = vdemExplanations[vdemY] ? vdemExplanations[vdemY].short_name : vdemY;
     
     const vdemScatterData = vdemData
       .filter(d => d.year >= xyYearMin);
+    
     const vdemGrouped = d3.nest()
       .key(d => d.country)
       .rollup(values => {
@@ -275,7 +317,13 @@ class App extends Component {
         return { x, y };
       })
       .entries(vdemScatterData);
-    //console.log('vdemGrouped', vdemGrouped);
+    
+    // console.log('vdemData:', vdemData);
+    // console.log('vdemGrouped:', vdemGrouped);
+    // console.log('countryFacetData', gbifCountryFacetData);
+    vdemGrouped.forEach(d => {
+      d.value.records = gbifCountryFacetData[d.key] ? gbifCountryFacetData[d.key].collections : 0;
+    });
 
     ScatterPlot('#xyChart', {
       // data: vdemData,
@@ -286,6 +334,7 @@ class App extends Component {
       // y: d => d[vdemY],
       x: d => d.value.x,
       y: d => d.value.y,
+      value: d => d.value.records,
       xLabel: vdemXLabel,
       yLabel: vdemYLabel,
       title: 'Number of public species records per country'

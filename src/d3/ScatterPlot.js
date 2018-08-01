@@ -24,6 +24,7 @@ export default function ScatterPlot(el, properties) {
     data: [],
     x: d => d.x,
     y: d => d.y,
+    value: d => d.value,
     xLabel: "",
     yLabel: "",
     title: "",
@@ -63,6 +64,7 @@ export default function ScatterPlot(el, properties) {
   // Scale the range of the data in the domains
   const xExtent = getExtent(data, props.x, props.xMin, props.xMax);
   const yExtent = getExtent(data, props.y, props.yMin, props.yMax);
+  const valueExtent = getExtent(data, props.value, props.valueMin, props.valueMax);
 
   // set the ranges
   const x = d3.scaleLinear()
@@ -71,7 +73,19 @@ export default function ScatterPlot(el, properties) {
   const y = d3.scaleLinear()
             .domain(yExtent)
             .range([height, 0]);
-  
+  const value = d3.scaleSqrt()
+            // .domain(valueExtent)
+            .domain(valueExtent)
+            .range([1, 50]);
+
+  const color = (value) => {
+    return '#000';
+  }
+  const opacity = (value) => {
+    return 0.5;
+  }
+            
+
   const xAxis = d3.axisBottom(x);  
   const yAxis = d3.axisLeft(y);
 
@@ -123,10 +137,12 @@ export default function ScatterPlot(el, properties) {
       .data(data)
     .enter().append("circle")
       .attr("class", "dot")
-      .attr("r", 3.5)
+      // .attr("r", d => value(props.value(d)))
+      .attr("r", d => value(props.value(d)) || 1)
       .attr("cx", d => x(props.x(d)))
       .attr("cy", d => y(props.y(d)))
-      // .style("fill", d => color(props.value(d)));
+      .style("fill", d => color(props.value(d)))
+      .style("opacity", d => opacity(props.value(d)))
       .on("mouseover", function (d) {
         tooltip.transition()
           .duration(200)
