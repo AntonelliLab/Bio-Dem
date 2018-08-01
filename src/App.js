@@ -408,6 +408,12 @@ class App extends Component {
       y: d => d.value.y,
       value: d => d.value.records,
       color: d => regimeColor(d.value.z),
+      tooltip: d => `
+        <div>
+          <div><strong>Country:</strong> ${d.key}</div>
+          <div><strong>Records:</strong> ${d.value.records}</div>
+        </div>
+      `,
       xLabel: vdemXLabel,
       yLabel: vdemYLabel,
       title: 'Number of public species records per country'

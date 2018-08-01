@@ -30,6 +30,7 @@ export default function ScatterPlot(el, properties) {
     xLabel: "",
     yLabel: "",
     title: "",
+    tooltip: null,
     fetching: false,
   }, properties);
 
@@ -91,7 +92,15 @@ export default function ScatterPlot(el, properties) {
   const xAxis = d3.axisBottom(x)
     .tickSizeOuter(0)
     .ticks(totalWidth / props.xTickGap);
+  
   const yAxis = d3.axisLeft(y);
+
+  // create a Voronoi diagram for snapping tooltips to nearest points
+  const voronoiDiagram = d3.voronoi()
+    .x(d => x(props.x(d)))
+    .y(d => y(props.y(d)))
+    .size([width, height])(data);
+  const voronoiRadius = width / 10;
 
   // x axis
   g.append("g")
@@ -121,9 +130,11 @@ export default function ScatterPlot(el, properties) {
       .text(props.yLabel);
 
   // add the tooltip area to the webpage
-  const tooltip = anchorElement.append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
+  const tooltip = anchorElement
+      .style("position", "relative")
+    .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
 
 
   // text label for title
@@ -139,26 +150,25 @@ export default function ScatterPlot(el, properties) {
       .data(data)
     .enter().append("circle")
       .attr("class", "dot")
-      // .attr("r", d => value(props.value(d)))
-      .attr("r", d => value(props.value(d)) || 1)
       .attr("cx", d => x(props.x(d)))
       .attr("cy", d => y(props.y(d)))
+      .attr("r", d => value(props.value(d)))
       .style("fill", d => color(d))
       .style("stroke", d => color(d))
       .style("fill-opacity", d => opacity(d))
-      .on("mouseover", function (d) {
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", .9);
-        tooltip.html(byAlpha3[d.key] ? byAlpha3[d.key].name : d.key)
-          .style("left", `${d3.event.pageX}px`)
-          .style("top", `${d3.event.pageY - 28}px`);
-      })
-      .on("mouseout", function (d) {
-        tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
-      });
+      // .on("mouseover", function (d) {
+      //   tooltip.transition()
+      //     .duration(200)
+      //     .style("opacity", .9);
+      //   tooltip.html(byAlpha3[d.key] ? byAlpha3[d.key].name : d.key)
+      //     .style("left", `${d3.event.pageX}px`)
+      //     .style("top", `${d3.event.pageY - 28}px`);
+      // })
+      // .on("mouseout", function (d) {
+      //   tooltip.transition()
+      //     .duration(500)
+      //     .style("opacity", 0);
+      // });
 
   // var legend = g.selectAll(".legend")
   //     .data(color.domain())
@@ -178,5 +188,72 @@ export default function ScatterPlot(el, properties) {
   //     .attr("dy", ".35em")
   //     .style("text-anchor", "end")
   //     .text(d => d);
+
+
+  // add a circle for indicating the highlighted point
+  const highlightCircle = g.append('circle')
+  .attr('class', 'highlight-circle')
+  .attr('r', 2)
+  .style('fill', 'none')
+  .style('stroke', '#333')
+  .style('display', 'none');
+
+  // highlight a data point
+  function highlight(d) {
+    if (d) {
+      highlightCircle
+      .style('display', '')
+      // .style("stroke", color(d))
+      .attr('cx', x(props.x(d)))
+      .attr('cy', y(props.y(d)))
+      .attr("r", value(props.value(d)) + 3);
+      
+      tooltip
+      // .transition()
+      .style("opacity", .9);
+      tooltip.html(props.tooltip(d))
+      .style("left", `${x(props.x(d))}px`)
+      .style("top", `${y(props.y(d)) - 30}px`);
+    } else {
+      // no point to highlight - hide the circle
+      highlightCircle.style('display', 'none');
+
+      tooltip
+      // .transition()
+      // .duration(500)
+      .style("opacity", 0);
   
+    }
+  }
+
+  function onMouseMove() {
+    // get the current mouse position relative to parent element
+    const [mx, my] = d3.mouse(this);
+    
+    // use the new diagram.find() function to find the Voronoi site
+    // closest to the mouse, limited by max distance voronoiRadius
+    const site = voronoiDiagram.find(mx, my, voronoiRadius);
+
+    // highlight the point if we found one
+    highlight(site && site.data);
+  }
+
+  function onMouseLeave() {
+    // hide the highlight circle when the mouse leaves the chart
+    highlight(null);
+  }
+
+  // add an overlay on top of everything to take the mouse events
+  const overlay = g.append('rect')
+  .attr('class', 'overlay')
+  .attr('width', width)
+  .attr('height', height)
+  .style('fill', '#f00')
+  .style('opacity', 0);
+
+  if (props.tooltip) {
+    overlay
+    .on('mousemove', onMouseMove)
+    .on('mouseleave', onMouseLeave);
+  }
 }
