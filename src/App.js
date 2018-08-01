@@ -23,7 +23,7 @@ import About from './About';
 import { queryGBIF } from "./api/gbif";
 
 import './App.css';
-import './d3.css';
+import './d3/d3.css';
 
 /**
  * V-dem variables

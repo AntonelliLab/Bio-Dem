@@ -105,7 +105,7 @@ export default function ScatterPlot(el, properties) {
       .text(props.yLabel);
 
   // add the tooltip area to the webpage
-  let tooltip = anchorElement.append("div")
+  const tooltip = anchorElement.append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
@@ -131,7 +131,9 @@ export default function ScatterPlot(el, properties) {
         tooltip.transition()
           .duration(200)
           .style("opacity", .9);
-        tooltip.html(byAlpha3[d.key].name);
+        tooltip.html(byAlpha3[d.key] ? byAlpha3[d.key].name : d.key)
+          .style("left", `${d3.event.pageX}px`)
+          .style("top", `${d3.event.pageY - 28}px`);
       })
       .on("mouseout", function (d) {
         tooltip.transition()

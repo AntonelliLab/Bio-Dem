@@ -1,0 +1,16 @@
+.axis {
+  font-size: 16px;
+}
+
+div.tooltip {
+  position: absolute;
+  /* text-align: center; */
+  /* width: 60px; */
+  /* height: 28px; */
+  padding: 2px;
+  /* font: 12px sans-serif; */
+  background: #fff;
+  border: 1px solid #999;
+  border-radius: 4px;
+  pointer-events: none;
+}
