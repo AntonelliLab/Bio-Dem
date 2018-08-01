@@ -17,20 +17,26 @@ export default function DualChart(el, properties) {
     bottom: 60,
     left: 80,
     height: 400,
+    xTickGap: 80,
     xMin: null,
     xMax: null,
     yMin: null,
     yMax: null,
     y2Min: null,
     y2Max: null,
+    zMin: null,
+    zMax: null,
     data: [],
-    secondData: [],
+    // secondData: [],
     x: d => d.x,
     y: d => d.y,
-    x2: d => d.x,
     y2: d => d.y,
+    color: d => 'steelblue',
+    // z: d => d.z,
+    xLabel: "Year",
     yLabel: "Value",
     y2Label: "Value #2",
+    // zLabel: d => d.z,
     title: "Title",
     fetching: false,
   }, properties);
@@ -63,13 +69,15 @@ export default function DualChart(el, properties) {
 
   g.attr("transform", `translate(${props.left}, ${props.top})`);
 
-  const { data, secondData } = props;
+  const { data } = props;
 
   // Scale the range of the data in the domains
   const xExtent = getExtent(data, props.x, props.xMin, props.xMax);
   const yExtent = getExtent(data, props.y, props.yMin, props.yMax);
   // For second axis
-  const y2Extent = getExtent(secondData, props.y2, props.y2Min, props.y2Max);
+  const y2Extent = getExtent(data, props.y2, props.y2Min, props.y2Max);
+  // For z dimension
+  // const zExtent = getExtent(data, props.z, props.zMin, props.zMax);
 
   // set the ranges
   const x = d3.scaleBand()
@@ -94,19 +102,22 @@ export default function DualChart(el, properties) {
             .range([height, 0]);
   
   const xAxis = d3.axisBottom(x)
-    .tickValues(x.domain().filter((d,i) => (i % 10) === 0));
+    .tickValues(d3.ticks(xExtent[0], xExtent[1], totalWidth / props.xTickGap));
   
   const yAxis = d3.axisLeft(y);
   const y2Axis = d3.axisRight(y2);
   
   // Second y data
   const y2line = d3.line()
-    .x(d => x2(props.x2(d)))
+    .x(d => x2(props.x(d)))
     .y(d => y2(props.y2(d)))
   
+  // const color = d3.scaleSequential(d3.interpolateViridis)
+  //   .domain(zExtent);
+
   const barColor = (d) => {
-    // console.log('barColor on d:', d); // { year, collections }
-    return props.fetching ? '#aaa' : 'steelblue';
+    // return props.fetching ? '#aaa' : color(props.z(d));
+    return props.fetching ? '#aaa' : props.color(d);
   }
 
   // add the x Axis
@@ -158,6 +169,26 @@ export default function DualChart(el, properties) {
       .style("text-anchor", "middle")
       .text(props.title);
   
+  // const legend = svg.selectAll(".legend")
+  //     // .data(z.ticks(6).slice(1).reverse())
+  //     .data(color.domain())
+  //   .enter().append("g")
+  //     .attr("class", "legend")
+  //     .attr("transform", (d, i) => `translate(${width/2 + i * 20},${height + props.bottom})`);
+  //     // .attr("transform", (d, i) => `translate(0,${i * 20})`);
+  //     // .attr("transform", function(d, i) { return "translate(" + (width + 20) + "," + (20 + i * 20) + ")"; });
+
+  // legend.append("rect")
+  //     .attr("width", 20)
+  //     .attr("height", 20)
+  //     .style("fill", color);
+
+  // legend.append("text")
+  //     .attr("x", 26)
+  //     .attr("y", 10)
+  //     .attr("dy", ".35em")
+  //     .text(String);
+
 
   // append the rectangles for the bar chart
   g.selectAll(".bar")
@@ -173,17 +204,17 @@ export default function DualChart(el, properties) {
 
   // Add second line
   g.append("path")
-    .datum(secondData)
+    .datum(data)
     .attr("class", "y2line")
     .style("stroke", "red")
     .attr("d", y2line);
 
   // Dots for second line
   g.selectAll(".dot")
-    .data(secondData)
+    .data(data)
   .enter().append("circle") // Uses the enter().append() method
     .attr("class", "dot") // Assign a class for styling
-    .attr("cx", d => x2(props.x2(d)))
+    .attr("cx", d => x(props.x(d)))
     .attr("cy", d => y2(props.y2(d)))
     .attr("r", 2);
 }

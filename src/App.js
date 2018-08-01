@@ -58,8 +58,29 @@ const vdemOptions = [
   // { value: 'conf' },
 ];
 
+const regimeTypes = {
+  0: 'Closed autocracy',
+  1: 'Electoral autocracy',
+  2: 'Electoral democracy',
+  3: 'Liberal democracy',
+};
+
+const regimeColor = d3.scaleSequential(d3.interpolateViridis)
+    .domain([0,3]);
+
 const BioDemLogo = ({ className = "logo", alt="logo" }) => (
   <img src={logo} className={className} alt={alt} />
+);
+
+const RegimeLegend = () => (
+  <Grid container className="regimeLegend" justify="center">
+    { Object.keys(regimeTypes).map(v =>
+      <div key={v} style={{ padding: 5, fontSize: '0.75em' }}>
+        <span style={{ backgroundColor: regimeColor(v), marginRight: 2 }}>&nbsp;&nbsp;&nbsp;</span>
+        {regimeTypes[v]}
+      </div>
+    )}
+  </Grid>
 );
 
 class App extends Component {
@@ -83,9 +104,12 @@ class App extends Component {
       xyYearMin: 1960,
       xyReduceFunction: 'mean',
     };
+    this.refScatterPlot = React.createRef();
+    this.refDualChart = React.createRef();
   }
-
+  
   async componentDidMount() {
+    window.addEventListener('resize', this.onResize, false);
     await this.initData();
   }
 
@@ -105,6 +129,17 @@ class App extends Component {
     if (fetchNewYearCondition) {
       await this.makeCountryFacetQuery();
     }
+  }
+
+  onResize = () => {
+    if (this.rqf) {
+      return;
+    }
+    this.rqf = window.requestAnimationFrame(() => {
+      this.rqf = null;
+      // Re-render charts with new size
+      this.renderCharts();
+    });
   }
 
   async fetchData() {
@@ -182,7 +217,7 @@ class App extends Component {
     this.setState({
       gbifData, fetching: false,
     }, () => {
-      this.renderChart();
+      this.renderCharts();
     });
   }
 
@@ -212,7 +247,7 @@ class App extends Component {
         fetching: false
       },
       () => {
-        this.renderChart();
+        this.renderCharts();
       }
     );
   }
@@ -241,14 +276,14 @@ class App extends Component {
       vdemExplanations,
       countries: Object.keys(countries),
     }, () => {
-      this.renderChart();
+      this.renderCharts();
     });
   }
 
   handleChange = (event) => {
     // console.log('handleChange, key:', event.target.name, 'value:', event.target.value);
     this.setState({ [event.target.name]: event.target.value }, () => {
-      this.renderChart();
+      this.renderCharts();
     });
   }
 
@@ -257,42 +292,13 @@ class App extends Component {
     this.setState({ [event.target.name]: event.target.value });
   }
 
-  renderChart() {
-    const { gbifData, vdemData, yearMin, yearMax, fetching, vdemVariable, vdemExplanations } = this.state;
-    
-    const y2Label = vdemExplanations[vdemVariable] ? vdemExplanations[vdemVariable].short_name : vdemVariable;
+  renderCharts() {
+    this.renderScatterPlot();
+    this.renderDualChart();
+  }
 
-    const vdemFiltered = vdemData
-      .filter(d => d.country === this.state.country && d.year >= yearMin && d.year <= yearMax)
-    
-    const gbifDataFiltered = gbifData
-      .filter(d => d.year >= yearMin && d.year <= yearMax)
-      .sort((a,b) => a.year - b.year)
-    
-    // console.log('renderChart with fethcing:', fetching);
-    DualChart('#dualChart', {
-      data: gbifDataFiltered,
-      secondData: vdemFiltered,
-      height: 300,
-      left: 110,
-      xMin: yearMin,
-      yMin: 1,
-      yMax: 50000000,
-      x: d => d.year,
-      y: d => d.collections,
-      x2: d => d.year,
-      y2: d => d[this.state.vdemVariable],
-      y2Min: 0,
-      y2Max: 1,
-      xLabel: 'Year',
-      yLabel: '#Records',
-      y2Label: y2Label,
-      title: 'Number of public species records per country and year',
-      fetching,
-    });
-
-
-    const { vdemX, vdemY, xyYearMin, xyReduceFunction, gbifCountryFacetData } = this.state;
+  renderScatterPlot() {
+    const { vdemData, vdemX, vdemY, xyYearMin, xyReduceFunction, gbifCountryFacetData, vdemExplanations } = this.state;
     const vdemXLabel = vdemExplanations[vdemX] ? vdemExplanations[vdemX].short_name : vdemX;
     const vdemYLabel = vdemExplanations[vdemY] ? vdemExplanations[vdemY].short_name : vdemY;
     
@@ -304,7 +310,8 @@ class App extends Component {
       .rollup(values => {
         const x = d3[xyReduceFunction](values, d => d[vdemX]);
         const y = d3[xyReduceFunction](values, d => d[vdemY]);
-        return { x, y };
+        const z = d3[xyReduceFunction](values, d => d.v2x_regime);
+        return { x, y, z };
       })
       .entries(vdemScatterData);
     
@@ -315,7 +322,7 @@ class App extends Component {
       d.value.records = gbifCountryFacetData[d.key] ? gbifCountryFacetData[d.key].collections : 0;
     });
 
-    ScatterPlot('#xyChart', {
+    ScatterPlot(this.refScatterPlot.current, {
       // data: vdemData,
       // data: vdemFiltered,
       // data: vdemGrouped,
@@ -326,16 +333,69 @@ class App extends Component {
       x: d => d.value.x,
       y: d => d.value.y,
       value: d => d.value.records,
+      color: d => regimeColor(d.value.z),
       xLabel: vdemXLabel,
       yLabel: vdemYLabel,
       title: 'Number of public species records per country'
     });
   }
 
+  renderDualChart() {
+    const { gbifData, vdemData, yearMin, yearMax, fetching, vdemVariable, vdemExplanations } = this.state;
+    
+    const y2Label = vdemExplanations[vdemVariable] ? vdemExplanations[vdemVariable].short_name : vdemVariable;
+
+    const vdemFiltered = vdemData
+      .filter(d => d.country === this.state.country && d.year >= yearMin && d.year <= yearMax)
+    
+    // const gbifDataFiltered = gbifData
+    //   .filter(d => d.year >= yearMin && d.year <= yearMax)
+    //   .sort((a,b) => a.year - b.year)
+    
+    // Merge gbif data into vdem data 
+    const gbifRecordsByYear = {};
+    gbifData.forEach(d => {
+      gbifRecordsByYear[d.year] = d.collections;
+    });
+    vdemFiltered.forEach(d => {
+      d.records = gbifRecordsByYear[d.year] || 0;
+    });
+    // console.log('gbifRecordsByYear:', gbifRecordsByYear);
+    // console.log('vdemFiltered:', vdemFiltered);
+    
+    // console.log('renderCharts with fethcing:', fetching);
+    DualChart(this.refDualChart.current, {
+      // data: gbifDataFiltered,
+      data: vdemFiltered,
+      height: 300,
+      // left: 110,
+      xTickGap: 140,
+      xMin: yearMin,
+      // xMax: yearMax,
+      yMin: 1,
+      yMax: 50000000,
+      x: d => d.year,
+      y: d => d.records,
+      y2: d => d[vdemVariable],
+      // z: d => d.v2x_regime,
+      color: d => regimeColor(d.v2x_regime),
+      zMin: 0,
+      zMax: 3,
+      // zLabel: d => regimeTypes[d.v2x_regime],
+      y2Min: 0,
+      y2Max: 1,
+      xLabel: 'Year',
+      yLabel: '#Records',
+      y2Label: y2Label,
+      title: 'Number of public species records per country and year',
+      fetching,
+    });
+  }
+
   renderProgress() {
     const { loaded, fetching } = this.state;
     return (
-      <div style={{ height: 20 }}>
+      <div style={{ height: 10 }}>
         { loaded && !fetching ? null : <LinearProgress /> }
       </div>
     )
@@ -390,12 +450,12 @@ class App extends Component {
                 </Typography>
               </Grid>
               <Grid item className="grid-item" xs={12} md={8}>
-                <div id="xyChart" />
-
+                <div id="scatterPlot" ref={this.refScatterPlot} />
+                <RegimeLegend />
                 {this.renderProgress()}
 
                 <div className="controls">
-                  <FormControl className="formControl" style={{ minWidth: 200, margin: 20 }}>
+                  <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
                     <InputLabel htmlFor="vdemX">X axis</InputLabel>
                     <AutoSelect
                       input={<Input name="vdemX" id="vdemX" />}
@@ -404,7 +464,7 @@ class App extends Component {
                       options={vdemOptions}
                     />
                   </FormControl>
-                  <FormControl className="formControl" style={{ minWidth: 200, margin: 20 }}>
+                  <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
                     <InputLabel htmlFor="vdemY">Y axis</InputLabel>
                     <AutoSelect
                       input={<Input name="vdemY" id="vdemY" />}
@@ -413,7 +473,7 @@ class App extends Component {
                       options={vdemOptions}
                     />
                   </FormControl>
-                  <FormControl className="formControl" style={{ minWidth: 100, margin: 20 }}>
+                  <FormControl className="formControl" style={{ minWidth: 100, margin: 10 }}>
                     <InputLabel htmlFor="xyYearMin">
                       From year
                     </InputLabel>
@@ -426,7 +486,7 @@ class App extends Component {
                       }))}
                     />
                   </FormControl>
-                  <FormControl className="formControl" style={{ minWidth: 100, margin: 20 }}>
+                  <FormControl className="formControl" style={{ minWidth: 100, margin: 10 }}>
                     <InputLabel htmlFor="xyReduceFunction">
                       Reduce by
                     </InputLabel>
@@ -459,12 +519,13 @@ class App extends Component {
 
               <Grid item className="grid-item" xs={12} md={8}>
                 
-                <div id="dualChart" />
+                <div id="dualChart" ref={this.refDualChart} />
+                <RegimeLegend />
                 
                 {this.renderProgress()}
                 
                 <div className="controls">
-                  <FormControl className="formControl" style={{ minWidth: 150, margin: 20 }}>
+                  <FormControl className="formControl" style={{ minWidth: 150, margin: 10 }}>
                     <InputLabel htmlFor="country">Country</InputLabel>
                     <AutoSelect
                       input={<Input name="country" id="country" />}
@@ -473,7 +534,7 @@ class App extends Component {
                       options={this.state.countries.map(d => ({ value: d, label: d }))}
                     />
                   </FormControl>
-                  <FormControl className="formControl" style={{ minWidth: 200, margin: 20 }}>
+                  <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
                     <InputLabel htmlFor="vdemVariable">
                       Political variable
                     </InputLabel>
@@ -484,7 +545,7 @@ class App extends Component {
                       options={vdemOptions}
                     />
                   </FormControl>
-                  <FormControl className="formControl" style={{ minWidth: 100, margin: 20 }}>
+                  <FormControl className="formControl" style={{ minWidth: 100, margin: 10 }}>
                     <InputLabel htmlFor="yearMin">
                       From year
                     </InputLabel>

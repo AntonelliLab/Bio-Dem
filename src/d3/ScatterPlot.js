@@ -19,12 +19,14 @@ export default function ScatterPlot(el, properties) {
     bottom: 60,
     left: 80,
     height: 400,
+    xTickGap: 80,
     xMin: null,
     xMax: null,
     data: [],
     x: d => d.x,
     y: d => d.y,
     value: d => d.value,
+    color: d => 'steelblue',
     xLabel: "",
     yLabel: "",
     title: "",
@@ -78,18 +80,16 @@ export default function ScatterPlot(el, properties) {
             .domain(valueExtent)
             .range([1, 30]);
 
-  const color = (value) => {
-    return '#000';
+  // const color = d3.scaleOrdinal(d3.schemeCategory10);
+  const color = (d) => {
+    return props.fetching ? '#aaa' : props.color(d);
   }
-  const opacity = (value) => {
+  const opacity = (d) => {
     return 0.5;
   }
             
-
-  const xAxis = d3.axisBottom(x);  
+  const xAxis = d3.axisBottom(x).ticks(totalWidth / props.xTickGap);  
   const yAxis = d3.axisLeft(y);
-
-  // const color = d3.scaleOrdinal(d3.schemeCategory10);
 
   // x axis
   g.append("g")
@@ -141,8 +141,9 @@ export default function ScatterPlot(el, properties) {
       .attr("r", d => value(props.value(d)) || 1)
       .attr("cx", d => x(props.x(d)))
       .attr("cy", d => y(props.y(d)))
-      .style("fill", d => color(props.value(d)))
-      .style("opacity", d => opacity(props.value(d)))
+      .style("fill", d => color(d))
+      .style("stroke", d => color(d))
+      .style("fill-opacity", d => opacity(d))
       .on("mouseover", function (d) {
         tooltip.transition()
           .duration(200)
@@ -175,4 +176,5 @@ export default function ScatterPlot(el, properties) {
   //     .attr("dy", ".35em")
   //     .style("text-anchor", "end")
   //     .text(d => d);
+  
 }
