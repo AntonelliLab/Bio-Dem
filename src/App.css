@@ -1,9 +1,48 @@
 .App {
   /* text-align: center; */
+  color: rgb(52, 58, 64);
 }
 
-.main {
+a {
+  text-decoration: none;
+}
+
+a, strong {
+  color: #861b58;
+}
+
+::selection {
+  background: #a5e1a6;
+}
+
+.appbar-logo {
+  height: 40px;
+  margin-right: 10px;
+}
+
+.grid-item {
   padding: 20px;
+}
+
+.intro {
+  /* padding: 20px; */
+}
+
+.intro-logo {
+  height: 100px;
+}
+
+.section {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.section-1, .section-3 {
+  background-color: #f6f6f6;
+}
+
+.heading {
+  font-family: 'Playfair Display', serif !important;
 }
 
 .formControl {

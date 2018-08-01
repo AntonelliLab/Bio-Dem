@@ -12,13 +12,17 @@ export default function DualChart(el, properties) {
   const props = Object.assign({
     autoResize: true,
     width: null, // null to set it to the width of the anchor element
-    top: 20,
+    top: 40,
     right: 80,
     bottom: 60,
     left: 80,
     height: 400,
     xMin: null,
     xMax: null,
+    yMin: null,
+    yMax: null,
+    y2Min: null,
+    y2Max: null,
     data: [],
     secondData: [],
     x: d => d.x,
@@ -27,6 +31,7 @@ export default function DualChart(el, properties) {
     y2: d => d.y,
     yLabel: "Value",
     y2Label: "Value #2",
+    title: "Title",
     fetching: false,
   }, properties);
 
@@ -64,7 +69,7 @@ export default function DualChart(el, properties) {
   const xExtent = getExtent(data, props.x, props.xMin, props.xMax);
   const yExtent = getExtent(data, props.y, props.yMin, props.yMax);
   // For second axis
-  const y2Extent = getExtent(secondData, props.y2);
+  const y2Extent = getExtent(secondData, props.y2, props.y2Min, props.y2Max);
 
   // set the ranges
   const x = d3.scaleBand()
@@ -87,59 +92,36 @@ export default function DualChart(el, properties) {
   
   const yAxis = d3.axisLeft(y);
   const y2Axis = d3.axisRight(y2);
-
-  // append the rectangles for the bar chart
-  g.selectAll(".bar")
-      .data(data)
-    .enter().append("rect")
-      .attr("class", "bar")
-      .style("fill", d => {
-        return props.fetching ? '#aaa' : 'steelblue';
-      })
-      .attr("x", d => x(props.x(d)))
-      .attr("width", x.bandwidth())
-      .attr("y", d => y(props.y(d)))
-      .attr("height", d => height - y(props.y(d)))
   
   // Second y data
   const y2line = d3.line()
     .x(d => x2(props.x2(d)))
     .y(d => y2(props.y2(d)))
   
-  g.append("path")
-    .datum(secondData)
-    .attr("class", "y2line")
-    .style("stroke", "red")
-    .attr("d", y2line);
-
-  g.selectAll(".dot")
-    .data(secondData)
-  .enter().append("circle") // Uses the enter().append() method
-    .attr("class", "dot") // Assign a class for styling
-    .attr("cx", d => x2(props.x2(d)))
-    .attr("cy", d => y2(props.y2(d)))
-    .attr("r", 2);
 
   // add the x Axis
   g.append("g")
+      .attr("class", "x axis")
       .attr("transform", `translate(0,${height})`)
       .call(xAxis);
 
   // add the y Axis
   g.append("g")
+      .attr("class", "y axis")
       .call(yAxis);
   
   // Add the second y Axis
   g.append("g")
-      .attr("class", "y2axis")
+      .attr("class", "y2 axis")
       .attr("transform", `translate(${width}, 0)`)
       .call(y2Axis);
 
   // text label for the x axis
-  g.append("text")             
-    .attr("transform", `translate(${width/2},${height+40})`)
+  g.append("text")
+    .attr("transform", `translate(${width/2},${height + props.bottom})`)
+    .attr("dy", "-0.5em")
     .style("text-anchor", "middle")
-    .text("Year");
+    .text(props.xLabel);
   
   // text label for the y axis
   g.append("text")
@@ -158,4 +140,42 @@ export default function DualChart(el, properties) {
       .attr("dy", "-1em")
       .style("text-anchor", "middle")
       .text(props.y2Label);
+  
+  // text label for title
+  g.append("text")
+      .attr("transform", `translate(${width/2},0)`)
+      .attr("dy", "-1em")
+      .style("text-anchor", "middle")
+      .text(props.title);
+  
+
+  // append the rectangles for the bar chart
+  g.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .style("fill", d => {
+        return props.fetching ? '#aaa' : 'steelblue';
+      })
+      .attr("x", d => x(props.x(d)))
+      .attr("width", x.bandwidth())
+      .attr("y", d => y(props.y(d)))
+      .attr("height", d => height - y(props.y(d)))
+  
+
+  // Add second line
+  g.append("path")
+    .datum(secondData)
+    .attr("class", "y2line")
+    .style("stroke", "red")
+    .attr("d", y2line);
+
+  // Dots for second line
+  g.selectAll(".dot")
+    .data(secondData)
+  .enter().append("circle") // Uses the enter().append() method
+    .attr("class", "dot") // Assign a class for styling
+    .attr("cx", d => x2(props.x2(d)))
+    .attr("cy", d => y2(props.y2(d)))
+    .attr("r", 2);
 }

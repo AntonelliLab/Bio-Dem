@@ -1,19 +1,12 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
+import { render } from 'react-dom';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import muiTheme from './theme';
 
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#75B176',
-      contrastText: '#ffffff',
-    },
-  },
-});
+const theme = createMuiTheme(muiTheme);
 
 const Index = () => (
   <MuiThemeProvider theme={theme}>
@@ -22,5 +15,7 @@ const Index = () => (
   </MuiThemeProvider>
 )
 
-ReactDOM.render(<Index />, document.getElementById('root'));
+const rootElement = document.getElementById('root');
+render(<Index />, rootElement);
+
 registerServiceWorker();

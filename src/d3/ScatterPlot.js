@@ -14,7 +14,7 @@ export default function ScatterPlot(el, properties) {
   const props = Object.assign({
     autoResize: true,
     width: null, // null to set it to the width of the anchor element
-    top: 20,
+    top: 40,
     right: 80,
     bottom: 60,
     left: 80,
@@ -26,6 +26,7 @@ export default function ScatterPlot(el, properties) {
     y: d => d.y,
     xLabel: "",
     yLabel: "",
+    title: "",
     fetching: false,
   }, properties);
 
@@ -81,28 +82,16 @@ export default function ScatterPlot(el, properties) {
       .attr("class", "x axis")
       .attr("transform", `translate(0,${height})`)
       .call(xAxis)
-    // .append("text")
-    //   .attr("class", "label")
-    //   .attr("x", width)
-    //   .attr("y", -6)
-    //   .style("text-anchor", "end")
-    //   .text(props.xLabel);
-
+  
   // y axis
   g.append("g")
       .attr("class", "y axis")
       .call(yAxis)
-    // .append("text")
-    //   .attr("class", "label")
-    //   .attr("transform", "rotate(-90)")
-    //   .attr("y", 6)
-    //   .attr("dy", ".71em")
-    //   .style("text-anchor", "end")
-    //   .text(props.yLabel)
 
   // text label for the x axis
   g.append("text")             
-    .attr("transform", `translate(${width/2},${height+40})`)
+    .attr("transform", `translate(${width/2},${height + props.bottom})`)
+    .attr("dy", "-0.5em")
     .style("text-anchor", "middle")
     .text(props.xLabel);
   
@@ -120,6 +109,15 @@ export default function ScatterPlot(el, properties) {
     .attr("class", "tooltip")
     .style("opacity", 0);
 
+
+  // text label for title
+  g.append("text")
+      .attr("transform", `translate(${width/2},0)`)
+      .attr("dy", "-1em")
+      .style("text-anchor", "middle")
+      .text(props.title);
+  
+      
   // scatter dots
   g.selectAll(".dot")
       .data(data)

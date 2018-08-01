@@ -28,6 +28,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "deploy": "surge build/ vdem-biodiversity.surge.sh"
+    "deployOld": "surge build/ vdem-biodiversity.surge.sh",
+    "deploy": "surge build/ bio-dem.surge.sh"
+  },
+  "devDependencies": {
+    "surge": "^0.20.1"
   }
 }

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import LinearProgress from '@material-ui/core/LinearProgress';
@@ -10,15 +12,18 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconPublic from '@material-ui/icons/Public';
 import IconPerson from '@material-ui/icons/RecordVoiceOver';
-import './App.css';
+import logo from './logo.svg';
 import DualChart from './d3/DualChart';
 import ScatterPlot from './d3/ScatterPlot';
 import { csv } from 'd3-fetch';
 import { byAlpha3 } from "iso-country-codes";
 import AutoSelect from './components/AutoSelect';
 import * as d3 from 'd3';
-
+import About from './About';
 import { queryGBIF } from "./api/gbif";
+
+import './App.css';
+import './d3.css';
 
 /**
  * V-dem variables
@@ -50,13 +55,17 @@ const vdemOptions = [
   { value: 'conf', label: 'conf' },
 ];
 
-const BioDemLogo = () => (
-  <span style={{ position: 'relative', marginLeft: 5, marginRight: 5 }}>
-    <span style={{ position: 'absolute', left: 2, top: -11 }}>
-      <IconPerson />
-    </span>
-    <IconPublic />
-  </span>
+// const BioDemLogo = () => (
+//   <span style={{ position: 'relative', marginLeft: 5, marginRight: 5 }}>
+//     <span style={{ position: 'absolute', left: 2, top: -11 }}>
+//       <IconPerson />
+//     </span>
+//     <IconPublic />
+//   </span>
+// );
+
+const BioDemLogo = ({ className = "logo", alt="logo" }) => (
+  <img src={logo} className={className} alt={alt} />
 );
 
 class App extends Component {
@@ -166,6 +175,7 @@ class App extends Component {
       countries[d.country] = 1;
     });
     this.setState({
+      loaded: true,
       vdemData,
       countries: Object.keys(countries),
     }, () => {
@@ -204,13 +214,18 @@ class App extends Component {
       data: gbifDataFiltered,
       secondData: vdemFiltered,
       height: 300,
+      left: 110,
       xMin: yearMin,
       x: d => d.year,
       y: d => d.collections,
       x2: d => d.year,
       y2: d => d[this.state.vdemVariable],
+      y2Min: 0,
+      y2Max: 1,
+      xLabel: 'Year',
       yLabel: '#Records',
       y2Label: this.state.vdemVariable,
+      title: 'Number of public species records per country and year',
       fetching,
     });
 
@@ -240,6 +255,7 @@ class App extends Component {
       y: d => d.value.y,
       xLabel: vdemX,
       yLabel: vdemY,
+      title: 'Number of public species records per country'
     });
   }
 
@@ -253,113 +269,182 @@ class App extends Component {
   }
 
   render() {
-    return <div className="App">
+    return (
+      <div className="App">
         <AppBar position="static" color="primary">
           <Toolbar>
-            <BioDemLogo />
+            {/* <BioDemLogo className="appbar-logo" alt="appbar-logo" /> */}
             <Typography variant="title" color="inherit">
-              Bio-Dem&nbsp;&mdash;&nbsp;Biodiversity knowledge and political regimes
+              Bio-Dem&nbsp;&mdash;&nbsp;Biodiversity knowledge and democracy
             </Typography>
           </Toolbar>
         </AppBar>
-        <div className="main">
-          {this.renderProgress()}
-          <div className="controls">
-            <FormControl className="formControl" style={{ minWidth: 200, margin: 20 }}>
-              <InputLabel htmlFor="vdemX">X axis</InputLabel>
-              <AutoSelect
-                input={<Input name="vdemX" id="vdemX" />}
-                value={this.state.vdemX}
-                onChange={this.handleChange}
-                options={vdemOptions}
-              />
-            </FormControl>
-            <FormControl className="formControl" style={{ minWidth: 200, margin: 20 }}>
-              <InputLabel htmlFor="vdemY">Y axis</InputLabel>
-              <AutoSelect
-                input={<Input name="vdemY" id="vdemY" />}
-                value={this.state.vdemY}
-                onChange={this.handleChange}
-                options={vdemOptions}
-              />
-            </FormControl>
-            <FormControl className="formControl" style={{ minWidth: 100, margin: 20 }}>
-              <InputLabel htmlFor="xyYearMin">
-                From year
-              </InputLabel>
-              <AutoSelect
-                input={<Input name="xyYearMin" id="xyYearMin" />}
-                value={this.state.xyYearMin}
-                onChange={this.handleChange}
-                options={d3.range(1960,2018).map(y => ({
-                  value: y, label: y
-                }))}
-              />
-            </FormControl>
-            <FormControl className="formControl" style={{ minWidth: 100, margin: 20 }}>
-              <InputLabel htmlFor="xyReduceFunction">
-                Reduce by
-              </InputLabel>
-              <AutoSelect
-                input={<Input name="xyReduceFunction" id="xyReduceFunction" />}
-                value={this.state.xyReduceFunction}
-                onChange={this.handleChange}
-                options={['mean', 'median'].map(d => ({
-                  value: d, label: d
-                }))}
-              />
-            </FormControl>
-          </div>
-          <div id="xyChart" />
-          {this.renderProgress()}
-          <div className="controls">
-            <FormControl className="formControl" style={{ minWidth: 150, margin: 20 }}>
-              <InputLabel htmlFor="country">Country</InputLabel>
-              <AutoSelect
-                input={<Input name="country" id="country" />}
-                value={this.state.country}
-                onChange={this.handleCountryChange}
-                options={this.state.countries.map(d => ({ value: d, label: d }))}
-              />
-            </FormControl>
-            <FormControl className="formControl" style={{ minWidth: 200, margin: 20 }}>
-              <InputLabel htmlFor="vdemVariable">
-                Political variable
-              </InputLabel>
-              <AutoSelect
-                input={<Input name="vdemVariable" id="vdemVariable" />}
-                value={this.state.vdemVariable}
-                onChange={this.handleChange}
-                options={vdemOptions}
-              />
-            </FormControl>
-            <FormControl className="formControl" style={{ minWidth: 100, margin: 20 }}>
-              <InputLabel htmlFor="yearMin">
-                From year
-              </InputLabel>
-              <AutoSelect
-                input={<Input name="yearMin" id="yearMin" />}
-                value={this.state.yearMin}
-                onChange={this.handleChange}
-                options={d3.range(1960,2018).map(y => ({
-                  value: y, label: y
-                }))}
-              />
-            </FormControl>
-            <FormControlLabel
-              control={
-              <Checkbox
-                checked={this.state.onlyDomestic}
-                onChange={() => this.setState({ onlyDomestic: !this.state.onlyDomestic })}
-              />
-              }
-              label="Only show records from domestic institutions"
-            />
-          </div>
-          <h1>{byAlpha3[this.state.country].name}</h1>
-          <div id="dualChart" />
-        </div>
-      </div>;
+
+        <Grid container>
+          <Grid item className="grid-item" xs={12} className="intro section section-0">
+            <Grid container direction="column" alignItems="center">
+              <Grid item>
+                <BioDemLogo className="intro-logo" alt="intro-logo" />
+              </Grid>
+              <Grid item>
+                <Grid container direction="column" alignItems="center">
+                  <Typography variant="display2" gutterBottom className="heading">
+                    Bio-Dem
+                  </Typography>
+                  <div style={{ borderTop: '1px solid #ccc', marginTop: -10, paddingTop: 10 }}>
+                    <Typography variant="subheading" gutterBottom style={{ maxWidth: 960 }}>
+                      Explore the relations between <a href="#gbif"><strong>biodiversity</strong></a> knowledge and different dimensions of <a href="#v-dem"><strong>democracy</strong></a> across the globe.
+                    </Typography>
+                  </div>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            
+          </Grid>
+
+          
+          <Grid item className="grid-item" xs={12} className="section section-1">
+            <Grid container>
+              <Grid item className="grid-item" xs={12} md={4}>
+                <Typography variant="headline" gutterBottom className="heading">
+                  Compare countries
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  The scatter plot shows the number of public species records for each country and their mean or median value on two selected dimensions of democracy. Use the drop down menus to customize your search. You can directly move to some particularly exciting results with the highlight buttons below; find explanation of  the plots and the features of Bio-Dem in our <a href="#">video tutorials</a>, 
+                  and learn more about the underlying data and included variables 
+                  at <a href="#about">About</a>.
+                </Typography>
+              </Grid>
+              <Grid item className="grid-item" xs={12} md={8}>
+                <div id="xyChart" />
+
+                {this.renderProgress()}
+
+                <div className="controls">
+                  <FormControl className="formControl" style={{ minWidth: 200, margin: 20 }}>
+                    <InputLabel htmlFor="vdemX">X axis</InputLabel>
+                    <AutoSelect
+                      input={<Input name="vdemX" id="vdemX" />}
+                      value={this.state.vdemX}
+                      onChange={this.handleChange}
+                      options={vdemOptions}
+                    />
+                  </FormControl>
+                  <FormControl className="formControl" style={{ minWidth: 200, margin: 20 }}>
+                    <InputLabel htmlFor="vdemY">Y axis</InputLabel>
+                    <AutoSelect
+                      input={<Input name="vdemY" id="vdemY" />}
+                      value={this.state.vdemY}
+                      onChange={this.handleChange}
+                      options={vdemOptions}
+                    />
+                  </FormControl>
+                  <FormControl className="formControl" style={{ minWidth: 100, margin: 20 }}>
+                    <InputLabel htmlFor="xyYearMin">
+                      From year
+                    </InputLabel>
+                    <AutoSelect
+                      input={<Input name="xyYearMin" id="xyYearMin" />}
+                      value={this.state.xyYearMin}
+                      onChange={this.handleChange}
+                      options={d3.range(1960,2018).map(y => ({
+                        value: y, label: y
+                      }))}
+                    />
+                  </FormControl>
+                  <FormControl className="formControl" style={{ minWidth: 100, margin: 20 }}>
+                    <InputLabel htmlFor="xyReduceFunction">
+                      Reduce by
+                    </InputLabel>
+                    <AutoSelect
+                      input={<Input name="xyReduceFunction" id="xyReduceFunction" />}
+                      value={this.state.xyReduceFunction}
+                      onChange={this.handleChange}
+                      options={['mean', 'median'].map(d => ({
+                        value: d, label: d
+                      }))}
+                    />
+                  </FormControl>
+                </div>
+              </Grid>
+            </Grid>
+          </Grid>
+          
+
+          <Grid item className="grid-item" xs={12} className="section section-2">
+            <Grid container>
+
+              <Grid item className="grid-item" xs={12} md={4}>
+                <Typography variant="headline" gutterBottom className="heading">
+                  Selected country through time
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  The dual axis chart shows the yearly evolution of the number of public species records together with the values of the selected democracy dimension. Use the drop down menus and the tick boxes to customize your search.
+                </Typography>
+              </Grid>
+
+              <Grid item className="grid-item" xs={12} md={8}>
+                
+                <div id="dualChart" />
+                
+                {this.renderProgress()}
+                
+                <div className="controls">
+                  <FormControl className="formControl" style={{ minWidth: 150, margin: 20 }}>
+                    <InputLabel htmlFor="country">Country</InputLabel>
+                    <AutoSelect
+                      input={<Input name="country" id="country" />}
+                      value={this.state.country}
+                      onChange={this.handleCountryChange}
+                      options={this.state.countries.map(d => ({ value: d, label: d }))}
+                    />
+                  </FormControl>
+                  <FormControl className="formControl" style={{ minWidth: 200, margin: 20 }}>
+                    <InputLabel htmlFor="vdemVariable">
+                      Political variable
+                    </InputLabel>
+                    <AutoSelect
+                      input={<Input name="vdemVariable" id="vdemVariable" />}
+                      value={this.state.vdemVariable}
+                      onChange={this.handleChange}
+                      options={vdemOptions}
+                    />
+                  </FormControl>
+                  <FormControl className="formControl" style={{ minWidth: 100, margin: 20 }}>
+                    <InputLabel htmlFor="yearMin">
+                      From year
+                    </InputLabel>
+                    <AutoSelect
+                      input={<Input name="yearMin" id="yearMin" />}
+                      value={this.state.yearMin}
+                      onChange={this.handleChange}
+                      options={d3.range(1960,2018).map(y => ({
+                        value: y, label: y
+                      }))}
+                    />
+                  </FormControl>
+                  <FormControlLabel
+                    control={
+                    <Checkbox
+                      checked={this.state.onlyDomestic}
+                      onChange={() => this.setState({ onlyDomestic: !this.state.onlyDomestic })}
+                    />
+                    }
+                    label="Only show records from domestic institutions"
+                  />
+                </div>
+              </Grid>
+            </Grid>
+          </Grid>
+
+        </Grid>
+
+        <Grid item className="grid-item" xs={12} className="section section-3">
+          <About />
+        </Grid>
+      </div>
+    );
   }
 }
 
