@@ -34,25 +34,31 @@ AFG,1961,0,0.18535179976794,0.129522240943792,0.368635436412438,0.26609335715031
 const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
 // const vdemDataUrl = `https://raw.githubusercontent.com/AntonelliLab/Vdem-Biodiversity/master/analyses/input/vdem_variables.csv?token=AG-YjnEhdZQC1HdaThLt5uEBQRmdT1zLks5bV-6-wA%3D%3D`;
 
+/**
+ * V-dem variables explanations
+ * id, full_name, short_name, description, relevance, references, comment
+ */
+const vdemExplanationsUrl = `${process.env.PUBLIC_URL}/data/vdem_variables_explanations.csv`;
+
 const vdemOptions = [
-  { value: 'v2x_regime', label: 'v2x_regime' },
-  { value: 'v2x_freexp_altinf', label: 'v2x_freexp_altinf' },
-  { value: 'v2x_frassoc_thick', label: 'v2x_frassoc_thick' },
-  { value: 'v2x_rule', label: 'v2x_rule' },
-  { value: 'v2xcl_dmove', label: 'v2xcl_dmove' },
-  { value: 'v2xcs_ccsi', label: 'v2xcs_ccsi' },
-  { value: 'v2x_corr', label: 'v2x_corr' },
-  { value: 'v2x_clphy', label: 'v2x_clphy' },
-  { value: 'e_area', label: 'e_area' },
-  { value: 'e_regiongeo', label: 'e_regiongeo' },
-  { value: 'e_peaveduc', label: 'e_peaveduc' },
-  { value: 'e_migdppc', label: 'e_migdppc' },
-  { value: 'e_peginiwi', label: 'e_peginiwi' },
-  { value: 'e_wri_pa', label: 'e_wri_pa' },
-  { value: 'e_population', label: 'e_population' },
-  { value: 'e_Civil_War', label: 'e_Civil_War' },
-  { value: 'e_miinterc', label: 'e_miinterc' },
-  { value: 'conf', label: 'conf' },
+  // { value: 'v2x_regime' },
+  { value: 'v2x_freexp_altinf' },
+  { value: 'v2x_frassoc_thick' },
+  // { value: 'v2x_rule' },
+  { value: 'v2xcl_dmove' },
+  { value: 'v2xcs_ccsi' },
+  { value: 'v2x_corr' },
+  { value: 'v2x_clphy' },
+  // { value: 'e_area' },
+  // { value: 'e_regiongeo' },
+  { value: 'e_peaveduc' },
+  { value: 'e_migdppc' },
+  // { value: 'e_peginiwi' },
+  { value: 'e_wri_pa' },
+  // { value: 'e_population' },
+  // { value: 'e_Civil_War' },
+  // { value: 'e_miinterc' },
+  // { value: 'conf' },
 ];
 
 // const BioDemLogo = () => (
@@ -75,6 +81,7 @@ class App extends Component {
       gbifData: [],
       onlyDomestic: false,
       vdemData: [],
+      vdemExplanations: {},
       loaded: false,
       fetching: false,
       country: 'SWE',
@@ -88,15 +95,6 @@ class App extends Component {
       xyYearMin: 1960,
       xyReduceFunction: 'mean',
     };
-  }
-
-  async componentDidUpdate(prevProps, prevState) {
-    if (this.state.onlyDomestic !== prevState.onlyDomestic || this.state.country !== prevState.country) {
-      // Get alpha2 ISO code for this country, as this is what GBIF requires as query
-      // TODO: Catch cases where !byAlpha3[event.target.value]
-      const alpha2 = byAlpha3[this.state.country].alpha2;
-      await this.makeQuery(alpha2);
-    }
   }
 
   async fetchData() {
@@ -135,7 +133,17 @@ class App extends Component {
         conf: +row.confl,
       };
     });
-    const data = await Promise.all([vdemData]);
+    const vdemExplanations = csv(vdemExplanationsUrl, row => {
+      return {
+        id: row.id,
+        full_name: row.full_name,
+        short_name: row.short_name,
+        description: row.description,
+        relevance: row.relevance,
+        references: row.references,
+      };
+    });
+    const data = await Promise.all([vdemData, vdemExplanations]);
     this.data = data;
     this.setState({
       loaded: true,
@@ -169,14 +177,26 @@ class App extends Component {
 
   async initData() {
     const data = await this.fetchData();
-    const [vdemData] = data;
+    const [vdemData, vdemExplanationsArray] = data;
     const countries = {};
     vdemData.forEach(d => {
       countries[d.country] = 1;
     });
+    const vdemExplanations = {};
+    vdemExplanationsArray.forEach(d => {
+      vdemExplanations[d.id] = d;
+    });
+    vdemOptions.forEach(d => {
+      d.label = vdemExplanations[d.value].short_name;
+      d.description = vdemExplanations[d.value].description;
+      d.relevance = vdemExplanations[d.value].relevance;
+      d.references = vdemExplanations[d.value].references;
+      d.full_name = vdemExplanations[d.value].full_name;
+    });
     this.setState({
       loaded: true,
       vdemData,
+      vdemExplanations,
       countries: Object.keys(countries),
     }, () => {
       this.renderChart();
@@ -199,9 +219,20 @@ class App extends Component {
     await this.initData();
   }
 
+  async componentDidUpdate(prevProps, prevState) {
+    if (this.state.onlyDomestic !== prevState.onlyDomestic || this.state.country !== prevState.country) {
+      // Get alpha2 ISO code for this country, as this is what GBIF requires as query
+      // TODO: Catch cases where !byAlpha3[event.target.value]
+      const alpha2 = byAlpha3[this.state.country].alpha2;
+      await this.makeQuery(alpha2);
+    }
+  }
+
   renderChart() {
-    const { gbifData, vdemData, yearMin, yearMax, fetching } = this.state;
+    const { gbifData, vdemData, yearMin, yearMax, fetching, vdemVariable, vdemExplanations } = this.state;
     
+    const y2Label = vdemExplanations[vdemVariable] ? vdemExplanations[vdemVariable].short_name : vdemVariable;
+
     const vdemFiltered = vdemData
       .filter(d => d.country === this.state.country && d.year >= yearMin && d.year <= yearMax)
     
@@ -224,13 +255,15 @@ class App extends Component {
       y2Max: 1,
       xLabel: 'Year',
       yLabel: '#Records',
-      y2Label: this.state.vdemVariable,
+      y2Label: y2Label,
       title: 'Number of public species records per country and year',
       fetching,
     });
 
 
     const { vdemX, vdemY, xyYearMin, xyReduceFunction } = this.state;
+    const vdemXLabel = vdemExplanations[vdemX] ? vdemExplanations[vdemX].short_name : vdemX;
+    const vdemYLabel = vdemExplanations[vdemY] ? vdemExplanations[vdemY].short_name : vdemY;
     
     const vdemScatterData = vdemData
       .filter(d => d.year >= xyYearMin);
@@ -253,8 +286,8 @@ class App extends Component {
       // y: d => d[vdemY],
       x: d => d.value.x,
       y: d => d.value.y,
-      xLabel: vdemX,
-      yLabel: vdemY,
+      xLabel: vdemXLabel,
+      yLabel: vdemYLabel,
       title: 'Number of public species records per country'
     });
   }
@@ -308,7 +341,7 @@ class App extends Component {
             <Grid container>
               <Grid item className="grid-item" xs={12} md={4}>
                 <Typography variant="headline" gutterBottom className="heading">
-                  Compare countries
+                  Biodiversity knowledge &amp; political regimes
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   The scatter plot shows the number of public species records for each country and their mean or median value on two selected dimensions of democracy. Use the drop down menus to customize your search. You can directly move to some particularly exciting results with the highlight buttons below; find explanation of  the plots and the features of Bio-Dem in our <a href="#">video tutorials</a>, 
@@ -377,7 +410,7 @@ class App extends Component {
 
               <Grid item className="grid-item" xs={12} md={4}>
                 <Typography variant="headline" gutterBottom className="heading">
-                  Selected country through time
+                  Biodiversity knowledge through time 
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   The dual axis chart shows the yearly evolution of the number of public species records together with the values of the selected democracy dimension. Use the drop down menus and the tick boxes to customize your search.
@@ -441,7 +474,7 @@ class App extends Component {
         </Grid>
 
         <Grid item className="grid-item" xs={12} className="section section-3">
-          <About />
+          <About vdemExplanations={this.state.vdemExplanations}/>
         </Grid>
       </div>
     );

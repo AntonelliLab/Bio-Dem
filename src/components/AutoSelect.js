@@ -92,6 +92,9 @@ class AutoSelect extends React.Component {
 
   render() {
     const { options, value, input } = this.props;
+    
+    const labelItem = options.find(d => d.value === value);
+    const label = labelItem === undefined ? value : labelItem.label;
 
     const createInput = (props) => input ?
       React.cloneElement(input, props) :
@@ -106,7 +109,7 @@ class AutoSelect extends React.Component {
       placeholder: this.props.placeholder,
       inputProps: {
         options,
-        value: { value, label: value },
+        value: { value, label },
       },
     });
   }

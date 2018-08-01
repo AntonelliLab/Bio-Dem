@@ -1,10 +1,15 @@
 import React from "react";
+import PropTypes from "prop-types";
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import './About.css';
 
-export default class About extends React.Component {
+class About extends React.Component {
   render() {
+    const { vdemExplanations : vdem } = this.props;
+    const vdemExplanations = Object.keys(vdem).map(d => vdem[d]);
+    console.log('vdemExplanations:', vdemExplanations);
+
     return (
       <Grid container>
         {/* First main column */}
@@ -165,322 +170,15 @@ export default class About extends React.Component {
             collections
           </h3>
 
-          <h4 id="regimetypev2x_regime">Regime type (v2x_regime)</h4>
-
-          <p>
-            <em>Description.</em> This variable classifies regimes according to
-            how democratic they are. It evaluates regimes according to two
-            principles. First, how competetive the process of access to power is.
-            A competetive process is characterized by free and fair multiparty
-            elections supported by political and civil liberties such as freedom
-            of expression, right to alternative information and associational
-            freedom. Second, how liberal democratic a regime is. This is
-            characterized by the so called rule of law and the presence of both
-            legislative and judicial constraints on the executive. The end-product
-            is four types of regimes: Closed autocracy, a regime that holds no
-            elections. Electoral autocracy, a regime that on paper elects the
-            legislative and executive, but these elections are neither free, fair,
-            multiparty in the real sense or supported by the essential political
-            liberties. Electoral democracy, a regime that holds elections for the
-            legislature and executive that are free, fair, multiparty and
-            supported by essential political liberties. Liberal democracy, a
-            regime that fulfills the requirements of electoral democracy, but also
-            live up to the liberal principles of democracy. This classification is
-            ordinal, ranging from autocratic to liberal democratic.
-          </p>
-
-          <p>
-            <em>Relevance</em>
-          </p>
-
-          <p>
-            <em>References</em> @Coppedge2018;
-          </p>
-
-          <h4 id="polyarchyorelectoraldemocracyv2x_polyarchy">
-            Polyarchy (or electoral democracy?) (v2x_polyarchy)
-          </h4>
-
-          <p>
-            <em>Description</em> This variable measures to what extent a country
-            is democratic in the electoral sense. It is theoretically derived from
-            the prominent political scientist Robert Dahl's conception of
-            polyarchy, rule by the many. It includes to what degree a regime
-            selects is executive and legislative through popular elections,
-            whether these elections are free and fair, and how widespread the
-            right to vote is. It also measures the presence of freedom of
-            expression and the right to alternative information, and the freedom
-            of association of people to organize themselves in political parties
-            and civil society organizations, despite being potential oppositional
-            forces. It ranges from 0 to 1, where higher scores indicate more
-            electoral democracy.
-          </p>
-
-          <p>
-            <em>Relevance</em>
-          </p>
-
-          <p>
-            <em>References</em> @Coppedge2018;{" "}
-          </p>
-
-          <h4 id="freedomofexpressionandalternativeinformationv2x_freexp_altinf">
-            Freedom of expression and alternative information (v2x
-            <em>freexp</em>altinf)
-          </h4>
-
-          <p>
-            <em>Description.</em> To what extent has a country freedom of
-            expression and alternative sources of information do exist? This
-            include aspects concerning press and media freedom, academic and
-            cultural freedom as well as the freedom for citizens to discuss
-            political matters in public and private spheres. It ranges from 0 to
-            1, where higher scores indicate more freedom of expression and access
-            to alternative information.
-          </p>
-
-          <p>
-            <em>Relevance.</em> In countries characterized by higher levels of
-            informational freedom and the ability to openly discuss and
-            disseminate information on virtually any aspect, we should expect
-            citizens to be more informed about environmental issues. This can
-            generate higher levels of environmental interest among citizens and
-            subsequently spur engagement for contributing to the information
-            collection of biodiversity related indicators. If information
-            collection potentially is conflictual to the aims or interests of the
-            government, political freedoms such as these should stimulate the
-            collection and dissemination of them, despite the risks.
-          </p>
-
-          <p>References: @Coppedge2018; @Chadwick1995; @Payne1995.</p>
-
-          <h4 id="freedomofassociationv2x_frassoc_thick">
-            Freedom of association (v2x
-            <em>frassoc</em>thick)
-          </h4>
-
-          <p>
-            <em>Description.</em> To what extent a country does a country provide
-            freedom of association to its citizens? The variable captures if civil
-            society organizations can operate freely and without fear of
-            repression from the government, and whether new or oppositional
-            political parties are free to take form and participate in elections.
-            It ranges from 0 to 1, where higher scores indicate higher levels of
-            associational freedom.
-          </p>
-
-          <p>
-            <em>Relevance.</em> In countries where people are free to organize
-            themselves, either in civil society organizations or political
-            parties, it is more likely that such organizations with an ecological
-            orientation exist. Especially if there are environmental aspects that
-            further motivate such actions. These collective "green" actors can
-            play multiple roles in the collection of information. They can
-            facilitate information collection on biodiversity outcomes by
-            gathering support for it through campaigning and lobbying efforts,
-            aimed at both the public and decision-makers. They can engage in
-            information collection themselves or provide necessary infrastructure.
-            Further, these type of political rights should also make it easier for
-            international environmental organizations to operate in the country.{" "}
-          </p>
-
-          <p>
-            <em>References.</em> @Coppedge2018; @Binder2005; @Payne1995.
-          </p>
-
-          <h4 id="freedomofmovementv2xcl_dmove">
-            Freedom of movement (v2xcl_dmove)
-          </h4>
-
-          <p>
-            <em>Description.</em> To what extent enjoy citizens formal freedom of
-            movement and residence? The variable gauges aspects such as the right
-            for men and women to move at all times of the day, across regions
-            using public thoroughfares. It ranges from 0 to 1, where higher scores
-            indicate more freedom of movement.
-          </p>
-
-          <p>
-            <em>Relevance.</em> In countries with restrictions on where and how
-            citizens can travel and reside, one can expect the collection of
-            biodiversity related information to face critical impediments. First,
-            by limiting the ways of travelling it can make it harder to reach
-            areas where observations can be made. Second, if certain areas where
-            observations of biodiversity can be made are put under restrictions,
-            it should decrease collections from that area.
-          </p>
-
-          <p>
-            <em>References.</em> @Coppedge2018; @Freitag1998 @Meyer2015
-          </p>
-
-          <h4 id="civilsocietyv2xcs_ccsi">Civil society (v2xcs_ccsi)</h4>
-
-          <p>
-            <em>Description.</em> How autonomous is a country's civil society?
-            This variable captures the extent to which a state allows civil
-            society organizations (CSO) to freely organize and operate without
-            being regulated or repressed, if these organizations are included in
-            policy-making processes and if civil society participation is
-            inclusive.
-          </p>
-
-          <p>
-            <em>Relevance.</em> In countries with relatively more robust civil
-            societies, one often find environmental performance in general to be
-            higher. The main reason behind this logic is that CSOs with an
-            ecological orientation can come to exist. Subsequently, they can
-            mobilize "ecological "green"" political preferences and call out
-            governments that are not addressing environmental degradation
-            adequately. One can expect that organizations such as these also
-            contribute to higher levels of information collection by pushing
-            governments to better manage their biodiversity, by providing
-            infrastructure that motivate others to collect information or by
-            collecting it themselves.
-          </p>
-
-          <p>
-            <em>References.</em> @Coppedge2018; @Bernauser2013; @Shandra2009.
-          </p>
-
-          <h4 id="politicalcorruptionv2x_corr">
-            Political corruption (v2x_corr)
-          </h4>
-
-          <p>
-            <em>Description.</em> The level of political corruption in a country.
-            This variable includes the extent of corruption within the public
-            sector, the judiciary, the executive and the legislative bodies. As
-            such, this captures different forms of corruption, operating at both
-            grand and petty levels, and aimed at affecting both political
-            decision-making and the implementation of policy. It ranges from 0 to
-            1, where higher scores indicate more corruption.
-          </p>
-
-          <p>
-            <em>Relevance.</em> In countries characterized by higher levels of
-            political corruption, one can expect that conservational efforts are
-            hampered. Corruption is for example argued to increase the
-            embezzlement of funds for conservational purposes, distort political
-            initiatives away from public goods toward private benefits and create
-            an institutional environment beneficial to illegal activity such as
-            poaching. To the extent that information collection depends on
-            sufficient economic resources and support from public policy,
-            corruption should be negative to the amount of records collected.
-            Further, if poaching is relatively higher in corrupt areas, then it
-            can discourage practitioners and scientist from travelling there and
-            collection information due to safety reasons.
-          </p>
-
-          <p>
-            <em>References.</em> @Coppedge2018; @Pellegrini2006; @Smith2003;
-            @Sundström2015.{" "}
-          </p>
-
-          <h4 id="physicalviolenceindexv2x_clphy">
-            Physical violence index (v2x_clphy)
-          </h4>
-
-          <p>
-            <em>Description.</em> To what extent a regime respects citizens
-            physical integrity? This variable captures to what degree torture and
-            killings for political purposes are carried out by the government. It
-            ranges from 0 to 1, where higher scores indicate higher levels of
-            physical violence.
-          </p>
-
-          <p>
-            <em>Relevance.</em> If countries have relatively low respect for
-            citizens physical integrity, one can expect this to have a negative
-            effect on practitioners and scientists motivations for travelling to
-            these countries. This can be both due to political concerns of
-            citizens well-being but also for personal safety reasons, as the scope
-            of violence potentially can expand to include country visitors.
-          </p>
-
-          <p>
-            <em>References.</em> @Amano2013; @Meyer2015.
-          </p>
-
-          <h4 id="averagelevelofeducationinpopulationolderthan15yearse_peaveduc">
-            Average level of education in population older than 15 years
-            (e_peaveduc)
-          </h4>
-
-          <p>
-            <em>Description.</em> The average level of education among citizens
-            that are older than fifteen years old.{" "}
-          </p>
-
-          <p>
-            <em>Relevance.</em> In countries that are characterized by relatively
-            higher levels of education, one can expect higher levels of
-            environmental awareness, more resources being allocated to educational
-            and scientific purposes, and more sound environmental policy. In turn,
-            this can be beneficial for information collection through higher
-            levels of interest and likely larger allocation of resources to
-            knowledge producing processes.
-          </p>
-
-          <p>
-            <em>References.</em> @Coppedge2018; @Amano2013; @Buitenzorgy2010;
-            @Pellegrini2006.
-          </p>
-
-          <h4 id="grossdomesticproductpercapitae_migdppc">
-            Gross domestic product per capita (e_migdppc)
-          </h4>
-
-          <p>
-            <em>Description.</em> The gross domestic product (GDP) per capita in a
-            country.
-          </p>
-
-          <p>
-            <em>Relevance.</em> In countries with higher levels of economic
-            development, understood here as GDP per capita, one can expect the
-            level of financial resources allocated to science and education to be
-            relatively lower. Thus, the capacity of research institutions to
-            provide infrastructure for the collection of information on
-            biodiversity should be limited. Development is also theorized to be
-            accompanied with environmentalistic values. Thus, more development can
-            lead to a higher interest in environmental issues, which consequently
-            can increase ambitions for and interest in the collection of
-            information.
-          </p>
-
-          <p>
-            <em>References.</em> @Bolt2018; @Amano2013; @Desai1998; @Meyer2015.
-          </p>
-
-          <h4 id="protectedarease_wri_pa">
-            Protected areas (e
-            <em>wri</em>pa)
-          </h4>
-
-          <p>
-            <em>Description.</em> The share of total land area that is put under
-            conservational status, as defined by the IUCN. It specifically
-            captures terrestrial protected areas.
-          </p>
-
-          <p>
-            <em>Relevance.</em> In countries with a larger proportion of its
-            terrestrial area under protective status, one can expect the
-            information collection of biodiversity to be relatively higher. First,
-            protected areas are often places with great biodiversity and
-            attractive species. As such, they can signal to both practitioners and
-            scientists that interesting observations can be made there. Second,
-            protected areas are often accompanied by relevant infrastructure for
-            explorations, which make it easier for interested actors to make
-            observations. Third, a larger share of protected areas can be a proxy
-            for the presence of relatively higher conservational ambitions within
-            a country. One can expect this to be associated with more collections.
-          </p>
-
-          <p>
-            <em>References.</em> @Meyer2015; @Yang2014.
-          </p>
+          { vdemExplanations.map(d => (
+            <div key={d.id}>
+              <h4 id={d.id}>{d.short_name}</h4>
+              
+              <p><em>Description:</em> {d.description}</p>
+              <p><em>Relevance:</em> {d.relevance}</p>
+              <p><em>References:</em> {d.references}</p>
+            </div>
+          )) }
 
           <h2 id="references">References</h2>
 
@@ -489,3 +187,9 @@ export default class About extends React.Component {
     );
   }
 }
+
+About.propTypes = {
+  vdemExplanations: PropTypes.object.isRequired,
+};
+
+export default About;
