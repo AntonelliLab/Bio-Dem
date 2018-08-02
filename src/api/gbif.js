@@ -11,7 +11,7 @@ export const queryGBIFYearFacet = async (country, onlyDomestic) => {
     country: country || 'SE',
     limit: 1,
     facet: 'year',
-    'year.facetLimit': 80
+    'year.facetLimit': 200
   }
   if (onlyDomestic) {
     params.publishingCountry = country;
