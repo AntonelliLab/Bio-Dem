@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import Grid from '@material-ui/core/Grid';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -10,18 +12,18 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Zoom from '@material-ui/core/Zoom';
+import * as d3 from 'd3';
+import { csv } from 'd3-fetch';
+import { byAlpha2, byAlpha3 } from "iso-country-codes";
+import { queryGBIFYearFacet, queryGBIFCountryFacet } from "./api/gbif";
+import About from './About';
 import logo from './logo.svg';
 import DualChart from './d3/DualChart';
 import ScatterPlot from './d3/ScatterPlot';
-import { csv } from 'd3-fetch';
-import { byAlpha2, byAlpha3 } from "iso-country-codes";
-import AutoSelect from './components/AutoSelect';
 import { haveNaN, isWithin } from './d3/helpers';
-import * as d3 from 'd3';
-import About from './About';
+import AutoSelect from './components/AutoSelect';
 import Notice from './components/Notice';
-import { queryGBIFYearFacet, queryGBIFCountryFacet } from "./api/gbif";
-
+import IconGithub from './components/Github';
 import './App.css';
 import './d3/d3.css';
 
@@ -489,16 +491,20 @@ class App extends Component {
     const xyYearIntervalLimited = xyYearMin < xyValidYears[0] || xyValidYears[1] < 2016;
     return (
       <div className="App">
-        <AppBar position="static" color="primary">
-          <Toolbar>
-            {/* <BioDemLogo className="appbar-logo" alt="appbar-logo" /> */}
-            <Typography variant="title" color="inherit">
-              Bio-Dem&nbsp;&mdash;&nbsp;Biodiversity knowledge and democracy
-            </Typography>
+        <AppBar color="primary" position="fixed">
+          <Toolbar variant="dense">
+            <IconButton href="#top" color="inherit" aria-label="Home">
+              <BioDemLogo className="appbar-logo" alt="appbar-logo" />
+            </IconButton>
+            <Button href="#about" color="inherit">About</Button>
+            <span style={{ flexGrow: 1 }} />
+            <IconButton href="https://github.com/AntonelliLab/Bio-Dem" color="inherit" aria-label="Github">
+              <IconGithub />
+            </IconButton>
           </Toolbar>
         </AppBar>
 
-        <Grid container>
+        <Grid container style={{ marginTop: 48 }}>
           <Grid item className="grid-item intro section section-0" xs={12}>
             <Grid container direction="column" alignItems="center">
               <Grid item>
@@ -510,8 +516,8 @@ class App extends Component {
                     Bio-Dem
                   </Typography>
                   <div style={{ borderTop: '1px solid #ccc', marginTop: -10, paddingTop: 10 }}>
-                    <Typography variant="subheading" gutterBottom style={{ maxWidth: 960 }}>
-                      Explore the relations between <a href="#gbif"><strong>biodiversity</strong></a> knowledge and different dimensions of <a href="#v-dem"><strong>democracy</strong></a> across the globe.
+                    <Typography variant="subheading" gutterBottom className="heading">
+                    Explore the relations between <a href="#gbif"><strong>biodiversity</strong></a> knowledge and different dimensions of <a href="#v-dem"><strong>democracy</strong></a> across the globe
                     </Typography>
                   </div>
                 </Grid>
@@ -657,10 +663,10 @@ class App extends Component {
             </Grid>
           </Grid>
 
-        </Grid>
+          <Grid item className="grid-item section-3" xs={12}>
+            <About vdemExplanations={this.state.vdemExplanations}/>
+          </Grid>
 
-        <Grid item className="grid-item section-3" xs={12}>
-          <About vdemExplanations={this.state.vdemExplanations}/>
         </Grid>
       </div>
     );
