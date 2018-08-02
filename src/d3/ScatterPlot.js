@@ -1,5 +1,4 @@
 import * as d3 from 'd3';
-import { byAlpha3 } from "iso-country-codes";
 
 // import './ScatterPlot.css';
 import { getExtent } from './helpers';
