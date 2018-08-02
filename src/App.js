@@ -272,9 +272,9 @@ class App extends Component {
   async initData() {
     const data = await this.fetchData();
     const [vdemData, vdemExplanationsArray] = data;
-    const countries = {};
+    const countryKeys = {};
     vdemData.forEach(d => {
-      countries[d.country] = 1;
+      countryKeys[d.country] = 1;
     });
     const vdemExplanations = {};
     vdemExplanationsArray.forEach(d => {
@@ -290,11 +290,20 @@ class App extends Component {
       d.references = vdemExplanations[d.value].references;
       d.full_name = vdemExplanations[d.value].full_name;
     });
+    const countries = Object.keys(countryKeys).map(alpha3 => {
+      const iso = byAlpha3[alpha3];
+      return {
+        value: alpha3,
+        label: iso ? iso.name : alpha3,
+        alpha3: alpha3,
+        alpha2: iso ? iso.alpha2 : undefined,
+      };
+    });
     this.setState({
       loaded: true,
       vdemData,
       vdemExplanations,
-      countries: Object.keys(countries),
+      countries,
     }, () => {
       this.renderCharts();
     });
@@ -616,13 +625,13 @@ class App extends Component {
                 {this.renderProgress()}
                 
                 <div className="controls">
-                  <FormControl className="formControl" style={{ minWidth: 150, margin: 10 }}>
+                  <FormControl className="formControl" style={{ minWidth: 260, margin: 10 }}>
                     <InputLabel htmlFor="country">Country</InputLabel>
                     <AutoSelect
                       input={<Input name="country" id="country" />}
                       value={this.state.country}
                       onChange={this.handleCountryChange}
-                      options={this.state.countries.map(d => ({ value: d, label: d }))}
+                      options={this.state.countries}
                     />
                   </FormControl>
                   <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
@@ -634,19 +643,6 @@ class App extends Component {
                       value={this.state.vdemVariable}
                       onChange={this.onDualChartChangeVdemVariable}
                       options={vdemOptions}
-                    />
-                  </FormControl>
-                  <FormControl className="formControl" style={{ minWidth: 100, margin: 10 }}>
-                    <InputLabel htmlFor="yearMin">
-                      From year
-                    </InputLabel>
-                    <AutoSelect
-                      input={<Input name="yearMin" id="yearMin" />}
-                      value={this.state.yearMin}
-                      onChange={this.onDualChartChangeYearMin}
-                      options={d3.range(1960,2018).map(y => ({
-                        value: y, label: y
-                      }))}
                     />
                   </FormControl>
                   <FormControlLabel
