@@ -170,7 +170,7 @@ class App extends Component {
     this.setState({
       fetching: true,
     });
-    await this.makeYearFacetQuery('SE');
+    await this.makeYearFacetQuery(byAlpha3[this.state.country].alpha2);
     await this.makeCountryFacetQuery();
     const vdemData = csv(vdemDataUrl, row => {
       const year = +row.year;
@@ -458,10 +458,11 @@ class App extends Component {
       x: d => d.year,
       y: d => d.records,
       y2: d => d[vdemVariable],
+      aux: d => d.confl,
+      // aux: d => d.year < 2000,
+      auxLabel: 'Conflict',
       // z: d => d.v2x_regime,
       color: d => regimeColor(d.v2x_regime),
-      zMin: 0,
-      zMax: 3,
       // zLabel: d => regimeTypes[d.v2x_regime],
       y2Min: 0,
       y2Max: vdemScaleMax[vdemVariable],

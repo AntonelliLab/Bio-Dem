@@ -32,7 +32,15 @@ export default function DualChart(el, properties) {
     y: d => d.y,
     y2: d => d.y,
     color: d => 'steelblue',
-    // z: d => d.z,
+    y2Stroke: (d) => '#D75C1F',
+    y2Fill: (d) => '#8C330F',
+    y2Opacity: (d) => 1,
+    aux: null, // () => b:Boolean, auxiliary boolean input based on the same x axis
+    auxFill: (d) => '#CA1229',
+    // auxStroke: (d) => '#fbc2c4',
+    auxStroke: (d) => 'none',
+    auxOpacity: (d) => 1,
+    auxLabel: 'Aux',
     xLabel: "Year",
     yLabel: "Value",
     y2Label: "Value #2",
@@ -132,6 +140,7 @@ export default function DualChart(el, properties) {
   // Add the second y Axis
   g.append("g")
       .attr("class", "y2 axis")
+      .style("fill", props.y2Stroke)
       .attr("transform", `translate(${width}, 0)`)
       .call(y2Axis);
 
@@ -158,6 +167,7 @@ export default function DualChart(el, properties) {
       .attr("x", 0 - (height / 2))
       .attr("dy", "-0.5em")
       .style("text-anchor", "middle")
+      // .style("stroke", props.y2Fill)
       .text(props.y2Label);
   
   // text label for title
@@ -206,7 +216,9 @@ export default function DualChart(el, properties) {
   g.append("path")
     .datum(cleanData)
     .attr("class", "y2line")
-    .style("stroke", "red")
+    // .style("fill", props.y2Fill)
+    .style("stroke", props.y2Stroke)
+    .style("opacity", props.y2Opacity)
     .attr("d", y2line);
 
   // Dots for second line
@@ -214,7 +226,50 @@ export default function DualChart(el, properties) {
     .data(cleanData)
   .enter().append("circle") // Uses the enter().append() method
     .attr("class", "dot") // Assign a class for styling
+    .style("fill", props.y2Fill)
     .attr("cx", d => x(props.x(d)))
     .attr("cy", d => y2(props.y2(d)))
     .attr("r", 2);
+
+  
+  if (props.aux) {
+    const auxData = data.filter(props.aux);
+    if (auxData.length > 0) {
+      // Dots for auxiliary boolean input
+      g.selectAll(".aux")
+        .data(data.filter(props.aux))
+      .enter().append("rect") // Uses the enter().append() method
+        .attr("class", "aux") // Assign a class for styling
+        .style("fill", props.auxFill)
+        .style("stroke", props.auxStroke)
+        .style("opacity", props.auxOpacity)
+        .attr("x", d => x(props.x(d)))
+        .attr("width", x.bandwidth())
+        .attr("y", height - 5)
+        .attr("height", 5);
+      
+      // Legend
+
+      // Add the second y Axis
+      const auxLegend = g.append("g")
+      .attr("class", "aux-legend")
+      .attr("transform", `translate(0, ${height + 20})`);
+
+      auxLegend.append("rect")
+      .style("fill", props.auxFill)
+      // .style("stroke", props.auxStroke)
+      // .style("opacity", props.auxOpacity)
+      .attr("x", 0)
+      .attr("width", Math.max(5, x.bandwidth()))
+      .attr("y", 10)
+      .attr("height", 5);
+
+      // text label for the x axis
+      auxLegend.append("text")
+      .attr("dx", Math.max(5, x.bandwidth()) + 4)
+      .attr("dy", "1em")
+      .style("text-anchor", "left")
+      .text(props.auxLabel);
+    }
+  }
 }
