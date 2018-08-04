@@ -131,6 +131,8 @@ class App extends Component {
       vdemY: 'v2x_frassoc_thick',
       xyYearMin: 1960,
       xyReduceFunction: 'mean',
+      // Taxon filter
+      taxaAutocompletes: [],
     };
     this.refScatterPlot = React.createRef();
     this.refDualChart = React.createRef();
@@ -142,8 +144,10 @@ class App extends Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
+    // Changes in state that require a new GBIF year facet query
     const fetchNewCountryCondition = this.state.onlyDomestic !== prevState.onlyDomestic
-      || this.state.country !== prevState.country;
+      || this.state.country !== prevState.country
+      || this.state.taxonFilter !== prevState.taxonFilter;
     
     if (fetchNewCountryCondition) {
       // Get alpha2 ISO code for this country, as this is what GBIF requires as query
@@ -221,15 +225,16 @@ class App extends Component {
   }
 
   makeYearFacetQuery = async (country) => {
-    const { onlyDomestic } = this.state;
+    const { onlyDomestic, taxonFilter } = this.state;
     
+    // TODO: replace this with an added taxon id filter in the facet query
     const response = await queryAutocompletesGBIF('Crassul');
     console.log('response', response);
 
     // Query the GBIF API
     console.log('Query gbif with year facet...');
     this.setState({ fetching: true });
-    const result = await queryGBIFYearFacet(country, onlyDomestic);
+    const result = await queryGBIFYearFacet(country, onlyDomestic, taxonFilter);
     // console.log('received gbif year facet data:', result);
     if (result.error) {
       // TODO: request errored out => handle UI
