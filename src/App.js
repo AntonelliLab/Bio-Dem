@@ -424,7 +424,7 @@ class App extends Component {
       tooltip: d => `
         <div>
           <div><strong>Country:</strong> ${d.key}</div>
-          <div><strong>Records:</strong> ${d.value.records}</div>
+          <div><strong>Records:</strong> ${d.value.records.toLocaleString('en')}</div>
         </div>
       `,
       xLabel: vdemXLabel,
