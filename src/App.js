@@ -229,7 +229,6 @@ class App extends Component {
     const result = await queryGBIFYearFacet(country, onlyDomestic, onlyWithImage);
     // console.log('received gbif year facet data:', result);
     if (result.error) {
-      // TODO: request errored out => handle UI
       const gbifError = Object.assign({}, this.state.gbifError);
       gbifError['101'] = result.error;
       this.setState({ fetching: false, gbifError });
@@ -257,7 +256,6 @@ class App extends Component {
     const result = await queryGBIFCountryFacet(this.state.xyYearMin);
     // console.log('received gbif country facet data:', result);
     if (result.error) {
-      // TODO: request errored out => handle UI
       const gbifError = Object.assign({}, this.state.gbifError);
       gbifError['102'] = result.error;
       this.setState({ fetching: false, gbifError });
@@ -369,7 +367,6 @@ class App extends Component {
     const result = await queryAutocompletesGBIF(newValue);
     // console.log('received gbif autocompletes data:', result);
     if (result.error) {
-      // TODO: request errored out => handle UI
       const gbifError = Object.assign({}, this.state.gbifError);
       gbifError['103'] = result.error;
       this.setState({ fetching: false, gbifError });
