@@ -2,10 +2,11 @@ import axios from "axios";
 
 const baseURL = "http://api.gbif.org/v1/";
 const occ = "occurrence/search";
+const autoc = "species/suggest";
 
-export const queryGBIFYearFacet = async (country, onlyDomestic, onlyWithImages) => {
+
+export const queryGBIFYearFacet = async (country, onlyDomestic, onlyWithImages, taxonFilter) => {
   // Construct the GBIF occurrences API url with facets for year counts
-  // TODO: Query for results that have images associated only
   const url = `${baseURL}${occ}`;
   const params = {
     country: country || 'SE',
@@ -15,6 +16,9 @@ export const queryGBIFYearFacet = async (country, onlyDomestic, onlyWithImages) 
   }
   if (onlyDomestic) {
     params.publishingCountry = country;
+  }
+  if (taxonFilter) {
+    params.taxonKey = taxonFilter;
   }
   if (onlyWithImages) {
     params.mediaType = 'StillImage';
@@ -44,7 +48,6 @@ export const queryGBIFCountryFacet = async (year) => {
     facet: 'country',
     'country.facetLimit': 200
   }
-
   // GET request to the GBIF-API
   return axios
     .get(url, { params })
@@ -57,5 +60,27 @@ export const queryGBIFCountryFacet = async (year) => {
         error
       );
       return { error };
+    });
+  };
+
+export const queryAutocompletesGBIF = async (q) => {
+  // Construct the GBIF Autocompletes url with query text
+  const url = `${baseURL}${autoc}`;
+  const params = {
+    q,
+    // Restrict to results from the GBIF taxonomic backbone only (i.e. not from other providers)
+    datasetKey: 'd7dddbf4-2cf0-4f39-9b2a-bb099caae36c'
+    // TODO: One more filter option for this API is by rank, maybe good idea to query for only the higher ranks and Promise all together
+  };
+
+  // GET request to the GBIF-API
+  return axios
+    .get(url, { params })
+    .then((response) => {
+      return ({ response });
+    })
+    .catch((error) => {
+      console.log('Error in fetching autocomplete suggestions from GBIF suggest API', error);
+      return ({ error });
     });
 };

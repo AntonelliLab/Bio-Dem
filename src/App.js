@@ -15,7 +15,11 @@ import Zoom from '@material-ui/core/Zoom';
 import * as d3 from 'd3';
 import { csv } from 'd3-fetch';
 import { byAlpha2, byAlpha3 } from "iso-country-codes";
-import { queryGBIFYearFacet, queryGBIFCountryFacet } from "./api/gbif";
+import {
+  queryGBIFYearFacet,
+  queryGBIFCountryFacet,
+  queryAutocompletesGBIF
+} from "./api/gbif";
 import About from './About';
 import logo from './logo.svg';
 import DualChart from './d3/DualChart';
@@ -120,6 +124,7 @@ class App extends Component {
       fetching: false,
       country: 'SWE',
       vdemVariable: 'v2x_freexp_altinf',
+      filterTaxon: undefined,
       countries: [],
       yearMin: 1960,
       yearMax: 2018,
@@ -128,6 +133,8 @@ class App extends Component {
       vdemY: 'v2x_frassoc_thick',
       xyYearMin: 1960,
       xyReduceFunction: 'mean',
+      // Taxon filter
+      taxaAutocompletes: [],
     };
     this.refScatterPlot = React.createRef();
     this.refDualChart = React.createRef();
@@ -142,6 +149,7 @@ class App extends Component {
     // Changes in state that require a new GBIF year facet query
     const fetchNewCountryCondition = this.state.onlyDomestic !== prevState.onlyDomestic
       || this.state.country !== prevState.country
+      || this.state.taxonFilter !== prevState.taxonFilter;
       || this.state.onlyWithImage !== prevState.onlyWithImage;
     
     if (fetchNewCountryCondition) {
@@ -220,13 +228,13 @@ class App extends Component {
   }
 
   makeYearFacetQuery = async (country) => {
-    const { onlyDomestic, onlyWithImage } = this.state;
+    const { onlyDomestic, onlyWithImage, taxonFilter } = this.state;
     // Query the GBIF API
     console.log('Query gbif with year facet...');
     const gbifError = Object.assign({}, this.state.gbifError);
     delete gbifError['101'];
     this.setState({ fetching: true, gbifError });
-    const result = await queryGBIFYearFacet(country, onlyDomestic, onlyWithImage);
+    const result = await queryGBIFYearFacet(country, onlyDomestic, onlyWithImage, taxonFilter);
     // console.log('received gbif year facet data:', result);
     if (result.error) {
       const gbifError = Object.assign({}, this.state.gbifError);
@@ -349,14 +357,27 @@ class App extends Component {
   }
 
   onDualChartChangeYearMin = (event) => {
-    
     this.setState({ [event.target.name]: event.target.value }, () => {
       this.renderDualChart();
     });
   }
 
-  /*
-      // Query autocompletes API
+  onInputChangeTaxonFilter = (newValue) => {
+    if (newValue.length > 1) {
+      this.makeAutocompletesQuery(newValue);
+    }
+  }
+
+  onDualChartChangeTaxonFilter = (event) => {
+    this.setState({
+      [event.target.name]: event.target.value,
+    }, () => {
+      this.renderDualChart();
+    });
+  }
+
+  makeAutocompletesQuery = async (newValue) => {
+    // Query autocompletes API
     console.log('Query gbif autocompletes API ...');
     const gbifError = Object.assign({}, this.state.gbifError);
     delete gbifError['103'];
@@ -372,7 +393,11 @@ class App extends Component {
       this.setState({ fetching: false, gbifError });
       return;
     }
-  */
+    // Transform the taxa array into the requered form
+    const taxaAutocompletes = result.response.data.map(t => ({ label: t.canonicalName, value: t.nubKey || t.key }));
+    // Save retrieved taxa to state
+    this.setState({ taxaAutocompletes });
+  }
   handleCountryChange = async (event) => {
     // console.log('querying for this country: ', event.target.value);
     this.setState({ [event.target.name]: event.target.value });
@@ -426,7 +451,7 @@ class App extends Component {
       );
 
       vdemGrouped.forEach(d => {
-        if (d.value !== null && gbifCountryFacetData[d.key]) {
+        if (d.value !== null && gbifCountryFacetData && gbifCountryFacetData[d.key]) {
           d.value.records = gbifCountryFacetData[d.key].collections;
         }
       });
@@ -680,6 +705,18 @@ class App extends Component {
                       value={this.state.vdemVariable}
                       onChange={this.onDualChartChangeVdemVariable}
                       options={vdemOptions}
+                    />
+                  </FormControl>
+                  <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
+                    <InputLabel htmlFor="taxonFilter">
+                      Taxon filter
+                    </InputLabel>
+                    <AutoSelect
+                      input={<Input name="taxonFilter" id="taxonFilter" />}
+                      value={this.state.taxonFilter}
+                      onChange={this.onDualChartChangeTaxonFilter}
+                      onInputChange={(newValue) => this.onInputChangeTaxonFilter(newValue)}
+                      options={this.state.taxaAutocompletes}
                     />
                   </FormControl>
                   <FormControlLabel

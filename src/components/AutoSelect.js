@@ -91,7 +91,7 @@ class AutoSelect extends React.Component {
   }
 
   render() {
-    const { options, value, input } = this.props;
+    const { options, value, input, onInputChange } = this.props;
     
     const labelItem = options.find(d => d.value === value);
     const label = labelItem === undefined ? value : labelItem.label;
@@ -110,7 +110,8 @@ class AutoSelect extends React.Component {
       inputProps: {
         options,
         value: { value, label },
-      },
+        onInputChange
+      }
     });
   }
 }
