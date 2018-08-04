@@ -634,7 +634,7 @@ class App extends Component {
                       <span>Yearly data only available in the sub interval <strong>[{xyValidYears.toString()}]</strong> for the selected dimensions</span>
                     }/>
                   </Zoom>
-                  <Zoom in={gbifError['101']}>
+                  <Zoom in={gbifError['102']}>
                     <Notice variant="error" message={
                       <span>Error: Querying the GBIF API for country facet data failed</span>
                     }/>
@@ -703,7 +703,7 @@ class App extends Component {
                     }
                     label="Only show records with photo"
                   />
-                  <Zoom in={gbifError['102']}>
+                  <Zoom in={gbifError['101']}>
                     <Notice variant="error" message={
                       <span>Error: Querying the GBIF API for year facet data failed</span>
                     } />
