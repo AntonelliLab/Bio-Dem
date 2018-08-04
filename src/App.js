@@ -421,7 +421,7 @@ class App extends Component {
       );
 
       vdemGrouped.forEach(d => {
-        if (d.value !== null && gbifCountryFacetData[d.key]) {
+        if (d.value !== null && gbifCountryFacetData && gbifCountryFacetData[d.key]) {
           d.value.records = gbifCountryFacetData[d.key].collections;
         }
       });
