@@ -15,7 +15,11 @@ import Zoom from '@material-ui/core/Zoom';
 import * as d3 from 'd3';
 import { csv } from 'd3-fetch';
 import { byAlpha2, byAlpha3 } from "iso-country-codes";
-import { queryGBIFYearFacet, queryGBIFCountryFacet } from "./api/gbif";
+import {
+  queryGBIFYearFacet,
+  queryGBIFCountryFacet,
+  queryAutocompletesGBIF
+} from "./api/gbif";
 import About from './About';
 import logo from './logo.svg';
 import DualChart from './d3/DualChart';
@@ -26,9 +30,6 @@ import Notice from './components/Notice';
 import IconGithub from './components/Github';
 import './App.css';
 import './d3/d3.css';
-import * as d3 from 'd3';
-
-import { queryGBIF, queryAutocompletesGBIF } from "./api/gbif";
 
 /**
  * V-dem variables
