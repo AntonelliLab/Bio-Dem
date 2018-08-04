@@ -149,7 +149,7 @@ class App extends Component {
     // Changes in state that require a new GBIF year facet query
     const fetchNewCountryCondition = this.state.onlyDomestic !== prevState.onlyDomestic
       || this.state.country !== prevState.country
-      || this.state.taxonFilter !== prevState.taxonFilter;
+      || this.state.taxonFilter !== prevState.taxonFilter
       || this.state.onlyWithImage !== prevState.onlyWithImage;
     
     if (fetchNewCountryCondition) {
