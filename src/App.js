@@ -226,10 +226,6 @@ class App extends Component {
 
   makeYearFacetQuery = async (country) => {
     const { onlyDomestic, taxonFilter } = this.state;
-    
-    // TODO: replace this with an added taxon id filter in the facet query
-    const response = await queryAutocompletesGBIF('Crassul');
-    console.log('response', response);
 
     // Query the GBIF API
     console.log('Query gbif with year facet...');
@@ -349,7 +345,6 @@ class App extends Component {
   }
 
   onDualChartChangeYearMin = (event) => {
-    
     this.setState({ [event.target.name]: event.target.value }, () => {
       this.renderDualChart();
     });
@@ -373,7 +368,7 @@ class App extends Component {
     // Query autocompletes API
     const result = await queryAutocompletesGBIF(newValue);
     if (result.error) {
-      // TODO: sth wenr wrong in API query, maybe show UI
+      // TODO: request errored out => handle UI
       return;
     }
     // Transform the taxa array into the requered form
