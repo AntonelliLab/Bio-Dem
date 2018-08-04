@@ -355,6 +355,15 @@ class App extends Component {
       this.makeAutocompletesQuery(newValue);
     }
   }
+
+  onDualChartChangeTaxonFilter = (event) => {
+    this.setState({
+      [event.target.name]: event.target.value,
+    }, () => {
+      this.renderDualChart();
+    });
+  }
+
   makeAutocompletesQuery = async (newValue) => {
     // Query autocompletes API
     const result = await queryAutocompletesGBIF(newValue);
@@ -679,6 +688,7 @@ class App extends Component {
                     <AutoSelect
                       input={<Input name="taxonFilter" id="taxonFilter" />}
                       value={this.state.taxonFilter}
+                      onChange={this.onDualChartChangeTaxonFilter}
                       onInputChange={(newValue) => this.onInputChangeTaxonFilter(newValue)}
                     />
                   </FormControl>
