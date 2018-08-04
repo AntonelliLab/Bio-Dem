@@ -529,7 +529,7 @@ class App extends Component {
   }
 
   render() {
-    const { vdemX, vdemY, xyYearMin } = this.state;
+    const { vdemX, vdemY, xyYearMin, gbifError } = this.state;
     const xyValidYears = this.getValidYears([vdemX, vdemY], 1960, 2018);
     const xyYearIntervalLimited = xyYearMin < xyValidYears[0] || xyValidYears[1] < 2016;
     return (
@@ -633,6 +633,11 @@ class App extends Component {
                       <span>Yearly data only available in the sub interval <strong>[{xyValidYears.toString()}]</strong> for the selected dimensions</span>
                     }/>
                   </Zoom>
+                  <Zoom in={gbifError['101']}>
+                    <Notice variant="error" message={
+                      <span>Error: Querying the GBIF API for country facet data failed</span>
+                    }/>
+                  </Zoom>
                 </div>
               </Grid>
             </Grid>
@@ -697,6 +702,16 @@ class App extends Component {
                     }
                     label="Only show records with photo"
                   />
+                  <Zoom in={gbifError['102']}>
+                    <Notice variant="error" message={
+                      <span>Error: Querying the GBIF API for year facet data failed</span>
+                    } />
+                  </Zoom>
+                  <Zoom in={gbifError['103']}>
+                    <Notice variant="error" message={
+                      <span>Error: Querying the GBIF API for taxon data failed</span>
+                    } />
+                  </Zoom>
                 </div>
               </Grid>
             </Grid>
