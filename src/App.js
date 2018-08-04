@@ -362,6 +362,10 @@ class App extends Component {
       // TODO: sth wenr wrong in API query, maybe show UI
       return;
     }
+    // Transform the taxa array into the requered form
+    const taxaAutocompletes = result.response.data.map(t => ({ label: t.canonicalName, value: t.nubKey || t.key }));
+    // Save retrieved taxa to state
+    this.setState({ taxaAutocompletes });
   }
 
   handleCountryChange = async (event) => {
