@@ -62,12 +62,12 @@ export const queryGBIFCountryFacet = async (year) => {
 
 export const queryAutocompletesGBIF = async (q) => {
   // Construct the GBIF Autocompletes url with query text
-  // Restrict to results from the GBIF taxonomic backbone only (i.e. not from other providers)
   const url = `${baseURL}${autoc}`;
   const params = {
     q,
-    // Restrict to GBIF backbone taxonomy
+    // Restrict to results from the GBIF taxonomic backbone only (i.e. not from other providers)
     datasetKey: 'd7dddbf4-2cf0-4f39-9b2a-bb099caae36c'
+    // TODO: One more filter option for this API is by rank, maybe good idea to query for only the higher ranks and Promise all together
   };
 
   // GET request to the GBIF-API

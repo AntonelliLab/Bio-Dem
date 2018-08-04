@@ -366,6 +366,9 @@ class App extends Component {
 
   makeAutocompletesQuery = async (newValue) => {
     // Query autocompletes API
+    // TODO: This queries the suggest API of GBIF which is nor really good customizable
+    // TODO: Maybe some result filtering to not show "synonyms" or only specific ranks
+    // TODO: One more filter option for this API is by rank, maybe good idea to query for only the higher ranks and Promise all together
     const result = await queryAutocompletesGBIF(newValue);
     if (result.error) {
       // TODO: request errored out => handle UI
