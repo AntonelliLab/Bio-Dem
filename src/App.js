@@ -111,6 +111,7 @@ class App extends Component {
     super(props);
     this.state = {
       gbifData: [],
+      gbifError: {},
       onlyDomestic: false,
       onlyWithImage: false,
       vdemData: [],
@@ -221,13 +222,19 @@ class App extends Component {
     const { onlyDomestic, onlyWithImage } = this.state;
     // Query the GBIF API
     console.log('Query gbif with year facet...');
-    this.setState({ fetching: true });
+    const gbifError = Object.assign({}, this.state.gbifError);
+    delete gbifError['101'];
+    this.setState({ fetching: true, gbifError });
     const result = await queryGBIFYearFacet(country, onlyDomestic, onlyWithImage);
     // console.log('received gbif year facet data:', result);
     if (result.error) {
       // TODO: request errored out => handle UI
+      const gbifError = Object.assign({}, this.state.gbifError);
+      gbifError['101'] = result.error;
+      this.setState({ fetching: false, gbifError });
       return;
     }
+
     const gbifData = result.response.data.facets[0].counts.map(d => ({
       year: +d.name,
       collections: +d.count,
@@ -243,13 +250,19 @@ class App extends Component {
   makeCountryFacetQuery = async () => {
     // Query the GBIF API
     console.log('Query gbif with country facet...');
-    this.setState({ fetching: true });
+    const gbifError = Object.assign({}, this.state.gbifError);
+    delete gbifError['102'];
+    this.setState({ fetching: true, gbifError });
     const result = await queryGBIFCountryFacet(this.state.xyYearMin);
     // console.log('received gbif country facet data:', result);
     if (result.error) {
       // TODO: request errored out => handle UI
+      const gbifError = Object.assign({}, this.state.gbifError);
+      gbifError['102'] = result.error;
+      this.setState({ fetching: false, gbifError });
       return;
     }
+
     const gbifCountryFacetData = {};
     result.response.data.facets[0].counts.map(d => {
       const alpha2Country = byAlpha2[d.name];
@@ -343,6 +356,25 @@ class App extends Component {
     });
   }
 
+  /*
+      // Query autocompletes API
+    console.log('Query gbif autocompletes API ...');
+    const gbifError = Object.assign({}, this.state.gbifError);
+    delete gbifError['103'];
+    this.setState({ fetching: true, gbifError });
+    // TODO: This queries the suggest API of GBIF which is nor really good customizable
+    // TODO: Maybe some result filtering to not show "synonyms" or only specific ranks
+    // TODO: One more filter option for this API is by rank, maybe good idea to query for only the higher ranks and Promise all together
+    const result = await queryAutocompletesGBIF(newValue);
+    // console.log('received gbif autocompletes data:', result);
+    if (result.error) {
+      // TODO: request errored out => handle UI
+      const gbifError = Object.assign({}, this.state.gbifError);
+      gbifError['103'] = result.error;
+      this.setState({ fetching: false, gbifError });
+      return;
+    }
+  */
   handleCountryChange = async (event) => {
     // console.log('querying for this country: ', event.target.value);
     this.setState({ [event.target.name]: event.target.value });
