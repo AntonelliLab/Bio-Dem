@@ -350,6 +350,20 @@ class App extends Component {
     });
   }
 
+  onInputChangeTaxonFilter = (newValue) => {
+    if (newValue.length > 1) {
+      this.makeAutocompletesQuery(newValue);
+    }
+  }
+  makeAutocompletesQuery = async (newValue) => {
+    // Query autocompletes API
+    const result = await queryAutocompletesGBIF(newValue);
+    if (result.error) {
+      // TODO: sth wenr wrong in API query, maybe show UI
+      return;
+    }
+  }
+
   handleCountryChange = async (event) => {
     // console.log('querying for this country: ', event.target.value);
     this.setState({ [event.target.name]: event.target.value });
@@ -661,6 +675,7 @@ class App extends Component {
                     <AutoSelect
                       input={<Input name="taxonFilter" id="taxonFilter" />}
                       value={this.state.taxonFilter}
+                      onInputChange={(newValue) => this.onInputChangeTaxonFilter(newValue)}
                     />
                   </FormControl>
                   <FormControlLabel
