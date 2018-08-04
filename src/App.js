@@ -654,6 +654,15 @@ class App extends Component {
                       options={vdemOptions}
                     />
                   </FormControl>
+                  <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
+                    <InputLabel htmlFor="taxonFilter">
+                      Taxon filter
+                    </InputLabel>
+                    <AutoSelect
+                      input={<Input name="taxonFilter" id="taxonFilter" />}
+                      value={this.state.taxonFilter}
+                    />
+                  </FormControl>
                   <FormControlLabel
                     control={
                     <Checkbox
