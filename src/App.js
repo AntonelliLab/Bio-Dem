@@ -115,7 +115,9 @@ class App extends Component {
     super(props);
     this.state = {
       gbifData: [],
+      gbifError: {},
       onlyDomestic: false,
+      onlyWithImage: false,
       vdemData: [],
       vdemExplanations: {},
       loaded: false,
@@ -148,6 +150,7 @@ class App extends Component {
     const fetchNewCountryCondition = this.state.onlyDomestic !== prevState.onlyDomestic
       || this.state.country !== prevState.country
       || this.state.taxonFilter !== prevState.taxonFilter;
+      || this.state.onlyWithImage !== prevState.onlyWithImage;
     
     if (fetchNewCountryCondition) {
       // Get alpha2 ISO code for this country, as this is what GBIF requires as query
@@ -225,17 +228,21 @@ class App extends Component {
   }
 
   makeYearFacetQuery = async (country) => {
-    const { onlyDomestic, taxonFilter } = this.state;
-
+    const { onlyDomestic, onlyWithImage, taxonFilter } = this.state;
     // Query the GBIF API
     console.log('Query gbif with year facet...');
-    this.setState({ fetching: true });
-    const result = await queryGBIFYearFacet(country, onlyDomestic, taxonFilter);
+    const gbifError = Object.assign({}, this.state.gbifError);
+    delete gbifError['101'];
+    this.setState({ fetching: true, gbifError });
+    const result = await queryGBIFYearFacet(country, onlyDomestic, onlyWithImage, taxonFilter);
     // console.log('received gbif year facet data:', result);
     if (result.error) {
-      // TODO: request errored out => handle UI
+      const gbifError = Object.assign({}, this.state.gbifError);
+      gbifError['101'] = result.error;
+      this.setState({ fetching: false, gbifError });
       return;
     }
+
     const gbifData = result.response.data.facets[0].counts.map(d => ({
       year: +d.name,
       collections: +d.count,
@@ -251,13 +258,18 @@ class App extends Component {
   makeCountryFacetQuery = async () => {
     // Query the GBIF API
     console.log('Query gbif with country facet...');
-    this.setState({ fetching: true });
+    const gbifError = Object.assign({}, this.state.gbifError);
+    delete gbifError['102'];
+    this.setState({ fetching: true, gbifError });
     const result = await queryGBIFCountryFacet(this.state.xyYearMin);
     // console.log('received gbif country facet data:', result);
     if (result.error) {
-      // TODO: request errored out => handle UI
+      const gbifError = Object.assign({}, this.state.gbifError);
+      gbifError['102'] = result.error;
+      this.setState({ fetching: false, gbifError });
       return;
     }
+
     const gbifCountryFacetData = {};
     result.response.data.facets[0].counts.map(d => {
       const alpha2Country = byAlpha2[d.name];
@@ -366,12 +378,19 @@ class App extends Component {
 
   makeAutocompletesQuery = async (newValue) => {
     // Query autocompletes API
+    console.log('Query gbif autocompletes API ...');
+    const gbifError = Object.assign({}, this.state.gbifError);
+    delete gbifError['103'];
+    this.setState({ fetching: true, gbifError });
     // TODO: This queries the suggest API of GBIF which is nor really good customizable
     // TODO: Maybe some result filtering to not show "synonyms" or only specific ranks
     // TODO: One more filter option for this API is by rank, maybe good idea to query for only the higher ranks and Promise all together
     const result = await queryAutocompletesGBIF(newValue);
+    // console.log('received gbif autocompletes data:', result);
     if (result.error) {
-      // TODO: request errored out => handle UI
+      const gbifError = Object.assign({}, this.state.gbifError);
+      gbifError['103'] = result.error;
+      this.setState({ fetching: false, gbifError });
       return;
     }
     // Transform the taxa array into the requered form
@@ -379,7 +398,6 @@ class App extends Component {
     // Save retrieved taxa to state
     this.setState({ taxaAutocompletes });
   }
-
   handleCountryChange = async (event) => {
     // console.log('querying for this country: ', event.target.value);
     this.setState({ [event.target.name]: event.target.value });
@@ -461,7 +479,7 @@ class App extends Component {
       tooltip: d => `
         <div>
           <div><strong>Country:</strong> ${d.key}</div>
-          <div><strong>Records:</strong> ${d.value.records}</div>
+          <div><strong>Records:</strong> ${d.value.records.toLocaleString('en')}</div>
         </div>
       `,
       xLabel: vdemXLabel,
@@ -534,7 +552,7 @@ class App extends Component {
   }
 
   render() {
-    const { vdemX, vdemY, xyYearMin } = this.state;
+    const { vdemX, vdemY, xyYearMin, gbifError } = this.state;
     const xyValidYears = this.getValidYears([vdemX, vdemY], 1960, 2018);
     const xyYearIntervalLimited = xyYearMin < xyValidYears[0] || xyValidYears[1] < 2016;
     return (
@@ -638,6 +656,11 @@ class App extends Component {
                       <span>Yearly data only available in the sub interval <strong>[{xyValidYears.toString()}]</strong> for the selected dimensions</span>
                     }/>
                   </Zoom>
+                  <Zoom in={gbifError['102']}>
+                    <Notice variant="error" message={
+                      <span>Error: Querying the GBIF API for country facet data failed</span>
+                    }/>
+                  </Zoom>
                 </div>
               </Grid>
             </Grid>
@@ -705,6 +728,25 @@ class App extends Component {
                     }
                     label="Only show records from domestic institutions"
                   />
+                  <FormControlLabel
+                    control={
+                    <Checkbox
+                      checked={this.state.onlyWithImage}
+                      onChange={() => this.setState({ onlyWithImage: !this.state.onlyWithImage })}
+                    />
+                    }
+                    label="Only show records with photo"
+                  />
+                  <Zoom in={gbifError['101']}>
+                    <Notice variant="error" message={
+                      <span>Error: Querying the GBIF API for year facet data failed</span>
+                    } />
+                  </Zoom>
+                  <Zoom in={gbifError['103']}>
+                    <Notice variant="error" message={
+                      <span>Error: Querying the GBIF API for taxon data failed</span>
+                    } />
+                  </Zoom>
                 </div>
               </Grid>
             </Grid>

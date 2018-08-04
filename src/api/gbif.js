@@ -4,9 +4,9 @@ const baseURL = "http://api.gbif.org/v1/";
 const occ = "occurrence/search";
 const autoc = "species/suggest";
 
-export const queryGBIFYearFacet = async (country, onlyDomestic, taxonFilter) => {
+
+export const queryGBIFYearFacet = async (country, onlyDomestic, onlyWithImages, taxonFilter) => {
   // Construct the GBIF occurrences API url with facets for year counts
-  // TODO: Query for results that have images associated only
   const url = `${baseURL}${occ}`;
   const params = {
     country: country || 'SE',
@@ -19,6 +19,9 @@ export const queryGBIFYearFacet = async (country, onlyDomestic, taxonFilter) => 
   }
   if (taxonFilter) {
     params.taxonKey = taxonFilter;
+  }
+  if (onlyWithImages) {
+    params.mediaType = 'StillImage';
   }
 
   // GET request to the GBIF-API
