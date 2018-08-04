@@ -112,6 +112,7 @@ class App extends Component {
     this.state = {
       gbifData: [],
       onlyDomestic: false,
+      onlyWithImage: false,
       vdemData: [],
       vdemExplanations: {},
       loaded: false,
@@ -138,7 +139,8 @@ class App extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     const fetchNewCountryCondition = this.state.onlyDomestic !== prevState.onlyDomestic
-      || this.state.country !== prevState.country;
+      || this.state.country !== prevState.country
+      || this.state.onlyWithImage !== prevState.onlyWithImage;
     
     if (fetchNewCountryCondition) {
       // Get alpha2 ISO code for this country, as this is what GBIF requires as query
@@ -216,11 +218,11 @@ class App extends Component {
   }
 
   makeYearFacetQuery = async (country) => {
-    const { onlyDomestic } = this.state;
+    const { onlyDomestic, onlyWithImage } = this.state;
     // Query the GBIF API
     console.log('Query gbif with year facet...');
     this.setState({ fetching: true });
-    const result = await queryGBIFYearFacet(country, onlyDomestic);
+    const result = await queryGBIFYearFacet(country, onlyDomestic, onlyWithImage);
     // console.log('received gbif year facet data:', result);
     if (result.error) {
       // TODO: request errored out => handle UI
@@ -653,6 +655,15 @@ class App extends Component {
                     />
                     }
                     label="Only show records from domestic institutions"
+                  />
+                  <FormControlLabel
+                    control={
+                    <Checkbox
+                      checked={this.state.onlyWithImage}
+                      onChange={() => this.setState({ onlyWithImage: !this.state.onlyWithImage })}
+                    />
+                    }
+                    label="Only show records with photo"
                   />
                 </div>
               </Grid>
