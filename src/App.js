@@ -690,6 +690,7 @@ class App extends Component {
                       value={this.state.taxonFilter}
                       onChange={this.onDualChartChangeTaxonFilter}
                       onInputChange={(newValue) => this.onInputChangeTaxonFilter(newValue)}
+                      options={this.state.taxaAutocompletes}
                     />
                   </FormControl>
                   <FormControlLabel
