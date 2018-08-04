@@ -372,7 +372,7 @@ class App extends Component {
       return;
     }
     // Transform the taxa array into the requered form
-    const taxaAutocompletes = result.response.data.map(t => ({ label: t.canonicalName, value: t.nubKey || t.key }));
+    const taxaAutocompletes = result.response.data.results.map(t => ({ label: t.canonicalName, value: t.nubKey || t.key }));
     // Save retrieved taxa to state
     this.setState({ taxaAutocompletes });
   }
