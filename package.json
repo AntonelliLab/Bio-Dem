@@ -19,6 +19,7 @@
     "d3-svg-legend": "^2.25.6",
     "d3-transition": "^1.1.1",
     "iso-country-codes": "^0.0.5",
+    "lodash": "^4.17.10",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-scripts": "1.1.4",

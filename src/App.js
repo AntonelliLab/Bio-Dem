@@ -14,6 +14,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Zoom from '@material-ui/core/Zoom';
 import * as d3 from 'd3';
 import { csv } from 'd3-fetch';
+import debounce from 'lodash/debounce';
 import { byAlpha2, byAlpha3 } from "iso-country-codes";
 import {
   queryGBIFYearFacet,
@@ -134,6 +135,7 @@ class App extends Component {
       xyYearMin: 1960,
       xyReduceFunction: 'mean',
       // Taxon filter
+      taxonFilter: '',
       taxaAutocompletes: [],
     };
     this.refScatterPlot = React.createRef();
@@ -362,11 +364,13 @@ class App extends Component {
     });
   }
 
-  onInputChangeTaxonFilter = (newValue) => {
+  onInputChangeTaxonFilter = debounce((newValue) => {
     if (newValue.length > 1) {
       this.makeAutocompletesQuery(newValue);
+    } else if (newValue === '') {
+      // this.setState({ taxonFilter: '' });
     }
-  }
+  }, 400, { maxWait: 3000 })
 
   onDualChartChangeTaxonFilter = (event) => {
     this.setState({
@@ -715,8 +719,9 @@ class App extends Component {
                       input={<Input name="taxonFilter" id="taxonFilter" />}
                       value={this.state.taxonFilter}
                       onChange={this.onDualChartChangeTaxonFilter}
-                      onInputChange={(newValue) => this.onInputChangeTaxonFilter(newValue)}
+                      onInputChange={this.onInputChangeTaxonFilter}
                       options={this.state.taxaAutocompletes}
+                      isClearable
                     />
                   </FormControl>
                   <FormControlLabel
