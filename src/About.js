@@ -15,22 +15,19 @@ class About extends React.Component {
           <h2 id="about">About</h2>
           <p>
             The distribution of biological diversity, or biodiversity, has
-            fascinated humans for centuries. For centuries the humanities
-            knowledge of the distribution of this diversity, beyond the local
-            scale is based on naturalist collections, first as physical specimens
-            in museums herbaria or private collections and in more recent times
-            complemented by among others scientific and laymen observations,
-            camera trap observation and most recently large scale citizen science
-            data linked to photographs. The public availability of species
-            occurrence information from these sources has increased dramatically
-            in the last decade, in good parts thanks due large scale data
-            aggregators, such as the global biodiversity Information Facility,
-            that provide access to geographic distribution information of
-            biological species.
+            fascinated humans for centuries. On a global scale, 
+            the scientific knowledge on the geographic distribution of this diversity, 
+			is based on natural history collections; traditionally as physical specimens
+            in museums herbaria or private collections and more recently 
+            complemented by observations (vegetation plots or bird surveys),
+            camera trap observation and citizen science data linked to photographs. 
+			The public availability of information from these sources has increased dramatically
+            in the last decade, in good parts due to large scale data
+            aggregators, such as the Global Biodiversity Information Facility.
           </p>
 
           <p>
-            The availability of such collection is strongly biased geographically,
+            Fantstic as it is, the data available from such public aggregators is often biased geographically,
             for instance because some localities are more easily accessible, more
             spectacular or have a stronger naturalist history then others. While
             it is relative well understood which geographic factors favour record
@@ -39,15 +36,14 @@ class About extends React.Component {
             collection. This is surprising because first, it seems straight
             forward that some regimes would favour naturalist collection (e.g.
             open, safe, democratic) whereas others would not (repressive, unsafe,
-            authoritarian) and second a considerable body of literature exists on
-            the links between political regimes and the environmental performance.
+            authoritarian), and second a considerable body of literature exists on
+            the links between political regimes and the environmental performance of countries.
           </p>
 
           <p>
-            Bio-Dem tries to address this gap by exploring biodiversity knowledge
-            (approximated as geographic occurrence records in GBIF) and political
-            systems for countries around the world. Some specific questions that
-            motivated the development of Bio-Dem are:{" "}
+            Bio-Dem addresses this gap, and provides a tool to explore biodiversity knowledge
+            (approximated as geographic occurrence records in GBIF) in relation to political
+            systems around the world. Some specific questions that motivated the development of Bio-Dem are:{" "}
           </p>
 
           <ul>
@@ -61,11 +57,11 @@ class About extends React.Component {
             </li>
 
             <li>
-              How important are individual facets of regime types, such as freedom
+              How important are individual dimensions of regime types, such as freedom
               of movement, rule of law and strength of the civil society?{" "}
             </li>
 
-            <li>Which role to other factors play, such as national GDP?</li>
+            <li>Which role do other factors play, such as national GDP?</li>
 
             <li>How do conflicts impact record availability </li>
           </ul>
@@ -76,19 +72,18 @@ class About extends React.Component {
           </h3>
           
           <p>
-            The Global Biodiversity Information Facility (GBIF) is a large scale
-            data aggregation providing access to digitalized information on the
-            geographic distribution of biological species, mostly in the form of
-            geographic point occurrences. The data are contributed from scientific
+            The Global Biodiversity Information Facility (GBIF) provides access to 
+			digitalized information on the geographic distribution of biological species, mostly 
+            georeferenced point occurrences. The data are contributed from scientific
             institutions and citizen science projects around the world and include
             among others scientific collections from museums and herbaria,
             scientific observation records, camera trap pictures or citizen
             science observations. GBIF to date provides free access to more than 1
-            billion occurrence records collected in over three centuries from
-            across the globe. If you want to learn more about GBIF or access
-            species occurrence information, visit www.gbif.org. Bio-Dem fetches
-            the number of occurrence records per country and time live from the
-            recent version of GBIF via the GBIF API.
+            billion occurrence records collected in over three centuries 
+            around the globe. If you want to learn more about GBIF or access
+            species occurrence information, visit https://www.gbif.org. Bio-Dem fetches
+            the number of occurrence records live from the
+            latest version of GBIF via the GBIF API.
           </p>
 
           <h3 id="v-dem">
@@ -100,13 +95,11 @@ class About extends React.Component {
             conceptualization and collection of data on democracy. It is one of
             the largest existent databases on democracy containing over 18 million
             data points, where the latest version covers 201 countries and the
-            years 1789 to 2017. They provide superior flexibility in terms of
-            measurement, in that one can work with both aggregated higher-level
+            years 1789 to 2017. These data enable to work with both aggregated higher-level
             concepts such as "electoral democracy" or disaggregated concepts
             capturing for example women's participation in civil society or
-            freedom of academic expression. The data is constructed by aggregating
-            both factual data with expert-based subjective measures through a
-            Bayesian procedure that manages several issues, including coder bias
+            freedom of academic expression. The data combine factual data with expert-based 
+			subjective measures through a Bayesian modelling procedureaccounting for coder bias
             and heterogeneity across countries and years. For more information,
             visit <a href="https://www.v-dem.net/en/">V-Dem's website</a>, read <a href="http://journals.sagepub.com/doi/abs/10.1177/0192512115622046?journalCode=ipsa">
               "Measuring high level democratic principles using the V-Dem data"
@@ -120,9 +113,9 @@ class About extends React.Component {
             <h3 id="inthegreatercontext">In the greater context</h3>
           <p>
 		  
-            Bio-Dem is build to explore the relation between the number of
-            biological collection records available from any given country with
-            the political situation in this country, also through time. It must be
+            Bio-Dem visualizes the relation between 
+            biological collection records from any given country and
+            the political situation in this country. It must be
             noted that, in general, correlation is not causation (see <a href="http://www.tylervigen.com/spurious-correlations">here</a> for
             illustrative examples) and that, in particular, there are some caveats
             related to the data used by Bio-Dem. For instance, the amount of
@@ -135,12 +128,12 @@ class About extends React.Component {
             occurrence information--are clearly influenced by political structure
             and society of a country, such as the freedom of movement and physical
             violence. We only included those indicators in Bio-Dem which have a
-            sound mechanistic link to biodiversity collections (see <a href="link top the about theb data section">About the data</a>).
-            Indeed, interesting <a href="link to highlights section">patterns emerge</a> globally and
-            for individual countries through time. We consider Bio-Dem primarily
-            as an exploration tool, which can reveal interesting patterns and
+            <a href="#politicalindicatorvariablesandtheirconnectiontobiodiversitycollections">mechanistic link</a> to biodiversity collections.
+            Indeed, interesting patterns emerge globally and
+            for individual countries through time as shown by the example plots. We consider Bio-Dem primarily
+            as an exploration tool to reveal interesting patterns and
             inspire new thoughts on research, collection activity, data sharing
-            and ideally policy.
+            and, ideally, policy.
           </p>
 		  
           <h2 id="tutorials">Tutorials</h2>
