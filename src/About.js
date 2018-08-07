@@ -150,10 +150,8 @@ class About extends React.Component {
 		  
 
             <h3 id="tutorial1Biodiversityknowledgeandpoliticalregimes">Tutorial 1 - Biodiversity knowledge & political regimes</h3>
-          <p>
-		  
+
               <h3 id="tutorial2Biodiversityknowledgethroughtime">Tutorial 2 - Biodiversity knowledge through time</h3>
-          <p>
 		  
 
        <h2 id="references">References</h2>
