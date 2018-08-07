@@ -561,7 +561,7 @@ class App extends Component {
     const xyYearIntervalLimited = xyYearMin < xyValidYears[0] || xyValidYears[1] < 2016;
     return (
       <div className="App">
-        <AppBar color="primary" position="fixed">
+        <AppBar color="primary" position="fixed" className="appbar">
           <Toolbar variant="dense">
             <IconButton href="#top" color="inherit" aria-label="Home">
               <BioDemLogo className="appbar-logo" alt="appbar-logo" />
@@ -574,20 +574,17 @@ class App extends Component {
           </Toolbar>
         </AppBar>
 
-        <Grid container style={{ marginTop: 48 }}>
+        <Grid container>
           <Grid item className="grid-item intro section section-0" xs={12}>
             <Grid container direction="column" alignItems="center">
-              <Grid item>
-                <BioDemLogo className="intro-logo" alt="intro-logo" />
-              </Grid>
-              <Grid item>
+              <Grid item style={{ marginTop: 0, padding: '40px 0' }}>
                 <Grid container direction="column" alignItems="center">
                   <Typography variant="display2" gutterBottom className="heading">
                     Bio-Dem
                   </Typography>
                   <div style={{ borderTop: '1px solid #ccc', marginTop: -10, paddingTop: 10 }}>
-                    <Typography variant="subheading" gutterBottom className="heading">
-                    Explore the connection bewteen <a href="#gbif"><strong>biodiversity</strong></a> knowledge and dimensions of <a href="#v-dem"><strong>democracy</strong></a> across the globe
+                    <Typography variant="headline" gutterBottom className="heading" style={{ color: '#666' }}>
+                      <strong>Biodiversity</strong> knowledge &amp; <strong>democracy</strong>
                     </Typography>
                   </div>
                 </Grid>
@@ -596,6 +593,11 @@ class App extends Component {
           </Grid>
           <Grid item className="grid-item section section-1" xs={12}>
             <Grid container>
+              <Grid item className="grid-item" xs={12} style={{ paddingTop: 10 }}>
+                <Typography variant="subheading" gutterBottom>
+                  Welcome to explore the connection between <a href="#gbif"><strong>biodiversity</strong></a> knowledge and different dimensions of <a href="#v-dem"><strong>democracy</strong></a> across the globe!
+                </Typography>
+              </Grid>
               <Grid item className="grid-item" xs={12} md={4}>
                 <Typography variant="headline" gutterBottom className="heading">
                   Biodiversity knowledge &amp; political regimes
@@ -674,7 +676,7 @@ class App extends Component {
           </Grid>
           
 
-          <Grid item className="grid-item section-2" xs={12}>
+          <Grid item className="grid-item section section-2" xs={12}>
             <Grid container>
 
               <Grid item className="grid-item" xs={12} md={4}>
@@ -760,7 +762,7 @@ class App extends Component {
             </Grid>
           </Grid>
 
-          <Grid item className="grid-item section-3" xs={12}>
+          <Grid item className="grid-item section section-3" xs={12}>
             <About vdemExplanations={this.state.vdemExplanations}/>
           </Grid>
 
