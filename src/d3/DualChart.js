@@ -245,7 +245,7 @@ export default function DualChart(el, properties) {
         .style("opacity", props.auxOpacity)
         .attr("x", d => x(props.x(d)))
         .attr("width", x.bandwidth())
-        .attr("y", height - 5)
+        .attr("y", 0)
         .attr("height", 5);
       
       // Legend
