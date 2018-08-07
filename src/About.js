@@ -71,19 +71,6 @@ class About extends React.Component {
           </ul>
 
           
-          <h3 id="howtousebiodem">How to use Bio-Dem</h3>
-          <p>
-            Learn more about the features of Bio-Dem to explore the relation between biodiversity data and political regime in this video:
-          </p>
-
-
-          <h3 id="highlights">Highlights</h3>
-          <p>
-            A set of four predefined plots which can be access directly and show
-            some interesting pattern, plus explanatory text.
-          </p>
-
-          
           <h3 id="gbif">
             Biodiversity collection: The global biodiversity Information Facility
           </h3>
@@ -129,11 +116,10 @@ class About extends React.Component {
             </a>. Bio-Dem currently uses V-Dem version 8 and will be updated as
             new version are being published.
           </p>
-
-
-          <h2 id="inthegreatercontext">In the greater context</h2>
-
+		  
+            <h3 id="inthegreatercontext">In the greater context</h2>
           <p>
+		  
             Bio-Dem is build to explore the relation between the number of
             biological collection records available from any given country with
             the political situation in this country, also through time. It must be
@@ -157,6 +143,19 @@ class About extends React.Component {
             and ideally policy.
           </p>
 		  
+          <h2 id="tutorials">Tutorials</h3>
+          <p>
+            Learn more about the features of Bio-Dem to explore the relation between biodiversity data and political regime in our video tutorials:
+          </p>
+		  
+
+            <h3 id="tutorial1Biodiversityknowledgeandpoliticalregimes">Tutorial 1 - Biodiversity knowledge & political regimes</h2>
+          <p>
+		  
+              <h3 id="tutorial2Biodiversityknowledgethroughtime">Tutorial 2 - Biodiversity knowledge through time</h2>
+          <p>
+		  
+
        <h2 id="references">References</h2>
 		  <p>Amano, T. and W.J Sutherland (2013). “Four barriers to the global understanding of biodiversity conservation: wealth, language, geographical location and security”. <em>Proceedings of the Royal Society</em>, 20122649.</p>
 		  <p>Bernauer, T., T. Böhmelt and V. Koubi (2013). “Is There a Democracy–Civil Society Paradox in Global Environmental Governance?”. <em>Global Environmental Politics</em>, vol. 13(1): 88-107.</p>
@@ -175,14 +174,14 @@ class About extends React.Component {
 		  <p>Smith, R.J., R.D.J. Muir, M.J Walpole, A. Balmford and M. Leader-Williams (2003). “Governance and the loss of biodiversity”. <em>Nature</em>, 426.</p>
 		  <p>Sundström, A (2015). “Covenants with broken swords: Corruption and law enforcement in governance of the commons”. <em>Global Environmental Change</em>, 31: 253-262.</p>
 		  <p>Yang, W. K. Ma and H. Kreft (2014). “Environmental and socio-economic factors shaping the geography of floristic collections in China”. <em>Global Ecology and Biogeography</em>, 23: 1284-1292.</p>
-
+		  
 		  </Grid>
         
         {/* Second main column */}
         <Grid item className="column" xs={12} sm={6}>
           
           
-          <h3 id="politicalindicatorvariablesandtheirconnectiontobiodiversitycollections">
+          <h2 id="politicalindicatorvariablesandtheirconnectiontobiodiversitycollections">
             Political indicator variables and their connection to biodiversity
             collections
           </h3>
