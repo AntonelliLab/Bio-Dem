@@ -156,8 +156,26 @@ class About extends React.Component {
             inspire new thoughts on research, collection activity, data sharing
             and ideally policy.
           </p>
+		  
+       <h2 id="references">References</h2>
+		  <p>Amano, T. and W.J Sutherland (2013). “Four barriers to the global understanding of biodiversity conservation: wealth, language, geographical location and security”. <em>Proceedings of the Royal Society</em>, 20122649.</p>
+		  <p>Bernauer, T., T. Böhmelt and V. Koubi (2013). “Is There a Democracy–Civil Society Paradox in Global Environmental Governance?”. <em>Global Environmental Politics</em>, vol. 13(1): 88-107.</p>
+		  <p>Binder, S. and E. Neumayer (2005). “Environmental pressure group strength and air pollution: An empirical analysis”. <em>Ecological Economics</em>, 55: 527-538.</p>
+		  <p>Buitenzorgy, M. and A.P.J. Mol (2010). “Does Democracy Lead to a Better Environment? Deforestation and the Democratic Transition Peak”. <em>Environmental Resource Economics</em>, 48: 59-70.</p>
+		  <p>Bolt, J., R. Inklaar, H. De Jong and J.L. Van Zanden (2018). ”Rebasing ”Maddison”: New Income Comparisons and the Shape of Long-Run Economic Development”. Maddison Working Paper 10.</p>
+		  <p>Coppedge, M., J. Gerring, C.H. Knutsen, S.I. Lindberg, S-E. Skaaning, J. Teorell, D. Altman, M. Bernhard, A. Cornell, M.S. Fish, H, Gjerløw, A. Glynn, A. Hicken, J. Krusell, A. Lührmann, K.L. Marquardt, K. McMann, V. Mechkova, M. Olin, P. Paxton, D. Pemstein, B. Seim, R. Sigman, J. Staton, A. Sundtröm, E. Tzelgov, L. Uberti, Y-T. Wang, T. Wig, and D. Ziblatt (2018). “V-Dem Codebook v8”, Varieties of Democracy (V-Dem) Project.</p>
+		  <p>Chadwick, B.P. “Fisheries, Sovereignties and Red Herrings”. <em>Journal of International Affars</em>, vol. 48(2): 559-584. Desai, U (1998). “Environment, Economic Growth, and Government in Developing Countries”, in (ed.) Desai, U. <em>Ecological Policy and Politics in Developing Countries: Economic Growth, Democracy, and Environment</em>. State University of New York Press: Albany, New York.</p>
+		  <p>Freitag, S., C. Hobson, H.C. Biggs and A.S.V. Jaarsveld (1998). “Testing for potential survey bias: the effect of roads, urban areas and nature reserves on a southern African mammal data set”. <em>Animal Conservation</em>, 1: 119-127.</p>
+		  <p>Li, Q. and R. Reuveny (2006). “Democracy and Environmental Degradation”. <em>International Studies Quarterly</em>, 50: 935-956.</p>
+		  <p>Meyer, C. H. Kreft, R. Guralnick and W. Jetz (2015). “Global priorities for an effective information basis of biodiversity distributions”. <em>Nature Communications</em>, 6:8221.</p>
+		  <p>Neumayer, E (2002). “Do Democracies Exhibit Stronger International Environmental Commitment? A Cross-Country Analysis”. <em>Journal of Peace Research</em>, vol. 39(2): 139-164.</p>
+		  <p>Payne, R.A (1995). “Freedom and the environment”. <em>Journal of Democracy</em>, vol. 6(3). Pellegrini, L. and R. Gerlach (2006). “Corruption, Democracy, and Environmental Policy: An Empirical Contribution to the Debate”. <em>The Journal of Environment &amp; Development</em>, vol. 15(3): 332-354.</p>
+		  <p>Shandra, J.M., C. Leckband, L.A. McKinney and B. London (2009). “Ecologically Unequal Exchange, World Polity, and Biodiversity Loss: A Cross-National Analysis of Threatened Mammals”. <em>International Journal of Comparative Sociology</em>, vol. 50(3-4): 285-310.</p>
+		  <p>Smith, R.J., R.D.J. Muir, M.J Walpole, A. Balmford and M. Leader-Williams (2003). “Governance and the loss of biodiversity”. <em>Nature</em>, 426.</p>
+		  <p>Sundström, A (2015). “Covenants with broken swords: Corruption and law enforcement in governance of the commons”. <em>Global Environmental Change</em>, 31: 253-262.</p>
+		  <p>Yang, W. K. Ma and H. Kreft (2014). “Environmental and socio-economic factors shaping the geography of floristic collections in China”. <em>Global Ecology and Biogeography</em>, 23: 1284-1292.</p>
 
-        </Grid>
+		  </Grid>
         
         {/* Second main column */}
         <Grid item className="column" xs={12} sm={6}>
@@ -178,25 +196,7 @@ class About extends React.Component {
             </div>
           )) }
 
-          <h2 id="references">References</h2>
-		  <p>Amano, T. and W.J Sutherland (2013). “Four barriers to the global understanding of biodiversity conservation: wealth, language, geographical location and security”. <em>Proceedings of the Royal Society</em>, 20122649.</p>
-		  <p>Bernauer, T., T. Böhmelt and V. Koubi (2013). “Is There a Democracy–Civil Society Paradox in Global Environmental Governance?”. <em>Global Environmental Politics</em>, vol. 13(1): 88-107.</p>
-		  <p>Binder, S. and E. Neumayer (2005). “Environmental pressure group strength and air pollution: An empirical analysis”. <em>Ecological Economics</em>, 55: 527-538.</p>
-		  <p>Buitenzorgy, M. and A.P.J. Mol (2010). “Does Democracy Lead to a Better Environment? Deforestation and the Democratic Transition Peak”. <em>Environmental Resource Economics</em>, 48: 59-70.</p>
-		  <p>Bolt, J., R. Inklaar, H. De Jong and J.L. Van Zanden (2018). ”Rebasing ”Maddison”: New Income Comparisons and the Shape of Long-Run Economic Development”. Maddison Working Paper 10.</p>
-		  <p>Coppedge, M., J. Gerring, C.H. Knutsen, S.I. Lindberg, S-E. Skaaning, J. Teorell, D. Altman, M. Bernhard, A. Cornell, M.S. Fish, H, Gjerløw, A. Glynn, A. Hicken, J. Krusell, A. Lührmann, K.L. Marquardt, K. McMann, V. Mechkova, M. Olin, P. Paxton, D. Pemstein, B. Seim, R. Sigman, J. Staton, A. Sundtröm, E. Tzelgov, L. Uberti, Y-T. Wang, T. Wig, and D. Ziblatt (2018). “V-Dem Codebook v8”, Varieties of Democracy (V-Dem) Project.</p>
-		  <p>Chadwick, B.P. “Fisheries, Sovereignties and Red Herrings”. <em>Journal of International Affars</em>, vol. 48(2): 559-584. Desai, U (1998). “Environment, Economic Growth, and Government in Developing Countries”, in (ed.) Desai, U. <em>Ecological Policy and Politics in Developing Countries: Economic Growth, Democracy, and Environment</em>. State University of New York Press: Albany, New York.</p>
-		  <p>Freitag, S., C. Hobson, H.C. Biggs and A.S.V. Jaarsveld (1998). “Testing for potential survey bias: the effect of roads, urban areas and nature reserves on a southern African mammal data set”. <em>Animal Conservation</em>, 1: 119-127.</p>
-		  <p>Li, Q. and R. Reuveny (2006). “Democracy and Environmental Degradation”. <em>International Studies Quarterly</em>, 50: 935-956.</p>
-		  <p>Meyer, C. H. Kreft, R. Guralnick and W. Jetz (2015). “Global priorities for an effective information basis of biodiversity distributions”. <em>Nature Communications</em>, 6:8221.</p>
-		  <p>Neumayer, E (2002). “Do Democracies Exhibit Stronger International Environmental Commitment? A Cross-Country Analysis”. <em>Journal of Peace Research</em>, vol. 39(2): 139-164.</p>
-		  <p>Payne, R.A (1995). “Freedom and the environment”. <em>Journal of Democracy</em>, vol. 6(3). Pellegrini, L. and R. Gerlach (2006). “Corruption, Democracy, and Environmental Policy: An Empirical Contribution to the Debate”. <em>The Journal of Environment &amp; Development</em>, vol. 15(3): 332-354.</p>
-		  <p>Shandra, J.M., C. Leckband, L.A. McKinney and B. London (2009). “Ecologically Unequal Exchange, World Polity, and Biodiversity Loss: A Cross-National Analysis of Threatened Mammals”. <em>International Journal of Comparative Sociology</em>, vol. 50(3-4): 285-310.</p>
-		  <p>Smith, R.J., R.D.J. Muir, M.J Walpole, A. Balmford and M. Leader-Williams (2003). “Governance and the loss of biodiversity”. <em>Nature</em>, 426.</p>
-		  <p>Sundström, A (2015). “Covenants with broken swords: Corruption and law enforcement in governance of the commons”. <em>Global Environmental Change</em>, 31: 253-262.</p>
-		  <p>Yang, W. K. Ma and H. Kreft (2014). “Environmental and socio-economic factors shaping the geography of floristic collections in China”. <em>Global Ecology and Biogeography</em>, 23: 1284-1292.</p>
-
-        </Grid>
+       </Grid>
       </Grid>
     );
   }

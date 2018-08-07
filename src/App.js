@@ -595,7 +595,8 @@ class App extends Component {
             <Grid container>
               <Grid item className="grid-item" xs={12} style={{ paddingTop: 10 }}>
                 <Typography variant="subheading" gutterBottom>
-                  Welcome to explore the connection between <a href="#gbif"><strong>biodiversity</strong></a> knowledge and different dimensions of <a href="#v-dem"><strong>democracy</strong></a> across the globe!
+                  Welcome to explore the connection between occurrence records for biological species available from the <a href="#gbif"><strong>biodiversity</strong></a> and dimensions of <a href="#v-dem"><strong>democracy</strong></a> across the globe!
+				  Scroll down for a demonstration of the features of Bio-Dem in our <a href="#video">video tutorials</a> or to learn more about the underlying data (left column) and included democracy indicators (right column)
                 </Typography>
               </Grid>
               <Grid item className="grid-item" xs={12} md={4}>
@@ -607,8 +608,7 @@ class App extends Component {
 				  the number of occurrence record available from this country and the colour shows the time-aggregated political regime type. 
 				  Hover over any bubble for the country name and the number of records. Use the drop down menus to customize the x- and y-axis 
 				  with different dimensions of democracy. Values for each country are aggregated by median over the chosen time period. 
-				  Use the highlight buttons on top of the plot to choose preselected plots showing particularly exciting results. 
-                  at <a href="#about">About</a>.
+				  Use the highlight buttons on top of the plot to choose preselected plots showing particularly exciting results.
                 </Typography>
               </Grid>
               <Grid item className="grid-item" xs={12} md={8}>
@@ -684,7 +684,7 @@ class App extends Component {
                   Biodiversity knowledge through time 
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  The dual axis chart shows the yearly evolution of the number of public species records together with the values of the selected democracy dimension. Use the drop down menus and the tick boxes to customize your search.
+                  The evolution of species occurrence recording through time. The bars show the number of occurrence records collected from the selected country each year on a logarithmic scale (left y-axis). The overlaid line shows the development of a selected democracy indicator (right y axis). Red blocks at the bottom of the bars indicate years with armed conflict on the country territory. Chose any country and democracy indicator using the drop-down menu, and customize the record count to include only records from domestic institutions or records associated with pictures using the tick boxes.
                 </Typography>
               </Grid>
 
