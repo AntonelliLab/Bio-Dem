@@ -643,7 +643,7 @@ class App extends Component {
                       value={this.state.xyYearMin}
                       onChange={this.handleChange}
                       options={d3.range(1960,2018).map(y => ({
-                        value: y, label: y, disabled: !isWithin(y, xyValidYears) || y < 1963
+                        value: y, label: y, disabled: !isWithin(y, xyValidYears)
                       }))}
                     />
                   </FormControl>
