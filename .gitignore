@@ -9,6 +9,7 @@
 # production
 /build
 /.Rproj.user
+Bio-Dem.Rproj
 
 # misc
 .DS_Store
