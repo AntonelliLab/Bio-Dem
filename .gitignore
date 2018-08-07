@@ -8,6 +8,7 @@
 
 # production
 /build
+/.Rproj.user
 
 # misc
 .DS_Store
@@ -22,3 +23,4 @@ yarn-error.log*
 
 # data
 /public/data
+.Rproj.user

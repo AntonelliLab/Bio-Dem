@@ -583,7 +583,7 @@ class App extends Component {
                   </Typography>
                   <div style={{ borderTop: '1px solid #ccc', marginTop: -10, paddingTop: 10 }}>
                     <Typography variant="subheading" gutterBottom className="heading">
-                    Explore the relations between <a href="#gbif"><strong>biodiversity</strong></a> knowledge and different dimensions of <a href="#v-dem"><strong>democracy</strong></a> across the globe
+                    Explore the connection bewteen <a href="#gbif"><strong>biodiversity</strong></a> knowledge and dimensions of <a href="#v-dem"><strong>democracy</strong></a> across the globe
                     </Typography>
                   </div>
                 </Grid>
@@ -597,8 +597,11 @@ class App extends Component {
                   Biodiversity knowledge &amp; political regimes
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  The scatter plot shows the number of public species records for each country and their mean or median value on two selected dimensions of democracy. Use the drop down menus to customize your search. You can directly move to some particularly exciting results with the highlight buttons below; find explanation of  the plots and the features of Bio-Dem in our <a href="#video">video tutorials</a>, 
-                  and learn more about the underlying data and included variables 
+                  In this interactive scatterplot, each data bubble represents a political country; the size of the bubbles indicates 
+				  the number of occurrence record available from this country and the colour shows the time-aggregated political regime type. 
+				  Hover over any bubble for the country name and the number of records. Use the drop down menus to customize the x- and y-axis 
+				  with different dimensions of democracy. Values for each country are aggregated by median over the chosen time period. 
+				  Use the highlight buttons on top of the plot to choose preselected plots showing particularly exciting results. 
                   at <a href="#about">About</a>.
                 </Typography>
               </Grid>
