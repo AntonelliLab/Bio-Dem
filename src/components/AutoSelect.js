@@ -78,11 +78,12 @@ class AutoSelect extends React.Component {
     this.inputRef = React.createRef();
   }
 
-  handleChange = (data) => {
-    // data is the selected item of the options array, with a value and label field.
+  handleChange = (newValue, meta) => {
+    // newValue is the selected item of the options array, with a value and label field.
+    const data = meta && meta.action === 'clear' ? { value: '' } : newValue;
     const target = {
       ...this.inputRef.current.props,
-      ...data, // Override value from data
+      ...data, // Override value from newValue
     };
 
     if (this.props.onChange) {
@@ -91,7 +92,7 @@ class AutoSelect extends React.Component {
   }
 
   render() {
-    const { options, value, input, onInputChange } = this.props;
+    const { options, value, input, onInputChange, isClearable } = this.props;
     
     const labelItem = options.find(d => d.value === value);
     const label = labelItem === undefined ? value : labelItem.label;
@@ -105,13 +106,15 @@ class AutoSelect extends React.Component {
       fullWidth: true,
       inputComponent: SelectWrapped,
       value,
-      onChange: this.handleChange,
+      // onChange: this.handleChange,
       placeholder: this.props.placeholder,
       inputProps: {
         options,
         value: { value, label },
-        onInputChange
-      }
+        onInputChange,
+        onChange: this.handleChange,
+        isClearable: isClearable && !!value,
+      },
     });
   }
 }
@@ -126,10 +129,12 @@ AutoSelect.propTypes = {
   placeholder: PropTypes.string.isRequired,
   onChange: PropTypes.func,
   input: PropTypes.element,
+  isClearable: PropTypes.bool,
 };
 
 AutoSelect.defaultProps = {
   placeholder: 'Select...',
+  isClearable: false,
 };
 
 // export default withStyles(styles, { withTheme: true })(AutoSelect);
