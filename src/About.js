@@ -117,7 +117,7 @@ class About extends React.Component {
             new version are being published.
           </p>
 		  
-            <h3 id="inthegreatercontext">In the greater context</h2>
+            <h3 id="inthegreatercontext">In the greater context</h3>
           <p>
 		  
             Bio-Dem is build to explore the relation between the number of
@@ -143,16 +143,16 @@ class About extends React.Component {
             and ideally policy.
           </p>
 		  
-          <h2 id="tutorials">Tutorials</h3>
+          <h2 id="tutorials">Tutorials</h2>
           <p>
             Learn more about the features of Bio-Dem to explore the relation between biodiversity data and political regime in our video tutorials:
           </p>
 		  
 
-            <h3 id="tutorial1Biodiversityknowledgeandpoliticalregimes">Tutorial 1 - Biodiversity knowledge & political regimes</h2>
+            <h3 id="tutorial1Biodiversityknowledgeandpoliticalregimes">Tutorial 1 - Biodiversity knowledge & political regimes</h3>
           <p>
 		  
-              <h3 id="tutorial2Biodiversityknowledgethroughtime">Tutorial 2 - Biodiversity knowledge through time</h2>
+              <h3 id="tutorial2Biodiversityknowledgethroughtime">Tutorial 2 - Biodiversity knowledge through time</h3>
           <p>
 		  
 
@@ -184,7 +184,7 @@ class About extends React.Component {
           <h2 id="politicalindicatorvariablesandtheirconnectiontobiodiversitycollections">
             Political indicator variables and their connection to biodiversity
             collections
-          </h3>
+          </h2>
 
           { vdemExplanations.map(d => (
             <div key={d.id}>
