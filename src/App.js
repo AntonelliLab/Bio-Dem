@@ -674,8 +674,8 @@ class App extends Component {
                   The evolution of species occurrence recording through time. The bars show the number of occurrence records collected from the selected 
 				  country each year on a logarithmic scale (left y-axis). The overlaid line shows the development of a selected democracy indicator (right y axis). 
 				  Red blocks at the bottom of the bars indicate years with armed conflict on the country territory. Chose any country and democracy indicator 
-				  withe the drop-down menus,customize the record count to include only records from domestic 
-				  institutions or records associated with pictures using the tick boxes and fitler to certain taxa using the free text field.
+				  with the drop-down menus, customize the record count to include only records from domestic 
+				  institutions or records associated with pictures using the tick boxes and filter to certain taxa using the free text field.
                 </Typography>
               </Grid>
 
