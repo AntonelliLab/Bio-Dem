@@ -17,6 +17,13 @@ const customStyles = {
       boxShadow: "none"
     }
   }),
+  input: () => ({
+    padding: 0,
+  }),
+  clearIndicator: () => ({
+    padding: 0,
+    color: '#ccc',
+  }),
   menu: () => ({
     backgroundColor: "white",
     boxShadow: "1px 2px 6px #888888", // should be changed as material-ui
