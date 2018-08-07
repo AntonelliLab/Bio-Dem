@@ -133,7 +133,6 @@ class App extends Component {
       vdemX: 'v2x_freexp_altinf',
       vdemY: 'v2x_frassoc_thick',
       xyYearMin: 1960,
-      xyReduceFunction: 'mean',
       // Taxon filter
       taxonFilter: '',
       taxaAutocompletes: [],
@@ -428,7 +427,7 @@ class App extends Component {
   }
 
   renderScatterPlot() {
-    const { vdemData, vdemX, vdemY, xyYearMin, xyReduceFunction, gbifCountryFacetData, vdemExplanations } = this.state;
+    const { vdemData, vdemX, vdemY, xyYearMin, gbifCountryFacetData, vdemExplanations } = this.state;
     const vdemXLabel = vdemExplanations[vdemX] ? vdemExplanations[vdemX].short_name : vdemX;
     const vdemYLabel = vdemExplanations[vdemY] ? vdemExplanations[vdemY].short_name : vdemY;
     
@@ -444,9 +443,9 @@ class App extends Component {
         {
           return null;
         }
-        const x = d3[xyReduceFunction](values, d => d[vdemX]);
-        const y = d3[xyReduceFunction](values, d => d[vdemY]);
-        const z = d3[xyReduceFunction](values, d => d.v2x_regime);
+        const x = d3.median(values, d => d[vdemX]);
+        const y = d3.median(values, d => d[vdemY]);
+        const z = d3.median(values, d => d.v2x_regime);
         return { x, y, z };
       })
       .entries(vdemData
@@ -644,19 +643,6 @@ class App extends Component {
                       onChange={this.handleChange}
                       options={d3.range(1960,2018).map(y => ({
                         value: y, label: y, disabled: !isWithin(y, xyValidYears)
-                      }))}
-                    />
-                  </FormControl>
-                  <FormControl className="formControl" style={{ minWidth: 100, margin: 10 }}>
-                    <InputLabel htmlFor="xyReduceFunction">
-                      Reduce by
-                    </InputLabel>
-                    <AutoSelect
-                      input={<Input name="xyReduceFunction" id="xyReduceFunction" />}
-                      value={this.state.xyReduceFunction}
-                      onChange={this.handleChange}
-                      options={['mean', 'median'].map(d => ({
-                        value: d, label: d
                       }))}
                     />
                   </FormControl>
