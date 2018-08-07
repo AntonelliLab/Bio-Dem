@@ -596,8 +596,7 @@ class App extends Component {
             <Grid container>
               <Grid item className="grid-item" xs={12} style={{ paddingTop: 10 }}>
                 <Typography variant="subheading" gutterBottom>
-                  Welcome to explore the connection between occurrence records for biological species available from the <a href="https://www.gbif.org"><strong>biodiversity</strong></a> and <a href="https://www.v-dem.net"><strong>dimensions of democracy</strong></a> across the globe!
-				  Check out our <a href="#video">video tutorials</a> or <a href="#about">learn more</a> to get started.
+                  Welcome to explore the connection between <em>biodiversity</em> data and dimensions of <em>democracy</em> across the globe, using open data from <a href="#gbif"><strong>GBIF</strong></a> and <a href="#v-dem"><strong>V-Dem</strong></a>. Checkout our <a href="#tutorials">video tutorial</a> to get started!
                 </Typography>
               </Grid>
               <Grid item className="grid-item" xs={12} md={4}>
