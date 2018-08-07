@@ -72,7 +72,7 @@ class About extends React.Component {
           </h3>
           
           <p>
-            The Global Biodiversity Information Facility (GBIF) provides access to 
+            <a href="https://www.gbif.org">The Global Biodiversity Information Facility (GBIF)</a> provides access to 
 			digitalized information on the geographic distribution of biological species, mostly 
             georeferenced point occurrences. The data are contributed from scientific
             institutions and citizen science projects around the world and include
@@ -81,9 +81,9 @@ class About extends React.Component {
             science observations. GBIF to date provides free access to more than 1
             billion occurrence records collected in over three centuries 
             around the globe. If you want to learn more about GBIF or access
-            species occurrence information, visit https://www.gbif.org. Bio-Dem fetches
+            species occurrence information, visit <a href="https://www.gbif.org">GBIF</a>. Bio-Dem fetches
             the number of occurrence records live from the
-            latest version of GBIF via the GBIF API.
+            latest version of GBIF via the <a href="https://www.gbif.org/developer/summary">GBIF API</a>.
           </p>
 
           <h3 id="v-dem">
@@ -91,7 +91,7 @@ class About extends React.Component {
           </h3>
 
           <p>
-            Varieties of Democracy (V-Dem) is a research project dedicated to the
+            <a href="https://v-dem.net">Varieties of Democracy (V-Dem)</a> is a research project dedicated to the
             conceptualization and collection of data on democracy. It is one of
             the largest existent databases on democracy containing over 18 million
             data points, where the latest version covers 201 countries and the
@@ -107,7 +107,7 @@ class About extends React.Component {
             or <a href="https://www.v-dem.net/en/data/data-version-8/">
               download the data and browse the codebook
             </a>. Bio-Dem currently uses V-Dem version 8 and will be updated as
-            new version are being published.
+            new versions are being published.
           </p>
 		  
             <h3 id="inthegreatercontext">In the greater context</h3>
