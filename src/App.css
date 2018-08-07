@@ -33,8 +33,25 @@ a, strong {
 }
 
 .section {
-  padding-top: 40px;
+  /* padding-top: 40px; */
   padding-bottom: 40px;
+}
+
+.section-0 {
+  margin-top: 60px !important;
+  position: relative;
+}
+
+.section-0::after {
+  content: "";
+  background: center / contain no-repeat url(logo.svg);
+  opacity: 0.1;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;   
 }
 
 .section-1, .section-3 {
