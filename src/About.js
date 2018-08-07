@@ -127,7 +127,7 @@ class About extends React.Component {
             and laymen naturalist activity--two major sources of species
             occurrence information--are clearly influenced by political structure
             and society of a country, such as the freedom of movement and physical
-            violence. We only included those indicators in Bio-Dem which have a
+            violence. We only included those indicators in Bio-Dem which have a 
             <a href="#politicalindicatorvariablesandtheirconnectiontobiodiversitycollections">mechanistic link</a> to biodiversity collections.
             Indeed, interesting patterns emerge globally and
             for individual countries through time as shown by the example plots. We consider Bio-Dem primarily
