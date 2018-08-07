@@ -27,7 +27,7 @@ class About extends React.Component {
           </p>
 
           <p>
-            Fantstic as it is, the data available from such public aggregators is often biased geographically,
+            Fantastic as it is, the data available from such public aggregators is often biased geographically,
             for instance because some localities are more easily accessible, more
             spectacular or have a stronger naturalist history then others. While
             it is relative well understood which geographic factors favour record
@@ -41,9 +41,9 @@ class About extends React.Component {
           </p>
 
           <p>
-            Bio-Dem addresses this gap, and provides a tool to explore biodiversity knowledge
-            (approximated as geographic occurrence records in GBIF) in relation to political
-            systems around the world. Some specific questions that motivated the development of Bio-Dem are:{" "}
+            Bio-Dem addresses this gap, and provides a web-app to visually explore the availability of geographic occurrence records of biological species available from 
+			the Global Biodiversity Information Facility (as proxy for scientific biodiversity knowledge) in relation to political systems around the world
+            Some specific questions that motivated the development of Bio-Dem are:{" "}
           </p>
 
           <ul>
