@@ -481,7 +481,7 @@ class App extends Component {
       color: d => regimeColor(d.value.z),
       tooltip: d => `
         <div>
-          <div><strong>Country:</strong> ${d.key}</div>
+          <div><strong>Country:</strong> ${byAlpha3[d.key] ? byAlpha3[d.key].name : d.key}</div>
           <div><strong>Records:</strong> ${d.value.records.toLocaleString('en')}</div>
         </div>
       `,
