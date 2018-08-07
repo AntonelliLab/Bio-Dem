@@ -4,7 +4,7 @@
 
 Relatively little is known about the effect of society and political systems on the collection of biological specimens. This is surprising, because some societies would obviously favour naturalist activity (e.g. open, safe, democratic) compared to others (repressive, unsafe, authoritarian), and because extensive literature exists that links the environmental performance of countries to their political system.
 
-Bio-Dem is an open-source app to address this gap. It visualizes the number of occurrence records available from the [Global Biodiversity Information Facility](www.gbif.org) in relation to political systems as defined by [V-Dem](https://www.v-dem.net/) around the world. Some specific questions that motivated the development of Bio-Dem are:
+Bio-Dem is an open-source app to address this gap. It visualizes the number of occurrence records available from the [Global Biodiversity Information Facility](https://www.gbif.org) in relation to political systems as defined by [V-Dem](https://www.v-dem.net/) around the world. Some specific questions that motivated the development of Bio-Dem are:
 
 * Are democracies superior in record collection and mobilization?
 * Which dimensions of political systems are important (e.g. freedom of movement, rule of law or strength of the civil society)?
@@ -25,8 +25,11 @@ Documentation and background information on Bio-Dem, the data used and the theor
 
 # Team members
 Alexander Zizka, V-Dem Institute, Department of Political Sciences, University of Gothenburg, Sweden
+
 Daniel Edler, Department of Physics, University of Umeå, Sweden
+
 Johannes Klein, Gothenburg Global Biodiversity Centre, University of Gothenburg, Sweden
+
 Oskar Rydén, Department of Biological and Environmental Sciences, University of Gothenburg, Sweden
 
 # Link to source location
