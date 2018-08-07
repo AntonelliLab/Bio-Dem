@@ -168,7 +168,7 @@ class About extends React.Component {
 		  <p>Freitag, S., C. Hobson, H.C. Biggs and A.S.V. Jaarsveld (1998). “Testing for potential survey bias: the effect of roads, urban areas and nature reserves on a southern African mammal data set”. <em>Animal Conservation</em>, 1: 119-127.</p>
 		  <p>Li, Q. and R. Reuveny (2006). “Democracy and Environmental Degradation”. <em>International Studies Quarterly</em>, 50: 935-956.</p>
 		  <p>Meyer, C. H. Kreft, R. Guralnick and W. Jetz (2015). “Global priorities for an effective information basis of biodiversity distributions”. <em>Nature Communications</em>, 6:8221.</p>
-		  <p>Midlarsky M.I. (1998). “Democracy and the Environment: An Empirical Assessment”. <em>Journal of peace Research<em>, 35(3):341-361.</p>
+		  <p>Midlarsky M.I. (1998). “Democracy and the Environment: An Empirical Assessment”. <em>Journal of peace Research</em>, 35(3):341-361.</p>
 		  <p>Neumayer, E (2002). “Do Democracies Exhibit Stronger International Environmental Commitment? A Cross-Country Analysis”. <em>Journal of Peace Research</em>, vol. 39(2): 139-164.</p>
 		  <p>Payne, R.A (1995). “Freedom and the environment”. <em>Journal of Democracy</em>, vol. 6(3). Pellegrini, L. and R. Gerlach (2006). “Corruption, Democracy, and Environmental Policy: An Empirical Contribution to the Debate”. <em>The Journal of Environment &amp; Development</em>, vol. 15(3): 332-354.</p>
 		  <p>Shandra, J.M., C. Leckband, L.A. McKinney and B. London (2009). “Ecologically Unequal Exchange, World Polity, and Biodiversity Loss: A Cross-National Analysis of Threatened Mammals”. <em>International Journal of Comparative Sociology</em>, vol. 50(3-4): 285-310.</p>
