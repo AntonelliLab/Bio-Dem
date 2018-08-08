@@ -144,6 +144,25 @@ const RegimeLegend = () => (
   </Grid>
 );
 
+const HighlightsButtonGroup = (props) => (
+  <div className="toggleContainer">
+    <ToggleButtonGroup {...props} exclusive >
+      {
+        props.highlights.map((h, index) => (
+          <ToggleButton key={index} value={index}>
+            <Typography variant="body1" gutterBottom>
+              {h.buttonLabel}
+            </Typography>
+          </ToggleButton>
+        ))
+      }
+    </ToggleButtonGroup>
+    <Typography variant="body1" gutterBottom>
+      { props.value !== null ? props.highlights[props.value].explanation : null }
+    </Typography>
+  </div>
+);
+
 class App extends Component {
   constructor(props) {
     super(props);
