@@ -254,6 +254,7 @@ export default function ScatterPlot(el, properties) {
       // closest to the mouse, limited by max distance voronoiRadius
       const site = voronoiDiagram.find(mx, my, voronoiRadius);
       if (site && site.data) {
+        highlight(null);
         props.onClick(site.data);
       }
     }
