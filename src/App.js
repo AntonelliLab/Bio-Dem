@@ -385,6 +385,7 @@ class App extends Component {
       await this.makeYearFacetQuery(alpha2);
     }
 
+    // Changes in state that require a new GBIF country facet query
     const fetchNewYearCondition = this.state.xyYearMin !== prevState.xyYearMin;
 
     if (fetchNewYearCondition) {
@@ -642,7 +643,29 @@ class App extends Component {
     this.setState({
       country: d.key,
     });
-  }
+  };
+
+  onScatterPlotHighlightsChange = index => {
+    this.setState({ activeScatterPlotHighlight: index });
+    // If the current highlight is deselected, do nothing
+    if (index === null) {
+      return;
+    }
+    this.scatterPlotHighlights[index].onActivated(() => {
+      this.renderScatterPlot();
+    });
+  };
+
+  onDualChartHighlightsChange = index => {
+    this.setState({ activeDualChartHighlight: index });
+    // If the current highlight is deselected, do nothing
+    if (index === null) {
+      return;
+    }
+    this.dualChartHighlights[index].onActivated(() => {
+      this.renderDualChart();
+    });
+  };
 
   onScatterPlotChangeNormalization = (event) => {
     const { value, checked } = event.target;
