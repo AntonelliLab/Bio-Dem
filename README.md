@@ -42,7 +42,7 @@ http://bio-dem.surge.sh/#tutorials
 https://github.com/AntonelliLab/Bio-Dem/issues.
 
 # Contributing
-If you want to contribute to the project, send a pull request or contact [us](zizka.alexander@gmail.com).
+If you want to contribute to the project, send a pull request or contact [us](mailto:zizka.alexander@gmail.com).
 
 # Citation
 Edler D, Klein J, Ryden O and Zizka A. (2018) Bio-Dem - Biodiversity knowledge & democracy. Available at http://bio-dem.surge.sh/.
