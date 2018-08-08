@@ -24,7 +24,7 @@ Documentation and background information on Bio-Dem, the data used and the theor
 
 
 # Team members
-Alexander Zizka<sup>1</sup>, Daniel Edler<sup>2,3</sup>, Johannes Klein<sup>3</sup>, Oskar Rydén<sup>4</sup>
+Alexander Zizka<sup>1,3</sup>, Daniel Edler<sup>2,3</sup>, Johannes Klein<sup>3</sup>, Oskar Rydén<sup>3,4</sup>
 1. V-Dem Institute, Department of Political Sciences, University of Gothenburg, Sweden
 2. Department of Physics, University of Umeå, Sweden
 3. Gothenburg Global Biodiversity Centre, University of Gothenburg, Sweden
