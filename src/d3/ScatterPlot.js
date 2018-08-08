@@ -31,6 +31,7 @@ export default function ScatterPlot(el, properties) {
     title: "",
     tooltip: null,
     fetching: false,
+    selected: (d) => false,
   }, properties);
 
   const anchorElement = d3.select(el);
@@ -83,6 +84,9 @@ export default function ScatterPlot(el, properties) {
   // const color = d3.scaleOrdinal(d3.schemeCategory10);
   const color = (d) => {
     return props.fetching ? '#aaa' : props.color(d);
+  }
+  const strokeColor = (d) => {
+    return props.selected(d) ? 'red' : props.color(d);
   }
   const opacity = (d) => {
     return 0.5;
@@ -153,7 +157,7 @@ export default function ScatterPlot(el, properties) {
       .attr("cy", d => y(props.y(d)))
       .attr("r", d => value(props.value(d)))
       .style("fill", d => color(d))
-      .style("stroke", d => color(d))
+      .style("stroke", d => strokeColor(d))
       .style("fill-opacity", d => opacity(d))
       // .on("mouseover", function (d) {
       //   tooltip.transition()
@@ -242,6 +246,19 @@ export default function ScatterPlot(el, properties) {
     highlight(null);
   }
 
+  function onMouseClick() {
+    if (props.onClick) {
+      const [mx, my] = d3.mouse(this);
+      
+      // use the new diagram.find() function to find the Voronoi site
+      // closest to the mouse, limited by max distance voronoiRadius
+      const site = voronoiDiagram.find(mx, my, voronoiRadius);
+      if (site && site.data) {
+        props.onClick(site.data);
+      }
+    }
+  }
+
   // add an overlay on top of everything to take the mouse events
   const overlay = g.append('rect')
   .attr('class', 'overlay')
@@ -253,6 +270,7 @@ export default function ScatterPlot(el, properties) {
   if (props.tooltip) {
     overlay
     .on('mousemove', onMouseMove)
-    .on('mouseleave', onMouseLeave);
+    .on('mouseleave', onMouseLeave)
+    .on('click', onMouseClick);
   }
 }

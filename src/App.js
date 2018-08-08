@@ -406,6 +406,12 @@ class App extends Component {
     this.setState({ [event.target.name]: event.target.value });
   }
 
+  onScatterPlotClickCountry = (d) => {
+    this.setState({
+      country: d.key,
+    });
+  }
+
   /**
    * Get valid year range for selected data dimensions
    * This will adjust for data limits where certain dimensions lack values for all countries.
@@ -487,7 +493,9 @@ class App extends Component {
       `,
       xLabel: vdemXLabel,
       yLabel: vdemYLabel,
-      title: 'Number of public species records per country'
+      title: 'Number of public species records per country',
+      selected: d => d.key === this.state.country,
+      onClick: this.onScatterPlotClickCountry,
     });
   }
 
