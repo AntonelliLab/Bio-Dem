@@ -46,6 +46,14 @@ const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
  */
 const vdemExplanationsUrl = `${process.env.PUBLIC_URL}/data/vdem_variables_explanations.csv`;
 
+/**
+ * Country data
+ * country,area,e_regionpol
+AFG,642182,8
+AGO,1244654,4
+ */
+const countryDataUrl = `${process.env.PUBLIC_URL}/data/country_data.csv`;
+
 const vdemOptions = [
   // { value: 'v2x_regime' },
   { value: 'v2x_polyarchy' },
@@ -67,6 +75,20 @@ const regimeTypes = {
   1: 'Electoral autocracy',
   2: 'Electoral democracy',
   3: 'Liberal democracy',
+};
+
+const regions = {
+  1: 'Eastern Europe and Central Asia',
+  2: 'Latin America',
+  3: 'The Middle East and North Africa',
+  4: 'Sub-Saharan Africa',
+  5: 'Western Europe and North America',
+  6: 'East Asia',
+  7: 'South-East Asia',
+  8: 'South Asia',
+  9: 'The Pacific',
+  10: 'The Carribean',
+  'NA': 'NA',
 };
 
 // Some external variables lack data for all countries before or after a certain year
@@ -133,6 +155,7 @@ class App extends Component {
       vdemX: 'v2x_freexp_altinf',
       vdemY: 'v2x_frassoc_thick',
       xyYearMin: 1960,
+      normalizeByArea: false,
       // Taxon filter
       taxonFilter: '',
       taxaAutocompletes: [],
@@ -185,9 +208,7 @@ class App extends Component {
     this.setState({
       fetching: true,
     });
-    await this.makeYearFacetQuery(byAlpha3[this.state.country].alpha2);
-    await this.makeCountryFacetQuery();
-    const vdemData = csv(vdemDataUrl, row => {
+    const vdemDataPromise = csv(vdemDataUrl, row => {
       const year = +row.year;
       if (Number.isNaN(year)) {
         return null;
@@ -209,7 +230,7 @@ class App extends Component {
         confl: +row.confl,
       };
     });
-    const vdemExplanations = csv(vdemExplanationsUrl, row => {
+    const vdemExplanationsPromise = csv(vdemExplanationsUrl, row => {
       return {
         id: row.id,
         full_name: row.full_name,
@@ -219,7 +240,29 @@ class App extends Component {
         references: row.references,
       };
     });
-    const data = await Promise.all([vdemData, vdemExplanations]);
+    const countryDataPromise = csv(countryDataUrl, row => {
+      return {
+        value: row.country,
+        label: byAlpha3[row.country] ? byAlpha3[row.country].name : row.country,
+        area: +row.area,
+        // e_regionpol: row.e_regionpol,
+        region: regions[row.e_regionpol],
+      };
+    });
+    const [vdemData, vdemExplanations, countryData] = await Promise.all([
+      vdemDataPromise,
+      vdemExplanationsPromise,
+      countryDataPromise,
+      this.makeYearFacetQuery(byAlpha3[this.state.country].alpha2),
+      this.makeCountryFacetQuery(),
+    ]);
+    const countryMap = {};
+    countryData.forEach(d => {
+      countryMap[d.value] = d;
+    })
+    this.countryMap = countryMap;
+
+    const data = [vdemData, vdemExplanations, countryData];
     this.data = data;
     this.setState({
       loaded: true,
@@ -294,11 +337,7 @@ class App extends Component {
 
   async initData() {
     const data = await this.fetchData();
-    const [vdemData, vdemExplanationsArray] = data;
-    const countryKeys = {};
-    vdemData.forEach(d => {
-      countryKeys[d.country] = 1;
-    });
+    const [vdemData, vdemExplanationsArray, countryData] = data;
     const vdemExplanations = {};
     vdemExplanationsArray.forEach(d => {
       vdemExplanations[d.id] = d;
@@ -313,20 +352,11 @@ class App extends Component {
       d.references = vdemExplanations[d.value].references;
       d.full_name = vdemExplanations[d.value].full_name;
     });
-    const countries = Object.keys(countryKeys).map(alpha3 => {
-      const iso = byAlpha3[alpha3];
-      return {
-        value: alpha3,
-        label: iso ? iso.name : alpha3,
-        alpha3: alpha3,
-        alpha2: iso ? iso.alpha2 : undefined,
-      };
-    });
     this.setState({
       loaded: true,
       vdemData,
       vdemExplanations,
-      countries,
+      countries: countryData,
     }, () => {
       this.renderCharts();
     });
@@ -412,6 +442,15 @@ class App extends Component {
     });
   }
 
+  onScatterPlotChangeNormalization = (event) => {
+    const { value, checked } = event.target;
+    this.setState({
+      [value]: checked,
+    }, () => {
+      this.renderScatterPlot();
+    });
+  }
+
   /**
    * Get valid year range for selected data dimensions
    * This will adjust for data limits where certain dimensions lack values for all countries.
@@ -483,11 +522,13 @@ class App extends Component {
       // y: d => d[vdemY],
       x: d => d.value.x,
       y: d => d.value.y,
-      value: d => d.value.records,
+      value: d => this.state.normalizeByArea ? d.value.records / this.countryMap[d.key].area : d.value.records,
       color: d => regimeColor(d.value.z),
       tooltip: d => `
         <div>
-          <div><strong>Country:</strong> ${byAlpha3[d.key] ? byAlpha3[d.key].name : d.key}</div>
+          <div><strong>Country:</strong> ${this.countryMap[d.key].label}</div>
+          <div><strong>Region:</strong> ${this.countryMap[d.key].region}</div>
+          <div><strong>Area:</strong> ${this.countryMap[d.key].area.toLocaleString('en')} km²</div>
           <div><strong>Records:</strong> ${d.value.records.toLocaleString('en')}</div>
         </div>
       `,
@@ -655,6 +696,16 @@ class App extends Component {
                       }))}
                     />
                   </FormControl>
+                  <FormControlLabel
+                    control={
+                    <Checkbox
+                      checked={this.state.normalizeByArea}
+                      onChange={this.onScatterPlotChangeNormalization}
+                      value="normalizeByArea"
+                    />
+                    }
+                    label="Normalize records by country area"
+                  />
                   <Zoom in={xyYearIntervalLimited} mountOnEnter unmountOnExit>
                     <Notice variant="warning" message={
                       <span>Yearly data only available in the sub interval <strong>[{xyValidYears.toString()}]</strong> for the selected dimensions</span>
