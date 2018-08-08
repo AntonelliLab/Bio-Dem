@@ -358,6 +358,9 @@ class App extends Component {
       // Taxon filter
       taxonFilter: '',
       taxaAutocompletes: [],
+      // Active highlights
+      activeScatterPlotHighlight: null,
+      activeDualChartHighlight: null
     };
     this.refScatterPlot = React.createRef();
     this.refDualChart = React.createRef();
