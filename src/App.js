@@ -373,11 +373,12 @@ class App extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     // Changes in state that require a new GBIF year facet query
-    const fetchNewCountryCondition = this.state.onlyDomestic !== prevState.onlyDomestic
-      || this.state.country !== prevState.country
-      || this.state.taxonFilter !== prevState.taxonFilter
-      || this.state.onlyWithImage !== prevState.onlyWithImage;
-    
+    const fetchNewCountryCondition =
+      this.state.onlyDomestic !== prevState.onlyDomestic ||
+      this.state.country !== prevState.country ||
+      this.state.taxonFilter !== prevState.taxonFilter ||
+      this.state.onlyWithImage !== prevState.onlyWithImage;
+
     if (fetchNewCountryCondition) {
       // Get alpha2 ISO code for this country, as this is what GBIF requires as query
       // TODO: Catch cases where !byAlpha3[event.target.value]
@@ -402,14 +403,14 @@ class App extends Component {
       // Re-render charts with new size
       this.renderCharts();
     });
-  }
+  };
 
   async fetchData() {
     if (this.data) {
       return this.data;
     }
     this.setState({
-      fetching: true,
+      fetching: true
     });
     const vdemDataPromise = csv(vdemDataUrl, row => {
       const year = +row.year;
@@ -430,7 +431,7 @@ class App extends Component {
         e_peaveduc: +row.e_peaveduc,
         e_migdppc: +row.e_migdppc,
         e_wri_pa: +row.e_wri_pa,
-        confl: +row.confl,
+        confl: +row.confl
       };
     });
     const vdemExplanationsPromise = csv(vdemExplanationsUrl, row => {
@@ -440,7 +441,7 @@ class App extends Component {
         short_name: row.short_name,
         description: row.description,
         relevance: row.relevance,
-        references: row.references,
+        references: row.references
       };
     });
     const countryDataPromise = csv(countryDataUrl, row => {
@@ -469,12 +470,12 @@ class App extends Component {
     this.data = data;
     this.setState({
       loaded: true,
-      fetching: false,
+      fetching: false
     });
     return data;
   }
 
-  makeYearFacetQuery = async (country) => {
+  makeYearFacetQuery = async country => {
     const { onlyDomestic, onlyWithImage, taxonFilter } = this.state;
     // Query the GBIF API
     console.log('Query gbif with year facet...');
@@ -492,7 +493,7 @@ class App extends Component {
 
     const gbifData = result.response.data.facets[0].counts.map(d => ({
       year: +d.name,
-      collections: +d.count,
+      collections: +d.count
     }));
     // Fetching is complete rerender chart
     this.setState({
@@ -521,7 +522,7 @@ class App extends Component {
     result.response.data.facets[0].counts.map(d => {
       const alpha2Country = byAlpha2[d.name];
       gbifCountryFacetData[alpha2Country ? alpha2Country.alpha3 : null] = {
-        collections: d.count,
+        collections: d.count
       };
       return true;
     });
@@ -536,7 +537,7 @@ class App extends Component {
         this.renderCharts();
       }
     );
-  }
+  };
 
   async initData() {
     const data = await this.fetchData();
@@ -565,14 +566,14 @@ class App extends Component {
     });
   }
 
-  handleChange = (event) => {
+  handleChange = event => {
     // console.log('handleChange, key:', event.target.name, 'value:', event.target.value);
     this.setState({ [event.target.name]: event.target.value }, () => {
       this.renderCharts();
     });
-  }
+  };
 
-  onDualChartChangeVdemVariable = (event) => {
+  onDualChartChangeVdemVariable = event => {
     // const { vdemData, country } = this.state;
     // const vdemVariable = event.target.value;
     // const vdemValues = vdemData.filter(d => d.country === country);
@@ -594,7 +595,7 @@ class App extends Component {
     this.setState({ [event.target.name]: event.target.value }, () => {
       this.renderDualChart();
     });
-  }
+  };
 
   onInputChangeTaxonFilter = debounce((newValue) => {
     if (newValue.length > 1) {
@@ -612,7 +613,7 @@ class App extends Component {
     });
   }
 
-  makeAutocompletesQuery = async (newValue) => {
+  makeAutocompletesQuery = async newValue => {
     // Query autocompletes API
     console.log('Query gbif autocompletes API ...');
     const gbifError = Object.assign({}, this.state.gbifError);
@@ -630,18 +631,21 @@ class App extends Component {
       return;
     }
     // Transform the taxa array into the requered form
-    const taxaAutocompletes = result.response.data.map(t => ({ label: t.canonicalName, value: t.nubKey || t.key }));
+    const taxaAutocompletes = result.response.data.map(t => ({
+      label: t.canonicalName,
+      value: t.nubKey || t.key
+    }));
     // Save retrieved taxa to state
     this.setState({ taxaAutocompletes });
-  }
-  handleCountryChange = async (event) => {
+  };
+  handleCountryChange = async event => {
     // console.log('querying for this country: ', event.target.value);
     this.setState({ [event.target.name]: event.target.value });
-  }
+  };
 
-  onScatterPlotClickCountry = (d) => {
+  onScatterPlotClickCountry = d => {
     this.setState({
-      country: d.key,
+      country: d.key
     });
   };
 
@@ -687,7 +691,7 @@ class App extends Component {
     const dim = Array.isArray(dimension) ? dimension : [dimension];
     return [
       d3.max([...dim.map(d => startYear[d]), defaultStartYear]),
-      d3.min([...dim.map(d => stopYear[d]), defaultEndYear]),
+      d3.min([...dim.map(d => stopYear[d]), defaultEndYear])
     ];
   }
 
@@ -761,7 +765,7 @@ class App extends Component {
       yLabel: vdemYLabel,
       title: 'Number of public species records per country',
       selected: d => d.key === this.state.country,
-      onClick: this.onScatterPlotClickCountry,
+      onClick: this.onScatterPlotClickCountry
     });
   }
 
@@ -787,7 +791,7 @@ class App extends Component {
     });
     // console.log('gbifRecordsByYear:', gbifRecordsByYear);
     // console.log('vdemFiltered:', vdemFiltered);
-    
+
     // console.log('renderCharts with fethcing:', fetching);
     DualChart(this.refDualChart.current, {
       // data: gbifDataFiltered,
@@ -815,7 +819,7 @@ class App extends Component {
       yLabel: 'Number of records',
       y2Label: y2Label,
       title: 'Number of public species records per country and year',
-      fetching,
+      fetching
     });
   }
 
@@ -825,7 +829,7 @@ class App extends Component {
       <div style={{ height: 10 }}>
         { loaded && !fetching ? null : <LinearProgress /> }
       </div>
-    )
+    );
   }
 
   render() {
@@ -950,11 +954,9 @@ class App extends Component {
               </Grid>
             </Grid>
           </Grid>
-          
 
           <Grid item className="grid-item section section-2" xs={12}>
             <Grid container>
-
               <Grid item className="grid-item" xs={12} md={4}>
                 <Typography variant="headline" gutterBottom className="heading">
                   Biodiversity knowledge through time 
@@ -974,7 +976,6 @@ class App extends Component {
               </Grid>
 
               <Grid item className="grid-item" xs={12} md={8}>
-                
                 <div id="dualChart" ref={this.refDualChart} />
                 <RegimeLegend />
                 
@@ -1048,9 +1049,8 @@ class App extends Component {
           </Grid>
 
           <Grid item className="grid-item section section-3" xs={12}>
-            <About vdemExplanations={this.state.vdemExplanations}/>
+            <About vdemExplanations={this.state.vdemExplanations} />
           </Grid>
-
         </Grid>
       </div>
     );
