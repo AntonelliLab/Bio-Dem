@@ -9,6 +9,7 @@
 # production
 /build
 /.Rproj.user
+.Rhistory
 Bio-Dem.Rproj
 
 # misc
