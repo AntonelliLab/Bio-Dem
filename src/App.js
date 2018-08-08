@@ -12,6 +12,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Zoom from '@material-ui/core/Zoom';
+import ToggleButton, { ToggleButtonGroup } from "@material-ui/lab/ToggleButton";
 import * as d3 from 'd3';
 import { csv } from 'd3-fetch';
 import debounce from 'lodash/debounce';
@@ -54,19 +55,29 @@ AGO,1244654,4
  */
 const countryDataUrl = `${process.env.PUBLIC_URL}/data/country_data.csv`;
 
+// The strings for the v-dem variables used to get the static data
+const v2x_polyarchy = "v2x_polyarchy";
+const v2x_freexp_altinf = "v2x_freexp_altinf";
+const v2x_frassoc_thick = "v2x_frassoc_thick";
+const v2x_corr = "v2x_corr";
+const e_peaveduc = "e_peaveduc";
+const e_migdppc = "e_migdppc";
+// Protected areas
+const e_wri_pa = "e_wri_pa";
+
 const vdemOptions = [
   // { value: 'v2x_regime' },
-  { value: 'v2x_polyarchy' },
-  { value: 'v2x_freexp_altinf' },
-  { value: 'v2x_frassoc_thick' },
-  { value: 'v2xcl_dmove' },
-  { value: 'v2xcs_ccsi' },
-  { value: 'v2x_corr' },
-  { value: 'v2x_clphy' },
+  { value: v2x_polyarchy },
+  { value: v2x_freexp_altinf },
+  { value: v2x_frassoc_thick },
+  { value: "v2xcl_dmove" },
+  { value: "v2xcs_ccsi" },
+  { value: v2x_corr },
+  { value: "v2x_clphy" },
   // { value: 'e_regiongeo' },
-  { value: 'e_peaveduc' },
-  { value: 'e_migdppc' },
-  { value: 'e_wri_pa' },
+  { value: e_peaveduc },
+  { value: e_migdppc },
+  { value: e_wri_pa }
   // { value: 'conf' },
 ];
 
@@ -133,7 +144,195 @@ const RegimeLegend = () => (
   </Grid>
 );
 
+const HighlightsButtonGroup = (props) => (
+  <div className="toggleContainer">
+    <ToggleButtonGroup {...props} exclusive >
+      {
+        props.highlights.map((h, index) => (
+          <ToggleButton key={index} value={index}>
+            <Typography variant="body1" gutterBottom>
+              {h.buttonLabel}
+            </Typography>
+          </ToggleButton>
+        ))
+      }
+    </ToggleButtonGroup>
+    <Typography variant="body1" gutterBottom>
+      { props.value !== null ? props.highlights[props.value].explanation : null }
+    </Typography>
+  </div>
+);
+
 class App extends Component {
+  scatterPlotHighlights = [
+    {
+      buttonLabel: "Protected areas",
+      explanation:
+        "The majority of high record countries (large bubbles) are democracies (yellow or green) and located in the lower right corner of the plot. The majority of low record countries (small bubbles) are in the lower left corner, indicating that higher polyarchy corresponds to more collected records. There are four countries, two closed autocracies (Bhutan and Saudi Arabia, purple), one electoral autocracy (Seychelles, blue) and one electoral democracy (Venezuela), that protect a relatively large share of land area.",
+      onActivated: pc => {
+        this.setState(
+          {
+            vdemY: e_wri_pa,
+            vdemX: v2x_polyarchy,
+            xyYearMin: 1990
+          },
+          () => {
+            pc();
+          }
+        );
+      }
+    },
+    {
+      buttonLabel: "Corruption",
+      explanation:
+        "The majority of high record countries are liberal democracies (large, yellow bubbles) and have little corruption. Furthermore, record collection seems largely independent of the level of corruption (large bubbles are distributed horizontally) and corrupt countries can have many collection records. Additionally, corrupt countries can have relatively larger share of protected areas.",
+      onActivated: pc => {
+        this.setState(
+          {
+            vdemY: e_wri_pa,
+            vdemX: v2x_corr,
+            xyYearMin: 1990
+          },
+          () => {
+            pc();
+          }
+        );
+      }
+    },
+    {
+      buttonLabel: "GDP",
+      explanation:
+        "Democratic and economically developed countries often have many GBIF records (large bubbles cluster in the upper right corner of the plot). However, some economically rich countries have very few records (small bubbles with high values on the y-axis: Cyprus, Libya), and some relatively less developed countries have a large number of records (China, India, Tanzania and Uganda), indicating heterogeneity of biological record collection across both democracy and economic development.",
+      onActivated: pc => {
+        this.setState(
+          {
+            vdemY: e_migdppc,
+            vdemX: v2x_polyarchy,
+            xyYearMin: 1960
+          },
+          () => {
+            pc();
+          }
+        );
+      }
+    },
+    {
+      buttonLabel: "Education",
+      explanation:
+        "The number of available occurrence records increases with GDP per capita and length of education (bubble size increases from the lower left to the upper right corner). For instance, Burundi (purple bubble in the lower left corner) and Canada (yellow bubble in the upper right corner), are typical examples for this trend. In contrast India does not follow the general pattern, being a large bubble in the lower left corner.",
+      onActivated: pc => {
+        this.setState(
+          {
+            vdemY: e_peaveduc,
+            vdemX: e_migdppc,
+            xyYearMin: 1960
+          },
+          () => {
+            pc();
+          }
+        );
+      }
+    }
+  ];
+
+  dualChartHighlights = [
+    {
+      buttonLabel: "Angola",
+      explanation:
+        'The Angolan Civil War. In 1975, when the Angolan Civil War broke out, the collection activity drops drastically. This pattern is valid up until the end of the 1990\'s, a couple of years before the war ended and is visible for domestic and total collections. Ticking the "only domestic records box" furthermore reveals the importance of foreign collections for the country, especially until the mid 1990ies.',
+      onActivated: pc => {
+        this.setState(
+          {
+            country: 'AGO',
+            vdemVariable: v2x_polyarchy,
+            onlyDomestic: false,
+            onlyWithImage: false,
+            filterTaxon: null
+          },
+          () => {
+            pc();
+          }
+        );
+      }
+    },
+    {
+      buttonLabel: "India",
+      explanation:
+        'The Emergency in India 1975 and domestic records. From 1975 and 1977, "The Emergency" took place in India, an event of political turmoil where the prime minister declared a state of emergency and put political rights on freeze in order to take control over the rule. We see that this instability event coincides with a drop in domestic biological record collection.',
+      onActivated: pc => {
+        this.setState(
+          {
+            country: 'IND',
+            vdemVariable: v2x_polyarchy,
+            onlyDomestic: true,
+            onlyWithImage: false,
+            filterTaxon: null
+          },
+          () => {
+            pc();
+          }
+        );
+      }
+    },
+    {
+      buttonLabel: "Czechia",
+      explanation:
+        "The fall of the Soviet Union. In Czechia, record availability from domestic institutions only starts after the Soviet Union collapsed. Possibly a partial effect from the political liberalization and the country's independence.",
+      onActivated: pc => {
+        this.setState(
+          {
+            country: 'CZE',
+            vdemVariable: v2x_polyarchy,
+            onlyDomestic: true,
+            onlyWithImage: false,
+            filterTaxon: null
+          },
+          () => {
+            pc();
+          }
+        );
+      }
+    },
+    {
+      buttonLabel: "Cambodia",
+      explanation:
+        'Decades of political instability in Cambodia. Starting in the 1970\'s, Cambodia experienced a long period of conflicts and autocratization, which coincides with a decrease in biological record collection during this period.',
+      onActivated: pc => {
+        this.setState(
+          {
+            country: 'KHM',
+            vdemVariable: v2x_polyarchy,
+            onlyDomestic: false,
+            onlyWithImage: false,
+            filterTaxon: null
+          },
+          () => {
+            pc();
+          }
+        );
+      }
+    },
+    {
+      buttonLabel: "Indonesia",
+      explanation:
+        'Economic development and domestic collections in Indonesia. In the beginning of the 1980\'s, we see a start of domestic record collection that which increases following Indonesia\'s acceleration in gross domestic product per capita increase in the 1990\'ies. Displaying all records show that the proportion collected by domestic institutions also increases.',
+      onActivated: pc => {
+        this.setState(
+          {
+            country: 'IDN',
+            vdemVariable: e_migdppc,
+            onlyDomestic: true,
+            onlyWithImage: false,
+            filterTaxon: null
+          },
+          () => {
+            pc();
+          }
+        );
+      }
+    }
+  ];
+
   constructor(props) {
     super(props);
     this.state = {
@@ -145,20 +344,23 @@ class App extends Component {
       vdemExplanations: {},
       loaded: false,
       fetching: false,
-      country: 'SWE',
-      vdemVariable: 'v2x_freexp_altinf',
+      country: "SWE",
+      vdemVariable: v2x_freexp_altinf,
       filterTaxon: undefined,
       countries: [],
       yearMin: 1960,
       yearMax: 2018,
       // XY Plot:
-      vdemX: 'v2x_freexp_altinf',
-      vdemY: 'v2x_frassoc_thick',
+      vdemX: v2x_freexp_altinf,
+      vdemY: v2x_frassoc_thick,
       xyYearMin: 1960,
       normalizeByArea: false,
       // Taxon filter
       taxonFilter: '',
       taxaAutocompletes: [],
+      // Active highlights
+      activeScatterPlotHighlight: null,
+      activeDualChartHighlight: null
     };
     this.refScatterPlot = React.createRef();
     this.refDualChart = React.createRef();
@@ -171,11 +373,12 @@ class App extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     // Changes in state that require a new GBIF year facet query
-    const fetchNewCountryCondition = this.state.onlyDomestic !== prevState.onlyDomestic
-      || this.state.country !== prevState.country
-      || this.state.taxonFilter !== prevState.taxonFilter
-      || this.state.onlyWithImage !== prevState.onlyWithImage;
-    
+    const fetchNewCountryCondition =
+      this.state.onlyDomestic !== prevState.onlyDomestic ||
+      this.state.country !== prevState.country ||
+      this.state.taxonFilter !== prevState.taxonFilter ||
+      this.state.onlyWithImage !== prevState.onlyWithImage;
+
     if (fetchNewCountryCondition) {
       // Get alpha2 ISO code for this country, as this is what GBIF requires as query
       // TODO: Catch cases where !byAlpha3[event.target.value]
@@ -183,6 +386,7 @@ class App extends Component {
       await this.makeYearFacetQuery(alpha2);
     }
 
+    // Changes in state that require a new GBIF country facet query
     const fetchNewYearCondition = this.state.xyYearMin !== prevState.xyYearMin;
 
     if (fetchNewYearCondition) {
@@ -199,14 +403,14 @@ class App extends Component {
       // Re-render charts with new size
       this.renderCharts();
     });
-  }
+  };
 
   async fetchData() {
     if (this.data) {
       return this.data;
     }
     this.setState({
-      fetching: true,
+      fetching: true
     });
     const vdemDataPromise = csv(vdemDataUrl, row => {
       const year = +row.year;
@@ -227,7 +431,7 @@ class App extends Component {
         e_peaveduc: +row.e_peaveduc,
         e_migdppc: +row.e_migdppc,
         e_wri_pa: +row.e_wri_pa,
-        confl: +row.confl,
+        confl: +row.confl
       };
     });
     const vdemExplanationsPromise = csv(vdemExplanationsUrl, row => {
@@ -237,7 +441,7 @@ class App extends Component {
         short_name: row.short_name,
         description: row.description,
         relevance: row.relevance,
-        references: row.references,
+        references: row.references
       };
     });
     const countryDataPromise = csv(countryDataUrl, row => {
@@ -266,12 +470,12 @@ class App extends Component {
     this.data = data;
     this.setState({
       loaded: true,
-      fetching: false,
+      fetching: false
     });
     return data;
   }
 
-  makeYearFacetQuery = async (country) => {
+  makeYearFacetQuery = async country => {
     const { onlyDomestic, onlyWithImage, taxonFilter } = this.state;
     // Query the GBIF API
     console.log('Query gbif with year facet...');
@@ -289,7 +493,7 @@ class App extends Component {
 
     const gbifData = result.response.data.facets[0].counts.map(d => ({
       year: +d.name,
-      collections: +d.count,
+      collections: +d.count
     }));
     // Fetching is complete rerender chart
     this.setState({
@@ -318,7 +522,7 @@ class App extends Component {
     result.response.data.facets[0].counts.map(d => {
       const alpha2Country = byAlpha2[d.name];
       gbifCountryFacetData[alpha2Country ? alpha2Country.alpha3 : null] = {
-        collections: d.count,
+        collections: d.count
       };
       return true;
     });
@@ -333,7 +537,7 @@ class App extends Component {
         this.renderCharts();
       }
     );
-  }
+  };
 
   async initData() {
     const data = await this.fetchData();
@@ -362,14 +566,14 @@ class App extends Component {
     });
   }
 
-  handleChange = (event) => {
+  handleChange = event => {
     // console.log('handleChange, key:', event.target.name, 'value:', event.target.value);
     this.setState({ [event.target.name]: event.target.value }, () => {
       this.renderCharts();
     });
-  }
+  };
 
-  onDualChartChangeVdemVariable = (event) => {
+  onDualChartChangeVdemVariable = event => {
     // const { vdemData, country } = this.state;
     // const vdemVariable = event.target.value;
     // const vdemValues = vdemData.filter(d => d.country === country);
@@ -391,7 +595,7 @@ class App extends Component {
     this.setState({ [event.target.name]: event.target.value }, () => {
       this.renderDualChart();
     });
-  }
+  };
 
   onInputChangeTaxonFilter = debounce((newValue) => {
     if (newValue.length > 1) {
@@ -409,7 +613,7 @@ class App extends Component {
     });
   }
 
-  makeAutocompletesQuery = async (newValue) => {
+  makeAutocompletesQuery = async newValue => {
     // Query autocompletes API
     console.log('Query gbif autocompletes API ...');
     const gbifError = Object.assign({}, this.state.gbifError);
@@ -427,20 +631,45 @@ class App extends Component {
       return;
     }
     // Transform the taxa array into the requered form
-    const taxaAutocompletes = result.response.data.map(t => ({ label: t.canonicalName, value: t.nubKey || t.key }));
+    const taxaAutocompletes = result.response.data.map(t => ({
+      label: t.canonicalName,
+      value: t.nubKey || t.key
+    }));
     // Save retrieved taxa to state
     this.setState({ taxaAutocompletes });
-  }
-  handleCountryChange = async (event) => {
+  };
+  handleCountryChange = async event => {
     // console.log('querying for this country: ', event.target.value);
     this.setState({ [event.target.name]: event.target.value });
-  }
+  };
 
-  onScatterPlotClickCountry = (d) => {
+  onScatterPlotClickCountry = d => {
     this.setState({
-      country: d.key,
+      country: d.key
     });
-  }
+  };
+
+  onScatterPlotHighlightsChange = index => {
+    this.setState({ activeScatterPlotHighlight: index });
+    // If the current highlight is deselected, do nothing
+    if (index === null) {
+      return;
+    }
+    this.scatterPlotHighlights[index].onActivated(() => {
+      this.renderScatterPlot();
+    });
+  };
+
+  onDualChartHighlightsChange = index => {
+    this.setState({ activeDualChartHighlight: index });
+    // If the current highlight is deselected, do nothing
+    if (index === null) {
+      return;
+    }
+    this.dualChartHighlights[index].onActivated(() => {
+      this.renderDualChart();
+    });
+  };
 
   onScatterPlotChangeNormalization = (event) => {
     const { value, checked } = event.target;
@@ -462,7 +691,7 @@ class App extends Component {
     const dim = Array.isArray(dimension) ? dimension : [dimension];
     return [
       d3.max([...dim.map(d => startYear[d]), defaultStartYear]),
-      d3.min([...dim.map(d => stopYear[d]), defaultEndYear]),
+      d3.min([...dim.map(d => stopYear[d]), defaultEndYear])
     ];
   }
 
@@ -536,7 +765,7 @@ class App extends Component {
       yLabel: vdemYLabel,
       title: 'Number of public species records per country',
       selected: d => d.key === this.state.country,
-      onClick: this.onScatterPlotClickCountry,
+      onClick: this.onScatterPlotClickCountry
     });
   }
 
@@ -562,7 +791,7 @@ class App extends Component {
     });
     // console.log('gbifRecordsByYear:', gbifRecordsByYear);
     // console.log('vdemFiltered:', vdemFiltered);
-    
+
     // console.log('renderCharts with fethcing:', fetching);
     DualChart(this.refDualChart.current, {
       // data: gbifDataFiltered,
@@ -590,7 +819,7 @@ class App extends Component {
       yLabel: 'Number of records',
       y2Label: y2Label,
       title: 'Number of public species records per country and year',
-      fetching,
+      fetching
     });
   }
 
@@ -600,7 +829,7 @@ class App extends Component {
       <div style={{ height: 10 }}>
         { loaded && !fetching ? null : <LinearProgress /> }
       </div>
-    )
+    );
   }
 
   render() {
@@ -659,6 +888,11 @@ class App extends Component {
 				  with different dimensions of democracy. Values for each country are aggregated by median over the chosen time period. 
 				  Use the highlight buttons on top of the plot to choose preselected plots showing particularly exciting results.
                 </Typography>
+                <HighlightsButtonGroup
+                  highlights={this.scatterPlotHighlights}
+                  onChange={this.onScatterPlotHighlightsChange}
+                  value={this.state.activeScatterPlotHighlight}
+                />
               </Grid>
               <Grid item className="grid-item" xs={12} md={8}>
                 <div id="scatterPlot" ref={this.refScatterPlot} />
@@ -720,11 +954,9 @@ class App extends Component {
               </Grid>
             </Grid>
           </Grid>
-          
 
           <Grid item className="grid-item section section-2" xs={12}>
             <Grid container>
-
               <Grid item className="grid-item" xs={12} md={4}>
                 <Typography variant="headline" gutterBottom className="heading">
                   Biodiversity knowledge through time 
@@ -736,10 +968,14 @@ class App extends Component {
 				  with the drop-down menus, customize the record count to include only records from domestic 
 				  institutions or records associated with pictures using the tick boxes and filter to certain taxa using the free text field.
                 </Typography>
+                <HighlightsButtonGroup
+                  highlights={this.dualChartHighlights}
+                  onChange={this.onDualChartHighlightsChange}
+                  value={this.state.activeDualChartHighlight}
+                />
               </Grid>
 
               <Grid item className="grid-item" xs={12} md={8}>
-                
                 <div id="dualChart" ref={this.refDualChart} />
                 <RegimeLegend />
                 
@@ -813,9 +1049,8 @@ class App extends Component {
           </Grid>
 
           <Grid item className="grid-item section section-3" xs={12}>
-            <About vdemExplanations={this.state.vdemExplanations}/>
+            <About vdemExplanations={this.state.vdemExplanations} />
           </Grid>
-
         </Grid>
       </div>
     );
