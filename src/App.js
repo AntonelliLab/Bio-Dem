@@ -12,6 +12,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Zoom from '@material-ui/core/Zoom';
+import ToggleButton, { ToggleButtonGroup } from "@material-ui/lab/ToggleButton";
 import * as d3 from 'd3';
 import { csv } from 'd3-fetch';
 import debounce from 'lodash/debounce';
