@@ -884,6 +884,11 @@ class App extends Component {
 				  with different dimensions of democracy. Values for each country are aggregated by median over the chosen time period. 
 				  Use the highlight buttons on top of the plot to choose preselected plots showing particularly exciting results.
                 </Typography>
+                <HighlightsButtonGroup
+                  highlights={this.scatterPlotHighlights}
+                  onChange={this.onScatterPlotHighlightsChange}
+                  value={this.state.activeScatterPlotHighlight}
+                />
               </Grid>
               <Grid item className="grid-item" xs={12} md={8}>
                 <div id="scatterPlot" ref={this.refScatterPlot} />
@@ -961,6 +966,11 @@ class App extends Component {
 				  with the drop-down menus, customize the record count to include only records from domestic 
 				  institutions or records associated with pictures using the tick boxes and filter to certain taxa using the free text field.
                 </Typography>
+                <HighlightsButtonGroup
+                  highlights={this.dualChartHighlights}
+                  onChange={this.onDualChartHighlightsChange}
+                  value={this.state.activeDualChartHighlight}
+                />
               </Grid>
 
               <Grid item className="grid-item" xs={12} md={8}>
