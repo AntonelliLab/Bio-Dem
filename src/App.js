@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from "prop-types";
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -115,6 +116,24 @@ const stopYear = {
 const regimeColor = d3.scaleSequential(d3.interpolateViridis)
     .domain([0,3]);
 
+const regionColor = regionCode => {
+  if (regionCode > 0 && regionCode <= 10) {
+    return d3.schemeCategory10[regionCode - 1];
+  }
+  return '#000';
+}
+
+const colorByOptions = [
+  {
+    value: 'regime',
+    label: 'Regime type',
+  },
+  {
+    value: 'region',
+    label: 'Region',
+  },
+];
+
 const yAxisLabelGap = {
   e_migdppc: 100,//asdf
 }
@@ -127,6 +146,7 @@ const vdemScaleMax = {
   v2xcs_ccsi: 1,
   v2x_corr: 1,
   v2x_clphy: 1,
+  //TODO: Use global max on external variables
 }
 
 const BioDemLogo = ({ className = "logo", alt="logo" }) => (
@@ -143,6 +163,24 @@ const RegimeLegend = () => (
     )}
   </Grid>
 );
+
+const RegionLegend = () => (
+  <Grid container className="regionLegend" justify="center">
+    { Object.keys(regions).map(v =>
+      <div key={v} style={{ padding: 5, fontSize: '0.75em' }}>
+        <span style={{ backgroundColor: regionColor(v), marginRight: 2 }}>&nbsp;&nbsp;&nbsp;</span>
+        {regions[v]}
+      </div>
+    )}
+  </Grid>
+);
+
+const ColorLegend = ({ type }) => type === 'regime' ? 
+  <RegimeLegend /> : <RegionLegend />;
+
+ColorLegend.propTypes = {
+  type: PropTypes.oneOf(['regime', 'region']),
+};
 
 const HighlightsButtonGroup = (props) => (
   <div className="toggleContainer">
@@ -162,7 +200,7 @@ const HighlightsButtonGroup = (props) => (
     </Typography>
   </div>
 );
-
+  
 class App extends Component {
   scatterPlotHighlights = [
     {
@@ -350,6 +388,7 @@ class App extends Component {
       countries: [],
       yearMin: 1960,
       yearMax: 2018,
+      colorBy: 'regime',
       // XY Plot:
       vdemX: v2x_freexp_altinf,
       vdemY: v2x_frassoc_thick,
@@ -449,8 +488,8 @@ class App extends Component {
         value: row.country,
         label: byAlpha3[row.country] ? byAlpha3[row.country].name : row.country,
         area: +row.area,
-        // e_regionpol: row.e_regionpol,
-        region: regions[row.e_regionpol],
+        regionCode: +row.e_regionpol,
+        regionName: regions[row.e_regionpol],
       };
     });
     const [vdemData, vdemExplanations, countryData] = await Promise.all([
@@ -671,6 +710,14 @@ class App extends Component {
     });
   };
 
+  onScatterPlotChangeColorBy = (event) => {
+    this.setState({
+      [event.target.name]: event.target.value,
+    }, () => {
+      this.renderScatterPlot();
+    });
+  }
+
   onScatterPlotChangeNormalization = (event) => {
     const { value, checked } = event.target;
     this.setState({
@@ -752,11 +799,20 @@ class App extends Component {
       x: d => d.value.x,
       y: d => d.value.y,
       value: d => this.state.normalizeByArea ? d.value.records / this.countryMap[d.key].area : d.value.records,
-      color: d => regimeColor(d.value.z),
+      color: d => {
+        switch (this.state.colorBy) {
+          case 'regime':
+            return regimeColor(d.value.z);
+          case 'region':
+            return regionColor(this.countryMap[d.key].regionCode);
+          default:
+            return '#000';
+        }
+      },
       tooltip: d => `
         <div>
           <div><strong>Country:</strong> ${this.countryMap[d.key].label}</div>
-          <div><strong>Region:</strong> ${this.countryMap[d.key].region}</div>
+          <div><strong>Region:</strong> ${this.countryMap[d.key].regionName}</div>
           <div><strong>Area:</strong> ${this.countryMap[d.key].area.toLocaleString('en')} km²</div>
           <div><strong>Records:</strong> ${d.value.records.toLocaleString('en')}</div>
         </div>
@@ -896,7 +952,7 @@ class App extends Component {
               </Grid>
               <Grid item className="grid-item" xs={12} md={8}>
                 <div id="scatterPlot" ref={this.refScatterPlot} />
-                <RegimeLegend />
+                <ColorLegend type={this.state.colorBy} />
                 {this.renderProgress()}
                 <div className="controls">
                   <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
@@ -928,6 +984,17 @@ class App extends Component {
                       options={d3.range(1960,2018).map(y => ({
                         value: y, label: y, disabled: !isWithin(y, xyValidYears)
                       }))}
+                    />
+                  </FormControl>
+                  <FormControl className="formControl" style={{ minWidth: 150, margin: 10 }}>
+                    <InputLabel htmlFor="colorBy">
+                      Color by
+                    </InputLabel>
+                    <AutoSelect
+                      input={<Input name="colorBy" id="colorBy" />}
+                      value={this.state.colorBy}
+                      onChange={this.onScatterPlotChangeColorBy}
+                      options={colorByOptions}
                     />
                   </FormControl>
                   <FormControlLabel
