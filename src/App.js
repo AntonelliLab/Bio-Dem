@@ -55,19 +55,29 @@ AGO,1244654,4
  */
 const countryDataUrl = `${process.env.PUBLIC_URL}/data/country_data.csv`;
 
+// The strings for the v-dem variables used to get the static data
+const v2x_polyarchy = "v2x_polyarchy";
+const v2x_freexp_altinf = "v2x_freexp_altinf";
+const v2x_frassoc_thick = "v2x_frassoc_thick";
+const v2x_corr = "v2x_corr";
+const e_peaveduc = "e_peaveduc";
+const e_migdppc = "e_migdppc";
+// Protected areas
+const e_wri_pa = "e_wri_pa";
+
 const vdemOptions = [
   // { value: 'v2x_regime' },
-  { value: 'v2x_polyarchy' },
-  { value: 'v2x_freexp_altinf' },
-  { value: 'v2x_frassoc_thick' },
-  { value: 'v2xcl_dmove' },
-  { value: 'v2xcs_ccsi' },
-  { value: 'v2x_corr' },
-  { value: 'v2x_clphy' },
+  { value: v2x_polyarchy },
+  { value: v2x_freexp_altinf },
+  { value: v2x_frassoc_thick },
+  { value: "v2xcl_dmove" },
+  { value: "v2xcs_ccsi" },
+  { value: v2x_corr },
+  { value: "v2x_clphy" },
   // { value: 'e_regiongeo' },
-  { value: 'e_peaveduc' },
-  { value: 'e_migdppc' },
-  { value: 'e_wri_pa' },
+  { value: e_peaveduc },
+  { value: e_migdppc },
+  { value: e_wri_pa }
   // { value: 'conf' },
 ];
 
@@ -146,15 +156,15 @@ class App extends Component {
       vdemExplanations: {},
       loaded: false,
       fetching: false,
-      country: 'SWE',
-      vdemVariable: 'v2x_freexp_altinf',
+      country: "SWE",
+      vdemVariable: v2x_freexp_altinf,
       filterTaxon: undefined,
       countries: [],
       yearMin: 1960,
       yearMax: 2018,
       // XY Plot:
-      vdemX: 'v2x_freexp_altinf',
-      vdemY: 'v2x_frassoc_thick',
+      vdemX: v2x_freexp_altinf,
+      vdemY: v2x_frassoc_thick,
       xyYearMin: 1960,
       normalizeByArea: false,
       // Taxon filter
