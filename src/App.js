@@ -303,7 +303,7 @@ ColorLegend.propTypes = {
 
 const HighlightsButtonGroup = (props) => (
   <div className="toggleContainer">
-    <ToggleButtonGroup {...props} exclusive >
+    <ToggleButtonGroup {...props} exclusive selected={false} >
       {
         props.highlights.map((h, index) => (
           <ToggleButton key={index} value={index}>
