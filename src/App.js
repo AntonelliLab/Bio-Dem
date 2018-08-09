@@ -149,6 +149,121 @@ const vdemScaleMax = {
   //TODO: Use global max on external variables
 }
 
+const scatterPlotHighlights = [
+  {
+    buttonLabel: "Protected areas",
+    explanation:
+      "The majority of high record countries (large bubbles) are democracies (yellow or green) and located in the lower right corner of the plot. The majority of low record countries (small bubbles) are in the lower left corner, indicating that higher polyarchy corresponds to more collected records. There are four countries, two closed autocracies (Bhutan and Saudi Arabia, purple), one electoral autocracy (Seychelles, blue) and one electoral democracy (Venezuela), that protect a relatively large share of land area.",
+    onActvatedNewState:
+    {
+      vdemY: e_wri_pa,
+      vdemX: v2x_polyarchy,
+      xyYearMin: 1990
+    }
+  },
+  {
+    buttonLabel: "Corruption",
+    explanation:
+      "The majority of high record countries are liberal democracies (large, yellow bubbles) and have little corruption. Furthermore, record collection seems largely independent of the level of corruption (large bubbles are distributed horizontally) and corrupt countries can have many collection records. Additionally, corrupt countries can have relatively larger share of protected areas.",
+    onActvatedNewState:
+    {
+      vdemY: e_wri_pa,
+      vdemX: v2x_corr,
+      xyYearMin: 1990
+    }
+  },
+  {
+    buttonLabel: "GDP",
+    explanation:
+      "Democratic and economically developed countries often have many GBIF records (large bubbles cluster in the upper right corner of the plot). However, some economically rich countries have very few records (small bubbles with high values on the y-axis: Cyprus, Libya), and some relatively less developed countries have a large number of records (China, India, Tanzania and Uganda), indicating heterogeneity of biological record collection across both democracy and economic development.",
+    onActvatedNewState:
+    {
+      vdemY: e_migdppc,
+      vdemX: v2x_polyarchy,
+      xyYearMin: 1960
+    }
+  },
+  {
+    buttonLabel: "Education",
+    explanation:
+      "The number of available occurrence records increases with GDP per capita and length of education (bubble size increases from the lower left to the upper right corner). For instance, Burundi (purple bubble in the lower left corner) and Canada (yellow bubble in the upper right corner), are typical examples for this trend. In contrast India does not follow the general pattern, being a large bubble in the lower left corner.",
+    onActvatedNewState:
+    {
+      vdemY: e_peaveduc,
+      vdemX: e_migdppc,
+      xyYearMin: 1960
+    }
+  }
+];
+
+const dualChartHighlights = [
+  {
+    buttonLabel: "Angola",
+    explanation:
+      'The Angolan Civil War. In 1975, when the Angolan Civil War broke out, the collection activity drops drastically. This pattern is valid up until the end of the 1990\'s, a couple of years before the war ended and is visible for domestic and total collections. Ticking the "only domestic records box" furthermore reveals the importance of foreign collections for the country, especially until the mid 1990ies.',
+    onActvatedNewState:
+    {
+      country: 'AGO',
+      vdemVariable: v2x_polyarchy,
+      onlyDomestic: false,
+      onlyWithImage: false,
+      filterTaxon: null
+    }
+  },
+  {
+    buttonLabel: "India",
+    explanation:
+      'The Emergency in India 1975 and domestic records. From 1975 and 1977, "The Emergency" took place in India, an event of political turmoil where the prime minister declared a state of emergency and put political rights on freeze in order to take control over the rule. We see that this instability event coincides with a drop in domestic biological record collection.',
+    onActvatedNewState:
+    {
+      country: 'IND',
+      vdemVariable: v2x_polyarchy,
+      onlyDomestic: true,
+      onlyWithImage: false,
+      filterTaxon: null
+    }
+  },
+  {
+    buttonLabel: "Czechia",
+    explanation:
+      "The fall of the Soviet Union. In Czechia, record availability from domestic institutions only starts after the Soviet Union collapsed. Possibly a partial effect from the political liberalization and the country's independence.",
+    onActvatedNewState:
+    {
+      country: 'CZE',
+      vdemVariable: v2x_polyarchy,
+      onlyDomestic: true,
+      onlyWithImage: false,
+      filterTaxon: null
+    }
+  },
+  {
+    buttonLabel: "Cambodia",
+    explanation:
+      'Decades of political instability in Cambodia. Starting in the 1970\'s, Cambodia experienced a long period of conflicts and autocratization, which coincides with a decrease in biological record collection during this period.',
+    onActvatedNewState:
+    {
+      country: 'KHM',
+      vdemVariable: v2x_polyarchy,
+      onlyDomestic: false,
+      onlyWithImage: false,
+      filterTaxon: null
+    }
+  },
+  {
+    buttonLabel: "Indonesia",
+    explanation:
+      'Economic development and domestic collections in Indonesia. In the beginning of the 1980\'s, we see a start of domestic record collection that which increases following Indonesia\'s acceleration in gross domestic product per capita increase in the 1990\'ies. Displaying all records show that the proportion collected by domestic institutions also increases.',
+    onActvatedNewState:
+    {
+      country: 'IDN',
+      vdemVariable: e_migdppc,
+      onlyDomestic: true,
+      onlyWithImage: false,
+      filterTaxon: null
+    }
+  }
+];
+
 const BioDemLogo = ({ className = "logo", alt="logo" }) => (
   <img src={logo} className={className} alt={alt} />
 );
@@ -202,174 +317,6 @@ const HighlightsButtonGroup = (props) => (
 );
   
 class App extends Component {
-  scatterPlotHighlights = [
-    {
-      buttonLabel: "Protected areas",
-      explanation:
-        "The majority of high record countries (large bubbles) are democracies (yellow or green) and located in the lower right corner of the plot. The majority of low record countries (small bubbles) are in the lower left corner, indicating that higher polyarchy corresponds to more collected records. There are four countries, two closed autocracies (Bhutan and Saudi Arabia, purple), one electoral autocracy (Seychelles, blue) and one electoral democracy (Venezuela), that protect a relatively large share of land area.",
-      onActivated: pc => {
-        this.setState(
-          {
-            vdemY: e_wri_pa,
-            vdemX: v2x_polyarchy,
-            xyYearMin: 1990
-          },
-          () => {
-            pc();
-          }
-        );
-      }
-    },
-    {
-      buttonLabel: "Corruption",
-      explanation:
-        "The majority of high record countries are liberal democracies (large, yellow bubbles) and have little corruption. Furthermore, record collection seems largely independent of the level of corruption (large bubbles are distributed horizontally) and corrupt countries can have many collection records. Additionally, corrupt countries can have relatively larger share of protected areas.",
-      onActivated: pc => {
-        this.setState(
-          {
-            vdemY: e_wri_pa,
-            vdemX: v2x_corr,
-            xyYearMin: 1990
-          },
-          () => {
-            pc();
-          }
-        );
-      }
-    },
-    {
-      buttonLabel: "GDP",
-      explanation:
-        "Democratic and economically developed countries often have many GBIF records (large bubbles cluster in the upper right corner of the plot). However, some economically rich countries have very few records (small bubbles with high values on the y-axis: Cyprus, Libya), and some relatively less developed countries have a large number of records (China, India, Tanzania and Uganda), indicating heterogeneity of biological record collection across both democracy and economic development.",
-      onActivated: pc => {
-        this.setState(
-          {
-            vdemY: e_migdppc,
-            vdemX: v2x_polyarchy,
-            xyYearMin: 1960
-          },
-          () => {
-            pc();
-          }
-        );
-      }
-    },
-    {
-      buttonLabel: "Education",
-      explanation:
-        "The number of available occurrence records increases with GDP per capita and length of education (bubble size increases from the lower left to the upper right corner). For instance, Burundi (purple bubble in the lower left corner) and Canada (yellow bubble in the upper right corner), are typical examples for this trend. In contrast India does not follow the general pattern, being a large bubble in the lower left corner.",
-      onActivated: pc => {
-        this.setState(
-          {
-            vdemY: e_peaveduc,
-            vdemX: e_migdppc,
-            xyYearMin: 1960
-          },
-          () => {
-            pc();
-          }
-        );
-      }
-    }
-  ];
-
-  dualChartHighlights = [
-    {
-      buttonLabel: "Angola",
-      explanation:
-        'The Angolan Civil War. In 1975, when the Angolan Civil War broke out, the collection activity drops drastically. This pattern is valid up until the end of the 1990\'s, a couple of years before the war ended and is visible for domestic and total collections. Ticking the "only domestic records box" furthermore reveals the importance of foreign collections for the country, especially until the mid 1990ies.',
-      onActivated: pc => {
-        this.setState(
-          {
-            country: 'AGO',
-            vdemVariable: v2x_polyarchy,
-            onlyDomestic: false,
-            onlyWithImage: false,
-            filterTaxon: null
-          },
-          () => {
-            pc();
-          }
-        );
-      }
-    },
-    {
-      buttonLabel: "India",
-      explanation:
-        'The Emergency in India 1975 and domestic records. From 1975 and 1977, "The Emergency" took place in India, an event of political turmoil where the prime minister declared a state of emergency and put political rights on freeze in order to take control over the rule. We see that this instability event coincides with a drop in domestic biological record collection.',
-      onActivated: pc => {
-        this.setState(
-          {
-            country: 'IND',
-            vdemVariable: v2x_polyarchy,
-            onlyDomestic: true,
-            onlyWithImage: false,
-            filterTaxon: null
-          },
-          () => {
-            pc();
-          }
-        );
-      }
-    },
-    {
-      buttonLabel: "Czechia",
-      explanation:
-        "The fall of the Soviet Union. In Czechia, record availability from domestic institutions only starts after the Soviet Union collapsed. Possibly a partial effect from the political liberalization and the country's independence.",
-      onActivated: pc => {
-        this.setState(
-          {
-            country: 'CZE',
-            vdemVariable: v2x_polyarchy,
-            onlyDomestic: true,
-            onlyWithImage: false,
-            filterTaxon: null
-          },
-          () => {
-            pc();
-          }
-        );
-      }
-    },
-    {
-      buttonLabel: "Cambodia",
-      explanation:
-        'Decades of political instability in Cambodia. Starting in the 1970\'s, Cambodia experienced a long period of conflicts and autocratization, which coincides with a decrease in biological record collection during this period.',
-      onActivated: pc => {
-        this.setState(
-          {
-            country: 'KHM',
-            vdemVariable: v2x_polyarchy,
-            onlyDomestic: false,
-            onlyWithImage: false,
-            filterTaxon: null
-          },
-          () => {
-            pc();
-          }
-        );
-      }
-    },
-    {
-      buttonLabel: "Indonesia",
-      explanation:
-        'Economic development and domestic collections in Indonesia. In the beginning of the 1980\'s, we see a start of domestic record collection that which increases following Indonesia\'s acceleration in gross domestic product per capita increase in the 1990\'ies. Displaying all records show that the proportion collected by domestic institutions also increases.',
-      onActivated: pc => {
-        this.setState(
-          {
-            country: 'IDN',
-            vdemVariable: e_migdppc,
-            onlyDomestic: true,
-            onlyWithImage: false,
-            filterTaxon: null
-          },
-          () => {
-            pc();
-          }
-        );
-      }
-    }
-  ];
 
   constructor(props) {
     super(props);
@@ -694,9 +641,12 @@ class App extends Component {
     if (index === null) {
       return;
     }
-    this.scatterPlotHighlights[index].onActivated(() => {
-      this.renderScatterPlot();
-    });
+    this.setState(
+      scatterPlotHighlights[index].onActvatedNewState,
+      () => {
+        this.renderScatterPlot();
+      }
+    );
   };
 
   onDualChartHighlightsChange = index => {
@@ -705,9 +655,12 @@ class App extends Component {
     if (index === null) {
       return;
     }
-    this.dualChartHighlights[index].onActivated(() => {
-      this.renderDualChart();
-    });
+    this.setState(
+      dualChartHighlights[index].onActvatedNewState,
+      () => {
+        this.renderDualChart();
+      }
+    );
   };
 
   onScatterPlotChangeColorBy = (event) => {
@@ -945,7 +898,7 @@ class App extends Component {
 				  Use the highlight buttons on top of the plot to choose preselected plots showing particularly exciting results.
                 </Typography>
                 <HighlightsButtonGroup
-                  highlights={this.scatterPlotHighlights}
+                  highlights={scatterPlotHighlights}
                   onChange={this.onScatterPlotHighlightsChange}
                   value={this.state.activeScatterPlotHighlight}
                 />
@@ -1036,7 +989,7 @@ class App extends Component {
 				  institutions or records associated with pictures using the tick boxes and filter to certain taxa using the free text field.
                 </Typography>
                 <HighlightsButtonGroup
-                  highlights={this.dualChartHighlights}
+                  highlights={dualChartHighlights}
                   onChange={this.onDualChartHighlightsChange}
                   value={this.state.activeDualChartHighlight}
                 />
