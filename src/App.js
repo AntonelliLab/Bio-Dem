@@ -466,22 +466,27 @@ class App extends Component {
     return data;
   }
 
+  /**
+   * Query the GBIF API for a year facet search,
+   * prepare and handle negative or postive results.
+   */
   makeYearFacetQuery = async country => {
     const { onlyDomestic, onlyWithImage, taxonFilter } = this.state;
-    // Query the GBIF API
-    console.log('Query gbif with year facet...');
+    // Build up state for a query
     const gbifError = Object.assign({}, this.state.gbifError);
     delete gbifError['101'];
     this.setState({ fetching: true, gbifError });
+    // Query the GBIF API
+    console.log('Query gbif with year facet...');
     const result = await queryGBIFYearFacet(country, onlyDomestic, onlyWithImage, taxonFilter);
-    // console.log('received gbif year facet data:', result);
+    // If the query errored out set to error state
     if (result.error) {
       const gbifError = Object.assign({}, this.state.gbifError);
       gbifError['101'] = result.error;
       this.setState({ fetching: false, gbifError });
       return;
     }
-
+    // Transform the result as required for the DualChart
     const gbifData = result.response.data.facets[0].counts.map(d => ({
       year: +d.name,
       collections: +d.count
@@ -494,21 +499,26 @@ class App extends Component {
     });
   }
 
+  /**
+   * Query the GBIF API for a country facet search,
+   * prepare and handle negative or postive results.
+   */
   makeCountryFacetQuery = async () => {
-    // Query the GBIF API
-    console.log('Query gbif with country facet...');
+    // Build up state for a query
     const gbifError = Object.assign({}, this.state.gbifError);
     delete gbifError['102'];
     this.setState({ fetching: true, gbifError });
+    // Query the GBIF API
+    console.log('Query gbif with country facet...');
     const result = await queryGBIFCountryFacet(this.state.xyYearMin);
-    // console.log('received gbif country facet data:', result);
+    // If the query errored out set to error state
     if (result.error) {
       const gbifError = Object.assign({}, this.state.gbifError);
       gbifError['102'] = result.error;
       this.setState({ fetching: false, gbifError });
       return;
     }
-
+    // Transform the result as required for the ScatterPlot
     const gbifCountryFacetData = {};
     result.response.data.facets[0].counts.map(d => {
       const alpha2Country = byAlpha2[d.name];
@@ -517,7 +527,6 @@ class App extends Component {
       };
       return true;
     });
-
     // Fetching is complete rerender chart
     this.setState(
       {
@@ -558,7 +567,6 @@ class App extends Component {
   }
 
   handleChange = event => {
-    // console.log('handleChange, key:', event.target.name, 'value:', event.target.value);
     this.setState({ [event.target.name]: event.target.value }, () => {
       this.renderCharts();
     });
@@ -604,31 +612,36 @@ class App extends Component {
     });
   }
 
+  /**
+   * Query the GBIF autocompletes API, prepare and handle negative or postive results.
+   */
   makeAutocompletesQuery = async newValue => {
-    // Query autocompletes API
-    console.log('Query gbif autocompletes API ...');
+    // Build up state for a query
     const gbifError = Object.assign({}, this.state.gbifError);
     delete gbifError['103'];
     this.setState({ fetching: true, gbifError });
-    // TODO: This queries the suggest API of GBIF which is nor really good customizable
+    // TODO: This queries the suggest API of GBIF which is not really good customizable
     // TODO: Maybe some result filtering to not show "synonyms" or only specific ranks
     // TODO: One more filter option for this API is by rank, maybe good idea to query for only the higher ranks and Promise all together
+    // Query autocompletes API
+    console.log('Query gbif autocompletes API ...');
     const result = await queryAutocompletesGBIF(newValue);
-    // console.log('received gbif autocompletes data:', result);
+    // If the query errored out set to error state
     if (result.error) {
       const gbifError = Object.assign({}, this.state.gbifError);
       gbifError['103'] = result.error;
       this.setState({ fetching: false, gbifError });
       return;
     }
-    // Transform the taxa array into the requered form
+    // Transform the taxa array as required for dropdown menu
     const taxaAutocompletes = result.response.data.map(t => ({
       label: t.canonicalName,
       value: t.nubKey || t.key
     }));
     // Save retrieved taxa to state
-    this.setState({ taxaAutocompletes });
+    this.setState({ taxaAutocompletes, fetching: false });
   };
+
   handleCountryChange = async event => {
     // console.log('querying for this country: ', event.target.value);
     this.setState({ [event.target.name]: event.target.value });
@@ -640,12 +653,15 @@ class App extends Component {
     });
   };
 
+   * Function to set the {@link ScatterPlot} to a specific state. Called when one of the highlight buttons is pressed.
   onScatterPlotHighlightsChange = index => {
+    // Set state for button being selected
     this.setState({ activeScatterPlotHighlight: index });
     // If the current highlight is deselected, do nothing
     if (index === null) {
       return;
     }
+    // Set the state of the ScatterPlot as defined in the highlights array
     this.setState(
       scatterPlotHighlights[index].onActvatedNewState,
       () => {
@@ -654,12 +670,17 @@ class App extends Component {
     );
   };
 
+  /**
+   * Function to set the {@link DualChart} to a specific state. Called when one of the highlight buttons is pressed.
+   */
   onDualChartHighlightsChange = index => {
+    // Set state for button being selected
     this.setState({ activeDualChartHighlight: index });
     // If the current highlight is deselected, do nothing
     if (index === null) {
       return;
     }
+    // Set the state of the DualChart as defined in the highlights array
     this.setState(
       dualChartHighlights[index].onActvatedNewState,
       () => {
@@ -838,6 +859,7 @@ class App extends Component {
   }
 
   renderProgress() {
+    // If the app is loading static data or fetching data from the GBIF API, render a progress animation
     const { loaded, fetching } = this.state;
     return (
       <div style={{ height: 10 }}>
