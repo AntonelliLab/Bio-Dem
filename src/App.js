@@ -572,29 +572,17 @@ class App extends Component {
     });
   };
 
-  onDualChartChangeVdemVariable = event => {
-    // const { vdemData, country } = this.state;
-    // const vdemVariable = event.target.value;
-    // const vdemValues = vdemData.filter(d => d.country === country);
-    // const [ validVdemIndexMin, validVdemIndexMax ] = getFirstContiguousRangeNotNaN(vdemValues, d => d[vdemVariable]);
-    // const vdemYearMin = validVdemIndexMin === -1 ? -1 : vdemValues[validVdemIndexMin].year;
-    // const vdemYearMax = validVdemIndexMax === -1 ? -1 : vdemValues[validVdemIndexMax].year;
-    // console.log('vdemYearMin, vdemYearMax:', vdemYearMin, vdemYearMax);
-    
+  /**
+   * Generic handler for setting state for a new display conformation for the {@link DualChart},
+   * then trigger rerender.
+   */
+  onDualChartChange = event => {
     this.setState({
       [event.target.name]: event.target.value,
-      // vdemYearMin,
-      // vdemYearMax,
     }, () => {
       this.renderDualChart();
     });
   }
-
-  onDualChartChangeYearMin = (event) => {
-    this.setState({ [event.target.name]: event.target.value }, () => {
-      this.renderDualChart();
-    });
-  };
 
   onInputChangeTaxonFilter = debounce((newValue) => {
     if (newValue.length > 1) {
@@ -603,14 +591,6 @@ class App extends Component {
       // this.setState({ taxonFilter: '' });
     }
   }, 400, { maxWait: 3000 })
-
-  onDualChartChangeTaxonFilter = (event) => {
-    this.setState({
-      [event.target.name]: event.target.value,
-    }, () => {
-      this.renderDualChart();
-    });
-  }
 
   /**
    * Query the GBIF autocompletes API, prepare and handle negative or postive results.
@@ -653,7 +633,9 @@ class App extends Component {
     });
   };
 
+  /**
    * Function to set the {@link ScatterPlot} to a specific state. Called when one of the highlight buttons is pressed.
+   */
   onScatterPlotHighlightsChange = index => {
     // Set state for button being selected
     this.setState({ activeScatterPlotHighlight: index });
@@ -1045,7 +1027,7 @@ class App extends Component {
                     <AutoSelect
                       input={<Input name="vdemVariable" id="vdemVariable" />}
                       value={this.state.vdemVariable}
-                      onChange={this.onDualChartChangeVdemVariable}
+                      onChange={this.onDualChartChange}
                       options={vdemOptions}
                     />
                   </FormControl>
@@ -1056,7 +1038,7 @@ class App extends Component {
                     <AutoSelect
                       input={<Input name="taxonFilter" id="taxonFilter" />}
                       value={this.state.taxonFilter}
-                      onChange={this.onDualChartChangeTaxonFilter}
+                      onChange={this.onDualChartChange}
                       onInputChange={this.onInputChangeTaxonFilter}
                       options={this.state.taxaAutocompletes}
                       isClearable
