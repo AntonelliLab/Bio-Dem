@@ -158,7 +158,8 @@ const scatterPlotHighlights = [
     {
       vdemY: e_wri_pa,
       vdemX: v2x_polyarchy,
-      xyYearMin: 1990
+      xyYearMin: 1990,
+      colorBy: 'regime'
     }
   },
   {
@@ -169,7 +170,8 @@ const scatterPlotHighlights = [
     {
       vdemY: e_wri_pa,
       vdemX: v2x_corr,
-      xyYearMin: 1990
+      xyYearMin: 1990,
+      colorBy: 'regime'
     }
   },
   {
@@ -180,7 +182,8 @@ const scatterPlotHighlights = [
     {
       vdemY: e_migdppc,
       vdemX: v2x_polyarchy,
-      xyYearMin: 1960
+      xyYearMin: 1960,
+      colorBy: 'regime'
     }
   },
   {
@@ -191,7 +194,8 @@ const scatterPlotHighlights = [
     {
       vdemY: e_peaveduc,
       vdemX: e_migdppc,
-      xyYearMin: 1960
+      xyYearMin: 1960,
+      colorBy: 'regime'
     }
   }
 ];
