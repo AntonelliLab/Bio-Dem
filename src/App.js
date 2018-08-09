@@ -327,26 +327,27 @@ class App extends Component {
     this.state = {
       gbifData: [],
       gbifError: {},
-      onlyDomestic: false,
-      onlyWithImage: false,
       vdemData: [],
       vdemExplanations: {},
       loaded: false,
       fetching: false,
-      country: "SWE",
-      vdemVariable: v2x_freexp_altinf,
-      filterTaxon: undefined,
       countries: [],
       yearMin: 1960,
       yearMax: 2018,
-      colorBy: 'regime',
-      // XY Plot:
+      // ScatterPlot:
       vdemX: v2x_freexp_altinf,
       vdemY: v2x_frassoc_thick,
       xyYearMin: 1960,
       normalizeByArea: false,
+      colorBy: 'regime',      
+      // DualChart
+      country: "SWE",
+      vdemVariable: v2x_freexp_altinf,
+      onlyDomestic: false,
+      onlyWithImage: false,
       // Taxon filter
       taxonFilter: '',
+      filterTaxon: undefined,
       taxaAutocompletes: [],
       // Active highlights
       activeScatterPlotHighlight: null,
