@@ -216,7 +216,7 @@ export default function ScatterPlot(el, properties) {
       .style("opacity", .9);
       tooltip.html(props.tooltip(d))
       .style("left", `${x(props.x(d))}px`)
-      .style("top", `${y(props.y(d)) - 30}px`);
+      .style("bottom", `${props.height - y(props.y(d))}px`);
     } else {
       // no point to highlight - hide the circle
       highlightCircle.style('display', 'none');
