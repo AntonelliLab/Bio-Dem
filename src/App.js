@@ -67,7 +67,6 @@ const e_migdppc = "e_migdppc";
 const e_wri_pa = "e_wri_pa";
 
 const vdemOptions = [
-  // { value: 'v2x_regime' },
   { value: v2x_polyarchy },
   { value: v2x_freexp_altinf },
   { value: v2x_frassoc_thick },
@@ -75,12 +74,19 @@ const vdemOptions = [
   { value: "v2xcs_ccsi" },
   { value: v2x_corr },
   { value: "v2x_clphy" },
-  // { value: 'e_regiongeo' },
   { value: e_peaveduc },
   { value: e_migdppc },
   { value: e_wri_pa }
-  // { value: 'conf' },
 ];
+
+const scatterYOptions = vdemOptions.concat([{
+  value: "records",
+  label: "Records",
+  description: "",
+  relevance: "",
+  references: "",
+  full_name: ""
+}]);
 
 const regimeTypes = {
   0: 'Closed autocracy',
@@ -135,7 +141,8 @@ const colorByOptions = [
 ];
 
 const yAxisLabelGap = {
-  e_migdppc: 100,//asdf
+  e_migdppc: 100,
+  records: 120
 }
 
 const vdemScaleMax = {
@@ -547,14 +554,16 @@ class App extends Component {
       vdemExplanations[d.id] = d;
     });
     vdemOptions.forEach(d => {
-      if (!vdemExplanations[d.value]) {
+      const info = vdemExplanations[d.value];
+      if (!info) {
         console.log('Missing explanation for value:', d.value);
+      } else {
+        d.label = info.short_name;
+        d.description = info.description;
+        d.relevance = info.relevance;
+        d.references = info.references;
+        d.full_name = info.full_name;
       }
-      d.label = vdemExplanations[d.value].short_name;
-      d.description = vdemExplanations[d.value].description;
-      d.relevance = vdemExplanations[d.value].relevance;
-      d.references = vdemExplanations[d.value].references;
-      d.full_name = vdemExplanations[d.value].full_name;
     });
     this.setState({
       loaded: true,
@@ -711,8 +720,8 @@ class App extends Component {
   renderScatterPlot() {
     const { vdemData, vdemX, vdemY, xyYearMin, gbifCountryFacetData, vdemExplanations } = this.state;
     const vdemXLabel = vdemExplanations[vdemX] ? vdemExplanations[vdemX].short_name : vdemX;
-    const vdemYLabel = vdemExplanations[vdemY] ? vdemExplanations[vdemY].short_name : vdemY;
     
+    let vdemYLabel = vdemExplanations[vdemY] ? vdemExplanations[vdemY].short_name : vdemY;
     const [startYear, stopYear] = this.getValidYears([vdemX, vdemY], xyYearMin);
 
     const vdemGrouped = d3.nest()
@@ -743,6 +752,14 @@ class App extends Component {
       
       // Filter countries lacking values on the x y dimensions or have zero records (log safe)
       const vdemFiltered = vdemGrouped.filter(d => d.value !== null && d.value.records > 0);
+      // If the y axis is set to display number of records, replace the y axis with records
+      if (vdemY === "records") {
+        vdemYLabel = 'Number of records';
+        vdemFiltered.forEach(d => {
+          d.value.y = d.value.records;
+        });
+      }
+
       // console.log('vdemData:', vdemData);
       // console.log('vdemGrouped:', vdemGrouped);
       // console.log('vdemFiltered:', vdemFiltered);
@@ -923,7 +940,7 @@ class App extends Component {
                       input={<Input name="vdemY" id="vdemY" />}
                       value={this.state.vdemY}
                       onChange={this.handleChange}
-                      options={vdemOptions}
+                      options={scatterYOptions}
                     />
                   </FormControl>
                   <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
