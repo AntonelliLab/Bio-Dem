@@ -81,7 +81,7 @@ const vdemOptions = [
 
 const scatterYOptions = vdemOptions.concat([{
   value: "records",
-  label: "Records",
+  label: "Number of records",
   description: "",
   relevance: "",
   references: "",
