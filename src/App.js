@@ -79,6 +79,15 @@ const vdemOptions = [
   { value: e_wri_pa }
 ];
 
+const scatterYOptions = vdemOptions.concat([{
+  value: "records",
+  label: "Records",
+  description: "",
+  relevance: "",
+  references: "",
+  full_name: ""
+}]);
+
 const regimeTypes = {
   0: 'Closed autocracy',
   1: 'Electoral autocracy',
