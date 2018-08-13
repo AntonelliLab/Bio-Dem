@@ -67,7 +67,6 @@ const e_migdppc = "e_migdppc";
 const e_wri_pa = "e_wri_pa";
 
 const vdemOptions = [
-  // { value: 'v2x_regime' },
   { value: v2x_polyarchy },
   { value: v2x_freexp_altinf },
   { value: v2x_frassoc_thick },
@@ -75,11 +74,9 @@ const vdemOptions = [
   { value: "v2xcs_ccsi" },
   { value: v2x_corr },
   { value: "v2x_clphy" },
-  // { value: 'e_regiongeo' },
   { value: e_peaveduc },
   { value: e_migdppc },
   { value: e_wri_pa }
-  // { value: 'conf' },
 ];
 
 const regimeTypes = {
