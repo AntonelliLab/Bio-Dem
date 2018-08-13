@@ -719,8 +719,8 @@ class App extends Component {
   renderScatterPlot() {
     const { vdemData, vdemX, vdemY, xyYearMin, gbifCountryFacetData, vdemExplanations } = this.state;
     const vdemXLabel = vdemExplanations[vdemX] ? vdemExplanations[vdemX].short_name : vdemX;
-    const vdemYLabel = vdemExplanations[vdemY] ? vdemExplanations[vdemY].short_name : vdemY;
     
+    let vdemYLabel = vdemExplanations[vdemY] ? vdemExplanations[vdemY].short_name : vdemY;
     const [startYear, stopYear] = this.getValidYears([vdemX, vdemY], xyYearMin);
 
     const vdemGrouped = d3.nest()
@@ -751,6 +751,14 @@ class App extends Component {
       
       // Filter countries lacking values on the x y dimensions or have zero records (log safe)
       const vdemFiltered = vdemGrouped.filter(d => d.value !== null && d.value.records > 0);
+      // If the y axis is set to display number of records, replace the y axis with records
+      if (vdemY === "records") {
+        vdemYLabel = 'Number of records';
+        vdemFiltered.forEach(d => {
+          d.value.y = d.value.records;
+        });
+      }
+
       // console.log('vdemData:', vdemData);
       // console.log('vdemGrouped:', vdemGrouped);
       // console.log('vdemFiltered:', vdemFiltered);
