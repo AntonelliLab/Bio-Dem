@@ -141,7 +141,7 @@ const colorByOptions = [
 ];
 
 const yAxisLabelGap = {
-  e_migdppc: 100,//asdf
+  e_migdppc: 100,
   records: 120
 }
 
