@@ -142,6 +142,7 @@ const colorByOptions = [
 
 const yAxisLabelGap = {
   e_migdppc: 100,//asdf
+  records: 120
 }
 
 const vdemScaleMax = {
