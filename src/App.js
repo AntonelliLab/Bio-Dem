@@ -553,14 +553,16 @@ class App extends Component {
       vdemExplanations[d.id] = d;
     });
     vdemOptions.forEach(d => {
-      if (!vdemExplanations[d.value]) {
+      const info = vdemExplanations[d.value];
+      if (!info) {
         console.log('Missing explanation for value:', d.value);
+      } else {
+        d.label = info.short_name;
+        d.description = info.description;
+        d.relevance = info.relevance;
+        d.references = info.references;
+        d.full_name = info.full_name;
       }
-      d.label = vdemExplanations[d.value].short_name;
-      d.description = vdemExplanations[d.value].description;
-      d.relevance = vdemExplanations[d.value].relevance;
-      d.references = vdemExplanations[d.value].references;
-      d.full_name = vdemExplanations[d.value].full_name;
     });
     this.setState({
       loaded: true,
