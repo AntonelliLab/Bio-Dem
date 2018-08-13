@@ -939,7 +939,7 @@ class App extends Component {
                       input={<Input name="vdemY" id="vdemY" />}
                       value={this.state.vdemY}
                       onChange={this.handleChange}
-                      options={vdemOptions}
+                      options={scatterYOptions}
                     />
                   </FormControl>
                   <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
