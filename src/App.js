@@ -14,6 +14,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Zoom from '@material-ui/core/Zoom';
 import ToggleButton, { ToggleButtonGroup } from "@material-ui/lab/ToggleButton";
+// import Tabs from '@material-ui/core/Tabs';
+// import Tab from '@material-ui/core/Tab';
 import IconDownload from '@material-ui/icons/CloudDownload';
 import * as d3 from 'd3';
 import { csv } from 'd3-fetch';
@@ -310,7 +312,10 @@ ColorLegend.propTypes = {
 };
 
 const HighlightsButtonGroup = (props) => (
-  <div className="toggleContainer">
+  <div className="highlightsContainer">
+    <Typography variant="subheading" gutterBottom style={{ paddingLeft: 0 }}>
+      Highlights
+    </Typography>
     <ToggleButtonGroup {...props} exclusive selected={false} >
       {
         props.highlights.map((h, index) => (
@@ -327,7 +332,35 @@ const HighlightsButtonGroup = (props) => (
     </Typography>
   </div>
 );
-  
+
+// const HighlightTabs = (props) => (
+//   <div>
+//     <AppBar position="static" color="default">
+//       <Tabs
+//         value={props.value === null ? false : props.value}
+//         onChange={props.onChange}
+//         indicatorColor="primary"
+//         textColor="primary"
+//         scrollable
+//         scrollButtons="auto"
+//       >
+//         {
+//           props.highlights.map((h, index) => (
+//             <Tab key={index} label={h.buttonLabel} />
+//           ))
+//         }
+//       </Tabs>
+//     </AppBar>
+//     {
+//       props.value === null ? null : (
+//         <Typography variant="body1" gutterBottom>
+//           { props.highlights[props.value].explanation }
+//         </Typography>
+//       )
+//     }
+//   </div>
+// );
+
 class App extends Component {
 
   constructor(props) {
@@ -646,7 +679,7 @@ class App extends Component {
   /**
    * Function to set the {@link ScatterPlot} to a specific state. Called when one of the highlight buttons is pressed.
    */
-  onScatterPlotHighlightsChange = index => {
+  onScatterPlotHighlightsChange = (index) => {
     // Set state for button being selected
     this.setState({ activeScatterPlotHighlight: index });
     // If the current highlight is deselected, do nothing
@@ -665,7 +698,7 @@ class App extends Component {
   /**
    * Function to set the {@link DualChart} to a specific state. Called when one of the highlight buttons is pressed.
    */
-  onDualChartHighlightsChange = index => {
+  onDualChartHighlightsChange = (index) => {
     // Set state for button being selected
     this.setState({ activeDualChartHighlight: index });
     // If the current highlight is deselected, do nothing
