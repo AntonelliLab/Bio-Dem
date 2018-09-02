@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import Grid from '@material-ui/core/Grid';
 import './About.css';
 
+const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
+
 class About extends React.Component {
   render() {
     const { vdemExplanations : vdem } = this.props;
@@ -99,7 +101,7 @@ class About extends React.Component {
             concepts such as "electoral democracy" or disaggregated concepts
             capturing for example women's participation in civil society or
             freedom of academic expression. The data combine factual data with expert-based 
-			subjective measures through a Bayesian modelling procedureaccounting for coder bias
+			subjective measures through a Bayesian modelling procedure, accounting for coder bias
             and heterogeneity across countries and years. For more information,
             visit <a href="https://www.v-dem.net/en/">V-Dem's website</a>, read <a href="http://journals.sagepub.com/doi/abs/10.1177/0192512115622046?journalCode=ipsa">
               "Measuring high level democratic principles using the V-Dem data"
@@ -107,7 +109,8 @@ class About extends React.Component {
             or <a href="https://www.v-dem.net/en/data/data-version-8/">
               download the data and browse the codebook
             </a>. Bio-Dem currently uses V-Dem version 8 and will be updated as
-            new versions are being published.
+            new versions are being published. The current selected data for the application
+            can be downloaded <a href={vdemDataUrl} download target="blank">here</a>.
           </p>
 		  
             <h3 id="inthegreatercontext">In the greater context</h3>
