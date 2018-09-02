@@ -14,6 +14,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Zoom from '@material-ui/core/Zoom';
 import ToggleButton, { ToggleButtonGroup } from "@material-ui/lab/ToggleButton";
+import IconDownload from '@material-ui/icons/CloudDownload';
 import * as d3 from 'd3';
 import { csv } from 'd3-fetch';
 import debounce from 'lodash/debounce';
@@ -697,6 +698,46 @@ class App extends Component {
     });
   }
 
+  generateSVGFileUrl(parent) {
+    let svgContent = parent.innerHTML;
+    svgContent = svgContent.replace(/^<svg/, ['<svg',
+    'xmlns="http://www.w3.org/2000/svg"',
+    'xmlns:xlink="http://www.w3.org/1999/xlink"',
+    'version="1.1"'].join(' '));
+    svgContent = svgContent.replace(/<\/svg>.*/, '</svg>');
+    // Safari inserts NS1/NS2 namespaces as xlink is not defined within the svg html
+    svgContent = svgContent.replace("NS1", "xlink");
+    svgContent = svgContent.replace("NS2", "xlink");
+    // console.log("svgContent after:", svgContent.substring(0, 250));
+    
+    const url = URL.createObjectURL(new Blob([svgContent], { type: 'image/svg+xml' }));
+    return url;
+  }
+
+  onClickGenerateSvgScatterPlot = () => {
+    if (this.state.downloadUrlScatterPlot) {
+      URL.revokeObjectURL(this.state.downloadUrlScatterPlot);
+    }
+    const url = this.generateSVGFileUrl(this.refScatterPlot.current);
+    this.setState({ downloadUrlScatterPlot: url });
+  }
+
+  onClickDownloadScatterPlot = () => {
+    this.setState({ downloadUrlScatterPlot: null });
+  }
+
+  onClickGenerateSvgDualChart = () => {
+    if (this.state.downloadUrlDualChart) {
+      URL.revokeObjectURL(this.state.downloadUrlDualChart);
+    }
+    const url = this.generateSVGFileUrl(this.refDualChart.current);
+    this.setState({ downloadUrlDualChart: url });
+  }
+
+  onClickDownloadDualChart = () => {
+    this.setState({ downloadUrlDualChart: null });
+  }
+
   /**
    * Get valid year range for selected data dimensions
    * This will adjust for data limits where certain dimensions lack values for all countries.
@@ -928,6 +969,18 @@ class App extends Component {
                   onChange={this.onScatterPlotHighlightsChange}
                   value={this.state.activeScatterPlotHighlight}
                 />
+                {
+                  this.state.downloadUrlScatterPlot ? (
+                    <Button variant="raised" size="small" color="primary" href={this.state.downloadUrlScatterPlot} onClick={this.onClickDownloadScatterPlot} download="bio-dem_scatterplot.svg" target="blank">
+                      <IconDownload style={{ marginRight: 5 }}/>
+                      Download svg
+                    </Button> 
+                  ) : (
+                    <Button variant="raised" size="small" onClick={this.onClickGenerateSvgScatterPlot}>
+                      Generate svg...
+                    </Button>
+                  )
+                }
               </Grid>
               <Grid item className="grid-item" xs={12} md={8}>
                 <div id="scatterPlot" ref={this.refScatterPlot} />
@@ -1019,6 +1072,18 @@ class App extends Component {
                   onChange={this.onDualChartHighlightsChange}
                   value={this.state.activeDualChartHighlight}
                 />
+                {
+                  this.state.downloadUrlDualChart ? (
+                    <Button variant="raised" size="small" color="primary" href={this.state.downloadUrlDualChart} onClick={this.onClickDownloadDualChart} download="bio-dem_dualchart.svg" target="blank">
+                      <IconDownload style={{ marginRight: 5 }}/>
+                      Download svg
+                    </Button> 
+                  ) : (
+                    <Button variant="raised" size="small" onClick={this.onClickGenerateSvgDualChart}>
+                      Generate svg...
+                    </Button>
+                  )
+                }
               </Grid>
 
               <Grid item className="grid-item" xs={12} md={8}>
