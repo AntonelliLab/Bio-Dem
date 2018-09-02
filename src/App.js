@@ -811,6 +811,7 @@ class App extends Component {
       // data: vdemFiltered,
       // data: vdemGrouped,
       left: yAxisLabelGap[vdemY] || 70,
+      xTickGap: 120,
       data: vdemFiltered,
       height: 300,
       // x: d => d[vdemX],
