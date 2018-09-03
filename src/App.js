@@ -163,7 +163,7 @@ const scatterPlotHighlights = [
   {
     buttonLabel: "Protected areas",
     explanation:
-      "The majority of high record countries (large bubbles) are democracies (yellow or green) and located in the upper right corner of the plot. The majority of low record countries (small bubbles) are in the lower left corner, indicating that higher polyarchy corresponds to more collected records. There are four countries, two closed autocracies (Bhutan and Saudi Arabia, purple), one electoral autocracy (Seychelles, blue) and one electoral democracy (Venezuela), that protect a relatively large share of land area.",
+      "The majority of high record countries (large bubbles) are democracies (yellow or green) and located in the lower right corner of the plot. The majority of low record countries (small bubbles) are in the lower left corner, indicating that higher polyarchy corresponds to more collected records. There are four countries, two closed autocracies (Bhutan and Saudi Arabia, purple), one electoral autocracy (Seychelles, blue) and one electoral democracy (Venezuela), that protect a relatively large share of land area.",
     onActvatedNewState:
     {
       vdemY: e_wri_pa,
