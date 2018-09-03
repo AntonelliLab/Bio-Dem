@@ -33,9 +33,9 @@ class About extends React.Component {
             for instance because some localities are more easily accessible, more
             spectacular or have a stronger naturalist history then others. While
             it is relative well understood which geographic factors favour record
-            collection and hence knowledge on biodiversity, relatively little is
+            collection and hence knowledge on biodiversity, <strong>relatively little is
             known on the impact of society and political regime on record
-            collection. This is surprising because first, it seems straight
+            collection.</strong> This is surprising because first, it seems straight
             forward that some regimes would favour naturalist collection (e.g.
             open, safe, democratic) whereas others would not (repressive, unsafe,
             authoritarian), and second a considerable body of literature exists on
@@ -43,7 +43,7 @@ class About extends React.Component {
           </p>
 
           <p>
-            Bio-Dem addresses this gap, and provides a web-app to visually explore the availability of geographic occurrence records of biological species available from 
+            <strong>Bio-Dem addresses this gap</strong>, and provides a web-app to visually explore the availability of geographic occurrence records of biological species available from 
 			the Global Biodiversity Information Facility (as proxy for scientific biodiversity knowledge) in relation to political systems around the world
             Some specific questions that motivated the development of Bio-Dem are:{" "}
           </p>
