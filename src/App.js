@@ -85,10 +85,11 @@ const vdemOptions = [
 const scatterYOptions = vdemOptions.concat([{
   value: "records",
   label: "Number of records",
-  description: "",
+  short_name: "Number of records",
+  full_name: "Number of GBIF records",
+  description: "Number of species occurrence records in GBIF in selected years",
   relevance: "",
   references: "",
-  full_name: ""
 }]);
 
 const regimeTypes = {
@@ -145,7 +146,7 @@ const colorByOptions = [
 
 const yAxisLabelGap = {
   e_migdppc: 100,
-  records: 120
+  // records: 120
 }
 
 const vdemScaleMax = {
@@ -158,6 +159,10 @@ const vdemScaleMax = {
   v2x_clphy: 1,
   //TODO: Use global max on external variables
 }
+
+const useLogScale = {
+  records: true,
+};
 
 const scatterPlotHighlights = [
   {
@@ -587,16 +592,25 @@ class App extends Component {
     vdemExplanationsArray.forEach(d => {
       vdemExplanations[d.id] = d;
     });
+    vdemExplanations['records'] = {
+      id: 'records',
+      label: "Number of records",
+      short_name: "Number of records",
+      full_name: "Number of GBIF records",
+      description: "Number of species occurrence records in GBIF in selected years.",
+      relevance: "",
+      references: "",
+    };
     vdemOptions.forEach(d => {
       const info = vdemExplanations[d.value];
       if (!info) {
         console.log('Missing explanation for value:', d.value);
       } else {
         d.label = info.short_name;
-        d.description = info.description;
-        d.relevance = info.relevance;
-        d.references = info.references;
-        d.full_name = info.full_name;
+        // d.description = info.description;
+        // d.relevance = info.relevance;
+        // d.references = info.references;
+        // d.full_name = info.full_name;
       }
     });
     this.setState({
@@ -838,6 +852,7 @@ class App extends Component {
       // console.log('vdemGrouped:', vdemGrouped);
       // console.log('vdemFiltered:', vdemFiltered);
       // console.log('countryFacetData', gbifCountryFacetData);
+    console.log(vdemY, 'useLogScale:', useLogScale[vdemY]);
 
     ScatterPlot(this.refScatterPlot.current, {
       // data: vdemData,
@@ -845,6 +860,7 @@ class App extends Component {
       // data: vdemGrouped,
       left: yAxisLabelGap[vdemY] || 70,
       xTickGap: 120,
+      yLogScale: useLogScale[vdemY],
       data: vdemFiltered,
       height: 300,
       // x: d => d[vdemX],

@@ -31,6 +31,7 @@ export default function ScatterPlot(el, properties) {
     title: "",
     tooltip: null,
     fetching: false,
+    yLogScale: false,
     selected: (d) => false,
   }, properties);
 
@@ -73,7 +74,7 @@ export default function ScatterPlot(el, properties) {
   const x = d3.scaleLinear()
             .domain(xExtent)
             .range([0, width]);
-  const y = d3.scaleLinear()
+  const y = (props.yLogScale ? d3.scaleLog() : d3.scaleLinear())
             .domain(yExtent)
             .range([height, 0]);
   const value = d3.scaleLog()

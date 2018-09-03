@@ -180,7 +180,7 @@ class About extends React.Component {
             collections
           </h2>
 
-          { vdemExplanations.map(d => (
+          { vdemExplanations.map(d => d.id === 'records' ? null : (
             <div key={d.id}>
               <h4 id={d.id}>{d.short_name}</h4>
               
