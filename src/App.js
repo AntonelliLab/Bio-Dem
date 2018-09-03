@@ -20,33 +20,24 @@ import IconDownload from '@material-ui/icons/CloudDownload';
 import * as d3 from 'd3';
 import { csv } from 'd3-fetch';
 import debounce from 'lodash/debounce';
-import countryCodes from 'i18n-iso-countries';
-import countryCodesEn from 'i18n-iso-countries/langs/en.json';
 import {
   queryGBIFYearFacet,
   queryGBIFCountryFacet,
-  queryAutocompletesGBIF
+  queryAutocompletesGBIF,
+  // fetchRecordsPerCountryPerYear,
 } from "./api/gbif";
 import About from './About';
 import logo from './logo.svg';
 import DualChart from './d3/DualChart';
 import ScatterPlot from './d3/ScatterPlot';
 import { haveNaN, isWithin } from './d3/helpers';
+import countryCodes from './helpers/countryCodes';
 import AutoSelect from './components/AutoSelect';
 import Notice from './components/Notice';
 import IconGithub from './components/Github';
 import './App.css';
 import './d3/d3.css';
 
-countryCodes.registerLocale(countryCodesEn);
-
-const getCountryName = (code) => {
-  if (code === 'PSE') {
-    // TODO: Palestine West Bank in v-dem?
-    return 'Palestinian Territory';
-  }
-  return countryCodes.getName(code, 'en');
-}
 
 /**
  * V-dem variables
@@ -69,6 +60,14 @@ AFG,642182,8
 AGO,1244654,4
  */
 const countryDataUrl = `${process.env.PUBLIC_URL}/data/country_data.csv`;
+
+/**
+ * Gbif pre-downloaded data from api
+country,year,records
+AFG,1960,857
+AFG,1961,445
+ */
+const gbifDataUrl = `${process.env.PUBLIC_URL}/data/gbif_data.csv`;
 
 // The strings for the v-dem variables used to get the static data
 const v2x_polyarchy = "v2x_polyarchy";
@@ -434,11 +433,11 @@ class App extends Component {
     }
 
     // Changes in state that require a new GBIF country facet query
-    const fetchNewYearCondition = this.state.xyYearMin !== prevState.xyYearMin;
+    // const fetchNewYearCondition = this.state.xyYearMin !== prevState.xyYearMin;
 
-    if (fetchNewYearCondition) {
-      await this.makeCountryFacetQuery();
-    }
+    // if (fetchNewYearCondition) {
+    //   await this.makeCountryFacetQuery();
+    // }
   }
 
   onResize = () => {
@@ -497,18 +496,26 @@ class App extends Component {
       }
       return {
         value: row.country,
-        label: getCountryName(row.country),
+        label: countryCodes.getName(row.country),
         area: +row.area,
         regionCode: +row.e_regionpol,
         regionName: regions[row.e_regionpol],
       };
     });
-    const [vdemData, vdemExplanations, countryData] = await Promise.all([
+    const gbifDataPromise = csv(gbifDataUrl, row => {
+      return {
+        country: row.country,
+        year: +row.year,
+        records: row.records,
+      };
+    });
+    const [vdemData, vdemExplanations, countryData, gbifYearlyCountryData] = await Promise.all([
       vdemDataPromise,
       vdemExplanationsPromise,
       countryDataPromise,
+      gbifDataPromise,
       this.makeYearFacetQuery(countryCodes.alpha3ToAlpha2(this.state.country)),
-      this.makeCountryFacetQuery(),
+      // this.makeCountryFacetQuery(),
     ]);
     const countryMap = {};
     countryData.forEach(d => {
@@ -516,7 +523,7 @@ class App extends Component {
     })
     this.countryMap = countryMap;
 
-    const data = [vdemData, vdemExplanations, countryData];
+    const data = [vdemData, vdemExplanations, countryData, gbifYearlyCountryData];
     this.data = data;
     this.setState({
       loaded: true,
@@ -570,6 +577,9 @@ class App extends Component {
     // Query the GBIF API
     console.log('Query gbif with country facet...');
     const result = await queryGBIFCountryFacet(this.state.xyYearMin);
+    // const recordsPerCountryPerYear = await fetchRecordsPerCountryPerYear();
+    // console.log('recordsPerCountryPerYear:', recordsPerCountryPerYear);
+
     // If the query errored out set to error state
     if (result.error) {
       const gbifError = Object.assign({}, this.state.gbifError);
@@ -599,7 +609,7 @@ class App extends Component {
 
   async initData() {
     const data = await this.fetchData();
-    const [vdemData, vdemExplanationsArray, countryData] = data;
+    const [vdemData, vdemExplanationsArray, countryData, gbifYearlyCountryData] = data;
     const vdemExplanations = {};
     vdemExplanationsArray.forEach(d => {
       vdemExplanations[d.id] = d;
@@ -625,11 +635,20 @@ class App extends Component {
         // d.full_name = info.full_name;
       }
     });
+    // Integrate gbif data into vdem data
+    const gbifDataPerCountryAndYear = {};
+    gbifYearlyCountryData.forEach(d => {
+      gbifDataPerCountryAndYear[`${d.country}-${d.year}`] = d.records;
+    });
+    vdemData.forEach(d => {
+      d.records = gbifDataPerCountryAndYear[`${d.country}-${d.year}`] || 0;
+    })
     this.setState({
       loaded: true,
       vdemData,
       vdemExplanations,
       countries: countryData,
+      // gbifYearlyCountryData,
     }, () => {
       this.renderCharts();
     });
@@ -818,7 +837,8 @@ class App extends Component {
   }
 
   renderScatterPlot() {
-    const { vdemData, vdemX, vdemY, xyYearMin, gbifCountryFacetData, vdemExplanations } = this.state;
+    const { vdemData, vdemX, vdemY, xyYearMin, vdemExplanations } = this.state;
+    // const { gbifCountryFacetData } = this.state;
     const vdemXLabel = vdemExplanations[vdemX] ? vdemExplanations[vdemX].short_name : vdemX;
     
     let vdemYLabel = vdemExplanations[vdemY] ? vdemExplanations[vdemY].short_name : vdemY;
@@ -837,18 +857,19 @@ class App extends Component {
         const x = d3.median(values, d => d[vdemX]);
         const y = d3.median(values, d => d[vdemY]);
         const z = d3.median(values, d => d.v2x_regime);
-        return { x, y, z };
+        const records = d3.sum(values, d => d.records);
+        return { x, y, z, records };
       })
       .entries(vdemData
         // Aggregate within selected years
         .filter(d => d.year >= startYear && d.year <= stopYear)
       );
 
-      vdemGrouped.forEach(d => {
-        if (d.value !== null && gbifCountryFacetData && gbifCountryFacetData[d.key]) {
-          d.value.records = gbifCountryFacetData[d.key].collections;
-        }
-      });
+      // vdemGrouped.forEach(d => {
+      //   if (d.value !== null && gbifCountryFacetData && gbifCountryFacetData[d.key]) {
+      //     d.value.records = gbifCountryFacetData[d.key].collections;
+      //   }
+      // });
       
       // Filter countries lacking values on the x y dimensions or have zero records (log safe)
       const vdemFiltered = vdemGrouped.filter(d => d.value !== null && d.value.records > 0);
