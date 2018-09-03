@@ -163,7 +163,7 @@ const scatterPlotHighlights = [
   {
     buttonLabel: "Protected areas",
     explanation:
-      "The majority of high record countries (large bubbles) are democracies (yellow or green) and located in the lower right corner of the plot. The majority of low record countries (small bubbles) are in the lower left corner, indicating that higher polyarchy corresponds to more collected records. There are four countries, two closed autocracies (Bhutan and Saudi Arabia, purple), one electoral autocracy (Seychelles, blue) and one electoral democracy (Venezuela), that protect a relatively large share of land area.",
+      "The majority of high record countries (large bubbles) are democracies (yellow or green) and located in the upper right corner of the plot. The majority of low record countries (small bubbles) are in the lower left corner, indicating that higher polyarchy corresponds to more collected records. There are four countries, two closed autocracies (Bhutan and Saudi Arabia, purple), one electoral autocracy (Seychelles, blue) and one electoral democracy (Venezuela), that protect a relatively large share of land area.",
     onActvatedNewState:
     {
       vdemY: e_wri_pa,
@@ -943,7 +943,7 @@ class App extends Component {
   }
 
   render() {
-    const { vdemX, vdemY, xyYearMin, gbifError } = this.state;
+    const { vdemX, vdemY, xyYearMin, gbifError, vdemExplanations } = this.state;
     const xyValidYears = this.getValidYears([vdemX, vdemY], 1960, 2018);
     const xyYearIntervalLimited = xyYearMin < xyValidYears[0] || xyValidYears[1] < 2016;
     return (
@@ -1083,6 +1083,13 @@ class App extends Component {
                       <span>Error: Querying the GBIF API for country facet data failed</span>
                     }/>
                   </Zoom>
+                  <div style={{ marginTop: 10 }}>
+                    <h3>Selected variables:</h3>
+                    <h4>{vdemExplanations[this.state.vdemY] ? vdemExplanations[this.state.vdemY].short_name : ''}</h4>
+                    { vdemExplanations[this.state.vdemY] ? vdemExplanations[this.state.vdemY].description : '' }
+                    <h4>{vdemExplanations[this.state.vdemX] ? vdemExplanations[this.state.vdemX].short_name : ''}</h4>
+                    { vdemExplanations[this.state.vdemX] ? vdemExplanations[this.state.vdemX].description : '' }
+                  </div>
                 </div>
               </Grid>
             </Grid>
@@ -1188,6 +1195,11 @@ class App extends Component {
                       <span>Error: Querying the GBIF API for taxon data failed</span>
                     } />
                   </Zoom>
+                  <div style={{ marginTop: 10 }}>
+                    <h3>Selected variables:</h3>
+                    <h4>{vdemExplanations[this.state.vdemVariable] ? vdemExplanations[this.state.vdemVariable].short_name : ''}</h4>
+                    { vdemExplanations[this.state.vdemVariable] ? vdemExplanations[this.state.vdemVariable].description : '' }
+                  </div>
                 </div>
               </Grid>
             </Grid>
