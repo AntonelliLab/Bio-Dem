@@ -20,7 +20,8 @@ import IconDownload from '@material-ui/icons/CloudDownload';
 import * as d3 from 'd3';
 import { csv } from 'd3-fetch';
 import debounce from 'lodash/debounce';
-import { byAlpha2, byAlpha3 } from "iso-country-codes";
+import countryCodes from 'i18n-iso-countries';
+import countryCodesEn from 'i18n-iso-countries/langs/en.json';
 import {
   queryGBIFYearFacet,
   queryGBIFCountryFacet,
@@ -36,6 +37,16 @@ import Notice from './components/Notice';
 import IconGithub from './components/Github';
 import './App.css';
 import './d3/d3.css';
+
+countryCodes.registerLocale(countryCodesEn);
+
+const getCountryName = (code) => {
+  if (code === 'PSE') {
+    // TODO: Palestine West Bank in v-dem?
+    return 'Palestinian Territory';
+  }
+  return countryCodes.getName(code, 'en');
+}
 
 /**
  * V-dem variables
@@ -158,6 +169,7 @@ const vdemScaleMax = {
   v2x_corr: 1,
   v2x_clphy: 1,
   //TODO: Use global max on external variables
+  e_wri_pa: 60,
 }
 
 const useLogScale = {
@@ -418,9 +430,7 @@ class App extends Component {
 
     if (fetchNewCountryCondition) {
       // Get alpha2 ISO code for this country, as this is what GBIF requires as query
-      // TODO: Catch cases where !byAlpha3[event.target.value]
-      const alpha2 = byAlpha3[this.state.country].alpha2;
-      await this.makeYearFacetQuery(alpha2);
+      await this.makeYearFacetQuery(countryCodes.alpha3ToAlpha2(this.state.country));
     }
 
     // Changes in state that require a new GBIF country facet query
@@ -482,9 +492,12 @@ class App extends Component {
       };
     });
     const countryDataPromise = csv(countryDataUrl, row => {
+      if (!countryCodes.alpha3ToAlpha2(row.country)) {
+        console.log('country code not translatable:', row.country);
+      }
       return {
         value: row.country,
-        label: byAlpha3[row.country] ? byAlpha3[row.country].name : row.country,
+        label: getCountryName(row.country),
         area: +row.area,
         regionCode: +row.e_regionpol,
         regionName: regions[row.e_regionpol],
@@ -494,7 +507,7 @@ class App extends Component {
       vdemDataPromise,
       vdemExplanationsPromise,
       countryDataPromise,
-      this.makeYearFacetQuery(byAlpha3[this.state.country].alpha2),
+      this.makeYearFacetQuery(countryCodes.alpha3ToAlpha2(this.state.country)),
       this.makeCountryFacetQuery(),
     ]);
     const countryMap = {};
@@ -567,8 +580,7 @@ class App extends Component {
     // Transform the result as required for the ScatterPlot
     const gbifCountryFacetData = {};
     result.response.data.facets[0].counts.map(d => {
-      const alpha2Country = byAlpha2[d.name];
-      gbifCountryFacetData[alpha2Country ? alpha2Country.alpha3 : null] = {
+      gbifCountryFacetData[countryCodes.alpha2ToAlpha3(d.name)] = {
         collections: d.count
       };
       return true;
@@ -852,7 +864,6 @@ class App extends Component {
       // console.log('vdemGrouped:', vdemGrouped);
       // console.log('vdemFiltered:', vdemFiltered);
       // console.log('countryFacetData', gbifCountryFacetData);
-    console.log(vdemY, 'useLogScale:', useLogScale[vdemY]);
 
     ScatterPlot(this.refScatterPlot.current, {
       // data: vdemData,
