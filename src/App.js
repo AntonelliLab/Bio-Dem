@@ -978,6 +978,7 @@ class App extends Component {
       left: yAxisLabelGap[vdemY] || 70,
       xTickGap: 120,
       yLogScale: useLogScale[vdemY],
+      xLogScale: useLogScale[vdemX],
       data: vdemFiltered,
       height: 300,
       // x: d => d[vdemX],

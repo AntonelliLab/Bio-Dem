@@ -35,6 +35,7 @@ export default function ScatterPlot(el, properties) {
     tooltip: null,
     fetching: false,
     yLogScale: false,
+    xLogScale: false,
     selected: (d) => false,
   }, properties);
 
@@ -69,12 +70,12 @@ export default function ScatterPlot(el, properties) {
   const { data } = props;
 
   // Scale the range of the data in the domains
-  const xExtent = getExtent(data, props.x, props.xMin, props.xMax);
+  const xExtent = getExtent(data, props.x, !props.xLogScale || props.xMin > 1 ? props.xMin : 1, props.xMax);
   const yExtent = getExtent(data, props.y, !props.yLogScale || props.yMin > 1 ? props.yMin : 1, props.yMax);
   const valueExtent = getExtent(data, props.value, props.valueMin, props.valueMax);
 
   // set the ranges
-  const x = d3.scaleLinear()
+  const x = (props.xLogScale ? d3.scaleLog() : d3.scaleLinear())
             .domain(xExtent)
             .range([0, width]);
   const y = (props.yLogScale ? d3.scaleLog() : d3.scaleLinear())
