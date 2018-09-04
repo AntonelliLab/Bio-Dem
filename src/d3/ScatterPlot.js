@@ -85,6 +85,7 @@ export default function ScatterPlot(el, properties) {
   const value = d3.scaleLog()
             // .domain(valueExtent)
             .domain(valueExtent)
+            .clamp(true)
             .range([1, 30]);
 
   // const color = d3.scaleOrdinal(d3.schemeCategory10);

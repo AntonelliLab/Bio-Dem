@@ -1021,7 +1021,7 @@ class App extends Component {
       yMin: vdemScaleMin[vdemY],
       yMax: vdemScaleMax[vdemY],
       valueMin: 1,
-      valueMax: vdemScaleMax['records'],
+      valueMax: this.state.normalizeByArea ? 1e3 : vdemScaleMax['records'],
       x: d => d.value.x,
       y: d => d.value.y,
       value: d => this.state.normalizeByArea ? d.value.records / this.countryMap[d.key].area : d.value.records,
