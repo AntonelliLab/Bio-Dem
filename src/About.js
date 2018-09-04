@@ -1,7 +1,8 @@
-import React from "react";
-import PropTypes from "prop-types";
-import Grid from "@material-ui/core/Grid";
-import "./About.css";
+import React from 'react';
+import PropTypes from 'prop-types';
+import Grid from '@material-ui/core/Grid';
+import Youtube from 'react-youtube';
+import './About.css';
 
 const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
 
@@ -179,10 +180,16 @@ class About extends React.Component {
           <h3 id="tutorial1Biodiversityknowledgeandpoliticalregimes">
             Tutorial 1 - Biodiversity knowledge & political regimes
           </h3>
+          <div className="youtube-wrapper">
+            <Youtube videoId="ScMzIvxBSi4" />
+          </div>
 
           <h3 id="tutorial2Biodiversityknowledgethroughtime">
             Tutorial 2 - Biodiversity knowledge through time
           </h3>
+          <div className="youtube-wrapper">
+            <Youtube videoId="ScMzIvxBSi4" />
+          </div>
           
 
           <h2 id="contact">Contact</h2>
