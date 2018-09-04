@@ -151,10 +151,18 @@ class About extends React.Component {
               
        <h2 id="team">Team</h2>
        <p>
-       <a href="https://alexanderzizka.net/">Alexander Zizka</a>
-       Daniel Edler</br>
-       <a href="https://www.linkedin.com/in/oskarryden/">Oskar Ryden</a>
-       <a href="https://www.linkedin.com/in/dr-johannes-klein-220479127/">Johannes Klein</a>
+         <div>
+          <a href="https://alexanderzizka.net/">Alexander Zizka</a>
+         </div>
+         <div>
+          <a href="http://icelab.se/about/team/daniel-edler/">Daniel Edler</a>
+         </div>
+         <div>
+          <a href="https://www.linkedin.com/in/oskarryden/">Oskar Ryden</a>
+         </div>
+         <div>
+          <a href="https://www.linkedin.com/in/dr-johannes-klein-220479127/">Johannes Klein</a>
+         </div>
        </p>
 		  
 		   <h2 id="contact">Contact</h2>
