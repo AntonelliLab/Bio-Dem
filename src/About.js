@@ -148,6 +148,14 @@ class About extends React.Component {
             <h3 id="tutorial1Biodiversityknowledgeandpoliticalregimes">Tutorial 1 - Biodiversity knowledge & political regimes</h3>
 
               <h3 id="tutorial2Biodiversityknowledgethroughtime">Tutorial 2 - Biodiversity knowledge through time</h3>
+              
+       <h2 id="team">Team</h2>
+       <p>
+       <a href="https://alexanderzizka.net/">Alexander Zizka</a><br>
+       Daniel Edler<br>
+       <a href="https://www.linkedin.com/in/oskarryden/">Oskar Ryden</a><br>
+       <a href="https://www.linkedin.com/in/dr-johannes-klein-220479127/">Johannes Klein</a><br>
+       </p>
 		  
 		   <h2 id="contact">Contact</h2>
        <p>

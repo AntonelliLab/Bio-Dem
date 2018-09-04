@@ -973,6 +973,8 @@ class App extends Component {
             <span style={{ flexGrow: 1 }} />
             <Button href="#tutorials" color="inherit">Tutorials</Button>
             <span style={{ flexGrow: 1 }} />
+            <Button href="#contact" color="inherit">Contact</Button>
+            <span style={{ flexGrow: 1 }} />
             <IconButton href="https://github.com/AntonelliLab/Bio-Dem" color="inherit" aria-label="Github">
               <IconGithub />
             </IconButton>
