@@ -36,6 +36,9 @@
     "deploy": "surge build/ bio-dem.surge.sh"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/register": "^7.0.0",
     "surge": "^0.20.1"
   }
 }

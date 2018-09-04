@@ -15,4 +15,4 @@ public/data/$(VDEM_EXPLANATIONS_FILENAME):
 	wget https://github.com/AntonelliLab/Vdem-Biodiversity/raw/master/ebbe_nielsen/$(VDEM_EXPLANATION_FILENAME) -O $@
 
 public/data/gbif_data.csv:
-	npx babel-node downloadGbifData.js
+	node downloadGbifData.js

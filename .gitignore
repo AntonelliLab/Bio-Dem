@@ -1,5 +1,8 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
+# data file can be generated
+public/data/gbif_data.csv
+
 # dependencies
 /node_modules
 
