@@ -152,7 +152,7 @@ class About extends React.Component {
 		   <h2 id="contact">Contact</h2>
        <p>
        Please <a href="https://github.com/AntonelliLab/Bio-Dem/issues">contact us</a> for any comments, suggestions or bug reports and find the source code for Bio-Dem <a href="https://github.com/AntonelliLab/Bio-Dem">here</a>.
-       
+       </p>
 		  
 
        <h2 id="references">References</h2>
