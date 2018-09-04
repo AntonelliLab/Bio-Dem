@@ -254,6 +254,8 @@ class About extends React.Component {
           <p>
             Chadwick, B.P. “Fisheries, Sovereignties and Red Herrings”.{" "}
             <em>Journal of International Affars</em>, vol. 48(2): 559-584.
+          </p>
+          <p>
             Desai, U (1998). “Environment, Economic Growth, and Government in
             Developing Countries”, in (ed.) Desai, U.{" "}
             <em>
@@ -289,6 +291,8 @@ class About extends React.Component {
           <p>
             Payne, R.A (1995). “Freedom and the environment”.{" "}
             <em>Journal of Democracy</em>, vol. 6(3). Pellegrini, L. and R.
+          </p>
+          <p>
             Gerlach (2006). “Corruption, Democracy, and Environmental Policy: An
             Empirical Contribution to the Debate”.{" "}
             <em>The Journal of Environment &amp; Development</em>, vol. 15(3):
