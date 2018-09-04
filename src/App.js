@@ -17,6 +17,8 @@ import ToggleButton, { ToggleButtonGroup } from "@material-ui/lab/ToggleButton";
 // import Tabs from '@material-ui/core/Tabs';
 // import Tab from '@material-ui/core/Tab';
 import IconDownload from '@material-ui/icons/CloudDownload';
+// import IconPlay from '@material-ui/icons/PlayCircleOutline';
+// import IconPause from '@material-ui/icons/PauseCircleOutline';
 import * as d3 from 'd3';
 import { csv } from 'd3-fetch';
 import debounce from 'lodash/debounce';
@@ -822,6 +824,18 @@ class App extends Component {
     this.setState({ downloadUrlDualChart: null });
   }
 
+  onClickPlay = () => {
+    this.setState({
+      isPlaying: true,
+    });
+  }
+  
+  onClickPause = () => {
+    this.setState({
+      isPlaying: false,
+    });    
+  }
+
   /**
    * Get valid year range for selected data dimensions
    * This will adjust for data limits where certain dimensions lack values for all countries.
@@ -1137,8 +1151,16 @@ class App extends Component {
                 <ColorLegend type={this.state.colorBy} />
                 {this.renderProgress()}
                 <div id="brush" ref={this.refBrush} />
-                <div style={{ textAlign: 'center' }}>
-                  Selected years: { this.state.xyYearMin } - { this.state.xyYearMax }
+                <div className="play-container">
+                  <div>
+                    Selected years: { this.state.xyYearMin } - { this.state.xyYearMax }
+                  </div>
+                  <div style={{ marginLeft: 5 }}>
+                    {/* { this.state.isPlaying ?
+                      <IconPause className="icon" onClick={this.onClickPause} /> :
+                      <IconPlay className="icon" onClick={this.onClickPlay} />
+                    } */}
+                  </div>
                 </div>
 
                 <div className="controls">
