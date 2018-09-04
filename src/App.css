@@ -98,3 +98,7 @@ a, strong {
 .icon:hover {
   color: #000;
 }
+
+.country-highlight {
+  cursor: pointer;
+}
