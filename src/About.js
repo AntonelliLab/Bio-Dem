@@ -148,8 +148,8 @@ class About extends React.Component {
             <h3 id="tutorial1Biodiversityknowledgeandpoliticalregimes">Tutorial 1 - Biodiversity knowledge & political regimes</h3>
 
               <h3 id="tutorial2Biodiversityknowledgethroughtime">Tutorial 2 - Biodiversity knowledge through time</h3>
-              
-       <h2 id="team">Team</h2>
+      
+       <h2 id="contact">Contact</h2>    
        <p>
          <div>
           <a href="https://alexanderzizka.net/">Alexander Zizka</a>
@@ -164,10 +164,9 @@ class About extends React.Component {
           <a href="https://www.linkedin.com/in/dr-johannes-klein-220479127/">Johannes Klein</a>
          </div>
        </p>
-		  
-		   <h2 id="contact">Contact</h2>
+
        <p>
-       Please <a href="https://github.com/AntonelliLab/Bio-Dem/issues">contact us</a> for any comments, suggestions or bug reports and find the source code for Bio-Dem <a href="https://github.com/AntonelliLab/Bio-Dem">here</a>.
+       <a href="mailto:bio-dem@googlegroups.com">Contact us</a>, check out the <a href="https://github.com/AntonelliLab/Bio-Dem">source code</a> or file a <a href="https://github.com/AntonelliLab/Bio-Dem/issues">bug report</a>.
        </p>
 		  
 
