@@ -21,6 +21,8 @@ export default function ScatterPlot(el, properties) {
     xTickGap: 80,
     xMin: null,
     xMax: null,
+    yMin: null,
+    yMax: null,
     data: [],
     x: d => d.x,
     y: d => d.y,
@@ -68,7 +70,7 @@ export default function ScatterPlot(el, properties) {
 
   // Scale the range of the data in the domains
   const xExtent = getExtent(data, props.x, props.xMin, props.xMax);
-  const yExtent = getExtent(data, props.y, props.yMin, props.yMax);
+  const yExtent = getExtent(data, props.y, !props.yLogScale || props.yMin > 1 ? props.yMin : 1, props.yMax);
   const valueExtent = getExtent(data, props.value, props.valueMin, props.valueMax);
 
   // set the ranges

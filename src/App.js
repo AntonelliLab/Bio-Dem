@@ -170,6 +170,7 @@ const yAxisLabelGap = {
 }
 
 const vdemScaleMax = {
+  // v2x_regime: 3,
   v2x_polyarchy: 1,
   v2x_freexp_altinf: 1,
   v2x_frassoc_thick: 1,
@@ -177,12 +178,30 @@ const vdemScaleMax = {
   v2xcs_ccsi: 1,
   v2x_corr: 1,
   v2x_clphy: 1,
-  //TODO: Use global max on external variables
+  e_peaveduc: 15,
+  e_migdppc: 2e5,
   e_wri_pa: 60,
+  records: 1e9,
+}
+
+const vdemScaleMin = {
+  // v2x_regime: 0,
+  v2x_polyarchy: 0,
+  v2x_freexp_altinf: 0,
+  v2x_frassoc_thick: 0,
+  v2xcl_dmove: 0,
+  v2xcs_ccsi: 0,
+  v2x_corr: 0,
+  v2x_clphy: 0,
+  e_peaveduc: 0,
+  e_migdppc: 2e2,
+  e_wri_pa: 0,
+  records: 1,
 }
 
 const useLogScale = {
   records: true,
+  e_migdppc: true,
 };
 
 const scatterPlotHighlights = [
@@ -795,6 +814,7 @@ class App extends Component {
       [event.target.name]: event.target.value,
     }, () => {
       this.renderScatterPlot();
+      this.renderBrush();
     });
   }
 
@@ -922,7 +942,8 @@ class App extends Component {
     })
     .entries(vdemData
       // Aggregate within selected years
-      .filter(d => d.year >= startYear &&
+      .filter(d =>
+        d.year >= startYear &&
         d.year <= stopYear &&
         (regionFilter === 0 || this.countryMap[d.country].regionCode === regionFilter)
       )
@@ -961,6 +982,12 @@ class App extends Component {
       height: 300,
       // x: d => d[vdemX],
       // y: d => d[vdemY],
+      xMin: vdemScaleMin[vdemX],
+      xMax: vdemScaleMax[vdemX],
+      yMin: vdemScaleMin[vdemY],
+      yMax: vdemScaleMax[vdemY],
+      valueMin: 1,
+      valueMax: vdemScaleMax['records'],
       x: d => d.value.x,
       y: d => d.value.y,
       value: d => this.state.normalizeByArea ? d.value.records / this.countryMap[d.key].area : d.value.records,
@@ -991,11 +1018,11 @@ class App extends Component {
   }
 
   renderBrush() {
-    const { vdemData } = this.state;
+    const { vdemData, regionFilter } = this.state;
     if (vdemData.length === 0) {
       return;
     }
-    const [yearMinBrush, yearMaxBrush] = [1960, 2017];
+    const [startYear, stopYear] = [1960, 2017];
     const recordsPerYear = d3.nest()
     .key(d => d.year)
     .rollup(values => {
@@ -1008,7 +1035,11 @@ class App extends Component {
     })
     .entries(vdemData
       // Aggregate within selected years
-      .filter(d => d.year >= yearMinBrush && d.year <= yearMaxBrush)
+      .filter(d => 
+        d.year >= startYear &&
+        d.year <= stopYear &&
+        (regionFilter === 0 || this.countryMap[d.country].regionCode === regionFilter)
+      )
     );
     
     // console.log('recordsPerYear:', recordsPerYear);
@@ -1021,8 +1052,8 @@ class App extends Component {
       right: 20,
       bottom: 25,
       xTickGap: 140,
-      xMin: yearMinBrush,
-      xMax: yearMaxBrush,
+      xMin: startYear,
+      xMax: stopYear,
       // yMin: 1,
       // yMax: 50000000,
       x: d => d.key,
