@@ -24,7 +24,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # data
-/public/data
 .Rproj.user
 
 # manuscript
