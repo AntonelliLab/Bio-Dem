@@ -972,7 +972,12 @@ class App extends Component {
     const recordsPerYear = d3.nest()
     .key(d => d.year)
     .rollup(values => {
-      return { records: d3.sum(values, d => d.records) };
+      const numRecords = d3.sum(values, d => d.records);
+      const regime = d3.mean(values, d => d.v2x_regime);
+      return {
+        records: numRecords,
+        regime,
+      };
     })
     .entries(vdemData
       // Aggregate within selected years
@@ -995,6 +1000,7 @@ class App extends Component {
       // yMax: 50000000,
       x: d => d.key,
       y: d => d.value.records,
+      barColor: d => regimeColor(d.value.regime),
       xLabel: '',
       // yLabel: 'Number of records',
       // title: 'Number of public species records per country and year',

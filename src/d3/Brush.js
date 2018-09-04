@@ -24,7 +24,8 @@ export default function Brush(el, properties) {
     data: [],
     x: d => d.x,
     y: d => d.y,
-    color: d => 'steelblue',
+    color: d => '#999',
+    barColor: d => '#ccc',
     xLabel: "Year",
     yLabel: "",
     // title: "",
@@ -75,16 +76,21 @@ export default function Brush(el, properties) {
             .domain(timeExtent)
             .range([0, width]);
   
+  const xBar = d3.scaleBand()
+    .domain(d3.range(xExtent[0], xExtent[1] + 1))
+    .range([0, width])
+    .padding(0.1);
+  
   const y = d3.scaleLinear()
             .domain(yExtent)
-            .range([height, 0]);
+            .range([5, height]);
   
-  const xDateAccessor = (d) => parseYear(props.x(d))
+  // const xDateAccessor = (d) => parseYear(props.x(d))
 
-  // const yLogFriendlyAccessor = (d) => {
-  //   const y = props.y(d);
-  //   return Math.max(1, y);
-  // }
+  const yLogFriendlyAccessor = (d) => {
+    const y = props.y(d);
+    return Math.max(1, y);
+  }
   
   const xAxis = d3.axisBottom(x)
     .tickSizeOuter(0)
@@ -93,18 +99,17 @@ export default function Brush(el, properties) {
   
   const yAxis = d3.axisLeft(y);
 
-  const area = d3.area()
-    .curve(d3.curveMonotoneX)
-    // .x(d => x(props.x(d)))
-    .x(d => x(xDateAccessor(d)))
-    .y0(height)
-    // .y1(d => y(yLogFriendlyAccessor(d)));
-    .y1(d => y(props.y(d)));
+  // const area = d3.area()
+  //   .curve(d3.curveMonotoneX)
+  //   // .x(d => x(props.x(d)))
+  //   .x(d => x(xDateAccessor(d)))
+  //   .y0(height)
+  //   // .y1(d => y(yLogFriendlyAccessor(d)));
+  //   .y1(d => y(props.y(d)));
   
-  const color = (d) => {
-    // return props.fetching ? '#aaa' : color(props.z(d));
-    return props.fetching ? '#aaa' : props.color(d);
-  }
+  // const color = (d) => {
+  //   return props.fetching ? '#aaa' : props.color(d);
+  // }
   
   const brush = d3.brushX()
     .extent([[0, 0], [width, height]]);
@@ -149,13 +154,25 @@ export default function Brush(el, properties) {
         .text(props.title);
   }
   
-  g.append("path")
-    .datum(data)
-    .attr("class", "brush")
-    .style("stroke", color)
-    .style("fill", color)
-    .style("fill-opacity", 0.5)
-    .attr("d", area);
+  // g.append("path")
+  //   .datum(data)
+  //   .attr("class", "brush")
+  //   .style("stroke", color)
+  //   .style("fill", color)
+  //   .style("fill-opacity", 0.5)
+  //   .attr("d", area);
+  
+
+  g.selectAll(".bar")
+    .data(data)
+  .enter().append("rect")
+    .attr("class", "bar")
+    .style("fill", props.barColor)
+    .attr("x", d => xBar(props.x(d)))
+    .attr("width", xBar.bandwidth())
+    .attr("y", d => height - y(yLogFriendlyAccessor(d)))
+    .attr("height", d => y(yLogFriendlyAccessor(d)))
+  
 
   g.append("g")
     .attr("class", "brush")
