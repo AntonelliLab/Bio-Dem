@@ -216,7 +216,7 @@ export default function DualChart(el, properties) {
   g.append("path")
     .datum(cleanData)
     .attr("class", "y2line")
-    // .style("fill", props.y2Fill)
+    .style("fill", "none")
     .style("stroke", props.y2Stroke)
     .style("opacity", props.y2Opacity)
     .attr("d", y2line);
