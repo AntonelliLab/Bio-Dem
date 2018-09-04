@@ -149,6 +149,11 @@ class About extends React.Component {
 
               <h3 id="tutorial2Biodiversityknowledgethroughtime">Tutorial 2 - Biodiversity knowledge through time</h3>
 		  
+		   <h2 id="contact">Contact</h2>
+       <p>
+       Please <a href="https://github.com/AntonelliLab/Bio-Dem/issues">contact us</a> for any comments, suggestions or bug reports and find the source code for Bio-Dem <a href="https://github.com/AntonelliLab/Bio-Dem">here</a>.
+       
+		  
 
        <h2 id="references">References</h2>
 		  <p>Amano, T. and W.J Sutherland (2013). “Four barriers to the global understanding of biodiversity conservation: wealth, language, geographical location and security”. <em>Proceedings of the Royal Society</em>, 20122649.</p>
