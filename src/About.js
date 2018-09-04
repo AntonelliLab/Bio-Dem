@@ -181,14 +181,14 @@ class About extends React.Component {
             Tutorial 1 - Biodiversity knowledge & political regimes
           </h3>
           <div className="youtube-wrapper">
-            <Youtube videoId="ScMzIvxBSi4" />
+            <Youtube videoId="dkUHRdBRUj0" />
           </div>
 
           <h3 id="tutorial2Biodiversityknowledgethroughtime">
             Tutorial 2 - Biodiversity knowledge through time
           </h3>
           <div className="youtube-wrapper">
-            <Youtube videoId="ScMzIvxBSi4" />
+            <Youtube videoId="9c4-qgBXYw4" />
           </div>
           
 
