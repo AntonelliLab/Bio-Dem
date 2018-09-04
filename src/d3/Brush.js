@@ -26,6 +26,7 @@ export default function Brush(el, properties) {
     y: d => d.y,
     color: d => '#999',
     barColor: d => '#ccc',
+    fillOpacity: d => 0.5,
     xLabel: "Year",
     yLabel: "",
     // title: "",
@@ -169,7 +170,7 @@ export default function Brush(el, properties) {
     .attr("class", "bar")
     .style("stroke", props.barColor)
     .style("fill", props.barColor)
-    .style("fill-opacity", 0.5)
+    .style("fill-opacity", props.fillOpacity)
     .attr("x", d => xBar(props.x(d)))
     .attr("width", xBar.bandwidth())
     .attr("y", d => height - y(yLogFriendlyAccessor(d)))
