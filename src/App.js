@@ -165,7 +165,7 @@ const stopYear = {
 };
 
 const yAxisLabelGap = {
-  e_migdppc: 100,
+  e_migdppc: 80,
   // records: 120
 }
 
@@ -1107,6 +1107,7 @@ class App extends Component {
       // xMax: yearMax,
       yMin: 1,
       yMax: 50000000,
+      y2LogScale: useLogScale[vdemVariable],
       x: d => d.year,
       y: d => d.records,
       y2: d => d[vdemVariable],

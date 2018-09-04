@@ -19,6 +19,7 @@ export default function ScatterPlot(el, properties) {
     left: 80,
     height: 400,
     xTickGap: 80,
+    yTickGap: 30,
     xMin: null,
     xMax: null,
     yMin: null,
@@ -97,8 +98,9 @@ export default function ScatterPlot(el, properties) {
   const xAxis = d3.axisBottom(x)
     .tickSizeOuter(0)
     .ticks(totalWidth / props.xTickGap);
-  
-  const yAxis = d3.axisLeft(y);
+    
+    const yAxis = d3.axisLeft(y)
+    .ticks(height / props.yTickGap);
 
   // create a Voronoi diagram for snapping tooltips to nearest points
   const voronoiDiagram = d3.voronoi()

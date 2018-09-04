@@ -18,6 +18,7 @@ export default function DualChart(el, properties) {
     left: 80,
     height: 400,
     xTickGap: 80,
+    yTickGap: 30,
     xMin: null,
     xMax: null,
     yMin: null,
@@ -26,6 +27,7 @@ export default function DualChart(el, properties) {
     y2Max: null,
     zMin: null,
     zMax: null,
+    y2LogScale: false,
     data: [],
     // secondData: [],
     x: d => d.x,
@@ -84,7 +86,8 @@ export default function DualChart(el, properties) {
   const xExtent = getExtent(data, props.x, props.xMin, props.xMax);
   const yExtent = getExtent(data, props.y, props.yMin, props.yMax);
   // For second axis
-  const y2Extent = getExtent(data, props.y2, props.y2Min, props.y2Max);
+  // const y2Extent = getExtent(data, props.y2, props.y2Min, props.y2Max);
+  const y2Extent = getExtent(data, props.y2, !props.y2LogScale || props.y2Min > 1 ? props.y2Min : 1, props.y2Max);
   // For z dimension
   // const zExtent = getExtent(data, props.z, props.zMin, props.zMax);
 
@@ -103,7 +106,7 @@ export default function DualChart(el, properties) {
     return Math.max(1, y);
   }
 
-  const y2 = d3.scaleLinear()
+  const y2 = (props.y2LogScale ? d3.scaleLog() : d3.scaleLinear())
             .domain(y2Extent)
             .range([height, 0]);
   
@@ -111,8 +114,11 @@ export default function DualChart(el, properties) {
     .tickSizeOuter(0)
     .tickValues(d3.ticks(xExtent[0], xExtent[1], totalWidth / props.xTickGap));
   
-  const yAxis = d3.axisLeft(y);
-  const y2Axis = d3.axisRight(y2);
+  const yAxis = d3.axisLeft(y)
+    .ticks(height / props.yTickGap);
+  
+  const y2Axis = d3.axisRight(y2)
+    .ticks(height / props.yTickGap);
   
   // Second y data
   const y2line = d3.line()
