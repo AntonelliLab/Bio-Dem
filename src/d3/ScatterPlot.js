@@ -26,6 +26,7 @@ export default function ScatterPlot(el, properties) {
     y: d => d.y,
     value: d => d.value,
     color: d => 'steelblue',
+    fillOpacity: d => 0.5,
     xLabel: "",
     yLabel: "",
     title: "",
@@ -88,9 +89,6 @@ export default function ScatterPlot(el, properties) {
   }
   const strokeColor = (d) => {
     return props.selected(d) ? 'red' : props.color(d);
-  }
-  const opacity = (d) => {
-    return 0.5;
   }
             
   const xAxis = d3.axisBottom(x)
@@ -159,7 +157,7 @@ export default function ScatterPlot(el, properties) {
       .attr("r", d => value(props.value(d)))
       .style("fill", d => color(d))
       .style("stroke", d => strokeColor(d))
-      .style("fill-opacity", d => opacity(d))
+      .style("fill-opacity", props.fillOpacity)
       // .on("mouseover", function (d) {
       //   tooltip.transition()
       //     .duration(200)

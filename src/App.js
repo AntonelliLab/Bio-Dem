@@ -36,6 +36,7 @@ import ScatterPlot from './d3/ScatterPlot';
 import Brush from './d3/Brush';
 import { haveNaN } from './d3/helpers';
 import countryCodes from './helpers/countryCodes';
+import { hexToRGBA } from './helpers/colors';
 import AutoSelect from './components/AutoSelect';
 import Notice from './components/Notice';
 import IconGithub from './components/Github';
@@ -144,7 +145,7 @@ const regionColor = regionCode => {
   if (regionCode > 0 && regionCode <= 10) {
     return d3.schemeCategory10[regionCode - 1];
   }
-  return '#000';
+  return '#000000';
 }
 
 const colorByOptions = [
@@ -302,22 +303,30 @@ const BioDemLogo = ({ className = "logo", alt="logo" }) => (
   <img src={logo} className={className} alt={alt} />
 );
 
-const RegimeLegend = () => (
+const RegimeLegend = ({ fillOpacity = 0.5 }) => (
   <Grid container className="regimeLegend" justify="center">
     { Object.keys(regimeTypes).map(v =>
       <div key={v} style={{ padding: 5, fontSize: '0.75em' }}>
-        <span style={{ backgroundColor: regimeColor(v), marginRight: 2 }}>&nbsp;&nbsp;&nbsp;</span>
+        <span style={{
+          border: `1px solid ${regimeColor(v)}`,
+          backgroundColor: hexToRGBA(regimeColor(v), fillOpacity),
+          marginRight: 2,
+        }}>&nbsp;&nbsp;&nbsp;</span>
         {regimeTypes[v]}
       </div>
     )}
   </Grid>
 );
 
-const RegionLegend = () => (
+const RegionLegend = ({ fillOpacity = 0.5 }) => (
   <Grid container className="regionLegend" justify="center">
     { Object.keys(regions).map(v =>
       <div key={v} style={{ padding: 5, fontSize: '0.75em' }}>
-        <span style={{ backgroundColor: regionColor(v), marginRight: 2 }}>&nbsp;&nbsp;&nbsp;</span>
+        <span style={{
+          border: `1px solid ${regionColor(v)}`,
+          backgroundColor: hexToRGBA(regionColor(v), fillOpacity),
+          marginRight: 2
+        }}>&nbsp;&nbsp;&nbsp;</span>
         {regions[v]}
       </div>
     )}
@@ -944,7 +953,7 @@ class App extends Component {
           case 'region':
             return regionColor(this.countryMap[d.key].regionCode);
           default:
-            return '#000';
+            return '#000000';
         }
       },
       tooltip: d => `
@@ -1056,6 +1065,7 @@ class App extends Component {
       auxLabel: 'Conflict',
       // z: d => d.v2x_regime,
       color: d => regimeColor(d.v2x_regime),
+      fillOpacity: d => 0.75,
       // zLabel: d => regimeTypes[d.v2x_regime],
       y2Min: 0,
       y2Max: vdemScaleMax[vdemVariable],
@@ -1265,7 +1275,7 @@ class App extends Component {
 
               <Grid item className="grid-item" xs={12} md={8}>
                 <div id="dualChart" ref={this.refDualChart} />
-                <RegimeLegend />
+                <RegimeLegend fillOpacity={0.75}/>
                 
                 {this.renderProgress()}
                 

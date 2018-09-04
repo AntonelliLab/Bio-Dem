@@ -32,6 +32,7 @@ export default function DualChart(el, properties) {
     y: d => d.y,
     y2: d => d.y,
     color: d => 'steelblue',
+    fillOpacity: d => 1.0,
     y2Stroke: (d) => '#D75C1F',
     y2Fill: (d) => '#8C330F',
     y2Opacity: (d) => 1,
@@ -91,7 +92,7 @@ export default function DualChart(el, properties) {
   const x = d3.scaleBand()
             .domain(d3.range(xExtent[0], xExtent[1] + 1))
             .range([0, width])
-            .padding(0.1);
+            .padding(0.2);
   
   const y = d3.scaleLog()
             .domain(yExtent)
@@ -203,7 +204,9 @@ export default function DualChart(el, properties) {
       .data(data)
     .enter().append("rect")
       .attr("class", "bar")
+      .style("fill-opacity", props.fillOpacity)
       .style("fill", barColor)
+      .style("stroke", barColor)
       .attr("x", d => x(props.x(d)))
       .attr("width", x.bandwidth())
       .attr("y", d => y(yLogFriendlyAccessor(d)))
@@ -219,6 +222,7 @@ export default function DualChart(el, properties) {
     .style("fill", "none")
     .style("stroke", props.y2Stroke)
     .style("opacity", props.y2Opacity)
+    .style("stroke-width", 3)
     .attr("d", y2line);
 
   // Dots for second line
@@ -229,7 +233,7 @@ export default function DualChart(el, properties) {
     .style("fill", props.y2Fill)
     .attr("cx", d => x(props.x(d)))
     .attr("cy", d => y2(props.y2(d)))
-    .attr("r", 2);
+    .attr("r", 3);
 
   
   if (props.aux) {
