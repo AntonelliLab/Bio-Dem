@@ -20,6 +20,7 @@ import IconDownload from '@material-ui/icons/CloudDownload';
 import * as d3 from 'd3';
 import { csv } from 'd3-fetch';
 import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 import {
   queryGBIFYearFacet,
   queryGBIFCountryFacet,
@@ -30,7 +31,8 @@ import About from './About';
 import logo from './logo.svg';
 import DualChart from './d3/DualChart';
 import ScatterPlot from './d3/ScatterPlot';
-import { haveNaN, isWithin } from './d3/helpers';
+import Brush from './d3/Brush';
+import { haveNaN } from './d3/helpers';
 import countryCodes from './helpers/countryCodes';
 import AutoSelect from './components/AutoSelect';
 import Notice from './components/Notice';
@@ -395,6 +397,7 @@ class App extends Component {
       vdemX: v2x_freexp_altinf,
       vdemY: v2x_frassoc_thick,
       xyYearMin: 1960,
+      xyYearMax: 2017,
       normalizeByArea: false,
       colorBy: 'regime',      
       // DualChart
@@ -411,6 +414,7 @@ class App extends Component {
       activeDualChartHighlight: null
     };
     this.refScatterPlot = React.createRef();
+    this.refBrush = React.createRef();
     this.refDualChart = React.createRef();
   }
   
@@ -448,6 +452,7 @@ class App extends Component {
       this.rqf = null;
       // Re-render charts with new size
       this.renderCharts();
+      this.renderBrush();
     });
   };
 
@@ -651,6 +656,7 @@ class App extends Component {
       // gbifYearlyCountryData,
     }, () => {
       this.renderCharts();
+      this.renderBrush();
     });
   }
 
@@ -831,60 +837,77 @@ class App extends Component {
     ];
   }
 
+  
+  onBrush = throttle((domain) => {
+    const [xyYearMin, xyYearMax] = domain.map(d => d.getFullYear());
+    if (xyYearMin !== this.state.xyYearMin || xyYearMax !== this.state.xyYearMax) {
+      // console.log('###### onBrush:', xyYearMin, xyYearMax);
+      this.setState({
+        xyYearMin,
+        xyYearMax,
+      }, () => {
+        this.renderScatterPlot();
+      });
+    }
+  }, 50);
+
   renderCharts() {
     this.renderScatterPlot();
     this.renderDualChart();
   }
 
   renderScatterPlot() {
-    const { vdemData, vdemX, vdemY, xyYearMin, vdemExplanations } = this.state;
+    const { vdemData, vdemX, vdemY, xyYearMin, xyYearMax, vdemExplanations } = this.state;
+    if (vdemData.length === 0) {
+      return;
+    }
     // const { gbifCountryFacetData } = this.state;
     const vdemXLabel = vdemExplanations[vdemX] ? vdemExplanations[vdemX].short_name : vdemX;
     
     let vdemYLabel = vdemExplanations[vdemY] ? vdemExplanations[vdemY].short_name : vdemY;
-    const [startYear, stopYear] = this.getValidYears([vdemX, vdemY], xyYearMin);
+    const [startYear, stopYear] = this.getValidYears([vdemX, vdemY], xyYearMin, xyYearMax);
 
     const vdemGrouped = d3.nest()
-      .key(d => d.country)
-      .rollup(values => {
-        if (haveNaN([values[0][vdemX], values[0][vdemY], values[0].v2x_regime]) ||
-          haveNaN(values, d => d[vdemX]) ||
-          haveNaN(values, d => d[vdemY]) ||
-          haveNaN(values, d => d.v2x_regime))
-        {
-          return null;
-        }
-        const x = d3.median(values, d => d[vdemX]);
-        const y = d3.median(values, d => d[vdemY]);
-        const z = d3.median(values, d => d.v2x_regime);
-        const records = d3.sum(values, d => d.records);
-        return { x, y, z, records };
-      })
-      .entries(vdemData
-        // Aggregate within selected years
-        .filter(d => d.year >= startYear && d.year <= stopYear)
-      );
-
-      // vdemGrouped.forEach(d => {
-      //   if (d.value !== null && gbifCountryFacetData && gbifCountryFacetData[d.key]) {
-      //     d.value.records = gbifCountryFacetData[d.key].collections;
-      //   }
-      // });
-      
-      // Filter countries lacking values on the x y dimensions or have zero records (log safe)
-      const vdemFiltered = vdemGrouped.filter(d => d.value !== null && d.value.records > 0);
-      // If the y axis is set to display number of records, replace the y axis with records
-      if (vdemY === "records") {
-        vdemYLabel = 'Number of records';
-        vdemFiltered.forEach(d => {
-          d.value.y = d.value.records;
-        });
+    .key(d => d.country)
+    .rollup(values => {
+      if (haveNaN([values[0][vdemX], values[0][vdemY], values[0].v2x_regime]) ||
+        haveNaN(values, d => d[vdemX]) ||
+        haveNaN(values, d => d[vdemY]) ||
+        haveNaN(values, d => d.v2x_regime))
+      {
+        return null;
       }
+      const x = d3.median(values, d => d[vdemX]);
+      const y = d3.median(values, d => d[vdemY]);
+      const z = d3.median(values, d => d.v2x_regime);
+      const records = d3.sum(values, d => d.records);
+      return { x, y, z, records };
+    })
+    .entries(vdemData
+      // Aggregate within selected years
+      .filter(d => d.year >= startYear && d.year <= stopYear)
+    );
 
-      // console.log('vdemData:', vdemData);
-      // console.log('vdemGrouped:', vdemGrouped);
-      // console.log('vdemFiltered:', vdemFiltered);
-      // console.log('countryFacetData', gbifCountryFacetData);
+    // vdemGrouped.forEach(d => {
+    //   if (d.value !== null && gbifCountryFacetData && gbifCountryFacetData[d.key]) {
+    //     d.value.records = gbifCountryFacetData[d.key].collections;
+    //   }
+    // });
+    
+    // Filter countries lacking values on the x y dimensions or have zero records (log safe)
+    const vdemFiltered = vdemGrouped.filter(d => d.value !== null && d.value.records > 0);
+    // If the y axis is set to display number of records, replace the y axis with records
+    if (vdemY === "records") {
+      vdemYLabel = 'Number of records';
+      vdemFiltered.forEach(d => {
+        d.value.y = d.value.records;
+      });
+    }
+    
+    // console.log('vdemData:', vdemData);
+    // console.log('vdemGrouped:', vdemGrouped);
+    // console.log('vdemFiltered:', vdemFiltered);
+    // console.log('countryFacetData', gbifCountryFacetData);
 
     ScatterPlot(this.refScatterPlot.current, {
       // data: vdemData,
@@ -926,8 +949,52 @@ class App extends Component {
     });
   }
 
+  renderBrush() {
+    const { vdemData } = this.state;
+    if (vdemData.length === 0) {
+      return;
+    }
+    const [yearMinBrush, yearMaxBrush] = [1960, 2017];
+    const recordsPerYear = d3.nest()
+    .key(d => d.year)
+    .rollup(values => {
+      return { records: d3.sum(values, d => d.records) };
+    })
+    .entries(vdemData
+      // Aggregate within selected years
+      .filter(d => d.year >= yearMinBrush && d.year <= yearMaxBrush)
+    );
+    
+    // console.log('recordsPerYear:', recordsPerYear);
+
+    Brush(this.refBrush.current, {
+      data: recordsPerYear,
+      height: 70,
+      top: 10,
+      left: 20,
+      right: 20,
+      bottom: 25,
+      xTickGap: 140,
+      xMin: yearMinBrush,
+      xMax: yearMaxBrush,
+      // yMin: 1,
+      // yMax: 50000000,
+      x: d => d.key,
+      y: d => d.value.records,
+      xLabel: '',
+      // yLabel: 'Number of records',
+      // title: 'Number of public species records per country and year',
+      // fetching
+      onBrush: this.onBrush,
+      selectedYears: [startYear, stopYear].map(year => new Date(year, 0)),
+    });
+  }
+
   renderDualChart() {
     const { gbifData, vdemData, yearMin, yearMax, fetching, vdemVariable, vdemExplanations } = this.state;
+    if (vdemData.length === 0) {
+      return;
+    }
     
     const y2Label = vdemExplanations[vdemVariable] ? vdemExplanations[vdemVariable].short_name : vdemVariable;
 
@@ -1070,6 +1137,11 @@ class App extends Component {
                 <div id="scatterPlot" ref={this.refScatterPlot} />
                 <ColorLegend type={this.state.colorBy} />
                 {this.renderProgress()}
+                <div id="brush" ref={this.refBrush} />
+                <div style={{ textAlign: 'center' }}>
+                  Selected years: { this.state.xyYearMin } - { this.state.xyYearMax }
+                </div>
+
                 <div className="controls">
                   <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
                     <InputLabel htmlFor="vdemY">Y axis</InputLabel>
@@ -1087,19 +1159,6 @@ class App extends Component {
                       value={this.state.vdemX}
                       onChange={this.handleChange}
                       options={vdemOptions}
-                    />
-                  </FormControl>
-                  <FormControl className="formControl" style={{ minWidth: 100, margin: 10 }}>
-                    <InputLabel htmlFor="xyYearMin">
-                      From year
-                    </InputLabel>
-                    <AutoSelect
-                      input={<Input name="xyYearMin" id="xyYearMin" />}
-                      value={this.state.xyYearMin}
-                      onChange={this.handleChange}
-                      options={d3.range(1960,2018).map(y => ({
-                        value: y, label: y, disabled: !isWithin(y, xyValidYears)
-                      }))}
                     />
                   </FormControl>
                   <FormControl className="formControl" style={{ minWidth: 150, margin: 10 }}>
