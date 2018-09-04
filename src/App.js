@@ -935,7 +935,7 @@ class App extends Component {
       },
       tooltip: d => `
         <div>
-          <div><strong>Country:</strong> ${this.countryMap[d.key].label}</div>
+          <div><strong>Country:</strong> ${this.countryMap[d.key].label} (${d.key})</div>
           <div><strong>Region:</strong> ${this.countryMap[d.key].regionName}</div>
           <div><strong>Area:</strong> ${this.countryMap[d.key].area.toLocaleString('en')} km²</div>
           <div><strong>Records:</strong> ${d.value.records.toLocaleString('en')}</div>

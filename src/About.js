@@ -1,13 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Grid from '@material-ui/core/Grid';
-import './About.css';
+import Grid from "@material-ui/core/Grid";
+import "./About.css";
 
 const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
 
 class About extends React.Component {
   render() {
-    const { vdemExplanations : vdem } = this.props;
+    const { vdemExplanations: vdem } = this.props;
     const vdemExplanations = Object.keys(vdem).map(d => vdem[d]);
 
     return (
@@ -17,35 +17,44 @@ class About extends React.Component {
           <h2 id="about">About</h2>
           <p>
             The distribution of biological diversity, or biodiversity, has
-            fascinated humans for centuries. On a global scale, 
-            the scientific knowledge on the geographic distribution of this diversity, 
-			is based on natural history collections; traditionally as physical specimens
-            in museums herbaria or private collections and more recently 
+            fascinated humans for centuries. On a global scale, the scientific
+            knowledge on the geographic distribution of this diversity, is based
+            on natural history collections; traditionally as physical specimens
+            in museums herbaria or private collections and more recently
             complemented by observations (vegetation plots or bird surveys),
-            camera trap observation and citizen science data linked to photographs. 
-			The public availability of information from these sources has increased dramatically
-            in the last decade, in good parts due to large scale data
-            aggregators, such as the Global Biodiversity Information Facility.
+            camera trap observation and citizen science data linked to
+            photographs. The public availability of information from these
+            sources has increased dramatically in the last decade, in good parts
+            due to large scale data aggregators, such as the Global Biodiversity
+            Information Facility.
           </p>
 
           <p>
-            Fantastic as it is, the data available from such public aggregators is often biased geographically,
-            for instance because some localities are more easily accessible, more
-            spectacular or have a stronger naturalist history then others. While
-            it is relative well understood which geographic factors favour record
-            collection and hence knowledge on biodiversity, <strong>relatively little is
-            known on the impact of society and political regime on record
-            collection.</strong> This is surprising because first, it seems straight
-            forward that some regimes would favour naturalist collection (e.g.
-            open, safe, democratic) whereas others would not (repressive, unsafe,
-            authoritarian), and second a considerable body of literature exists on
-            the links between political regimes and the environmental performance of countries.
+            Fantastic as it is, the data available from such public aggregators
+            is often biased geographically, for instance because some localities
+            are more easily accessible, more spectacular or have a stronger
+            naturalist history then others. While it is relative well understood
+            which geographic factors favour record collection and hence
+            knowledge on biodiversity,{" "}
+            <strong>
+              relatively little is known on the impact of society and political
+              regime on record collection.
+            </strong>{" "}
+            This is surprising because first, it seems straight forward that
+            some regimes would favour naturalist collection (e.g. open, safe,
+            democratic) whereas others would not (repressive, unsafe,
+            authoritarian), and second a considerable body of literature exists
+            on the links between political regimes and the environmental
+            performance of countries.
           </p>
 
           <p>
-            <strong>Bio-Dem addresses this gap</strong>, and provides a web-app to visually explore the availability of geographic occurrence records of biological species available from 
-			the Global Biodiversity Information Facility (as proxy for scientific biodiversity knowledge) in relation to political systems around the world
-            Some specific questions that motivated the development of Bio-Dem are:{" "}
+            <strong>Bio-Dem addresses this gap</strong>, and provides a web-app
+            to visually explore the availability of geographic occurrence
+            records of biological species available from the Global Biodiversity
+            Information Facility (as proxy for scientific biodiversity
+            knowledge) in relation to political systems around the world Some
+            specific questions that motivated the development of Bio-Dem are:{" "}
           </p>
 
           <ul>
@@ -55,12 +64,14 @@ class About extends React.Component {
             </li>
 
             <li>
-              Do democracies perform better in collecting biodiversity knowledge?{" "}
+              Do democracies perform better in collecting biodiversity
+              knowledge?{" "}
             </li>
 
             <li>
-              How important are individual dimensions of regime types, such as freedom
-              of movement, rule of law and strength of the civil society?{" "}
+              How important are individual dimensions of regime types, such as
+              freedom of movement, rule of law and strength of the civil
+              society?{" "}
             </li>
 
             <li>Which role do other factors play, such as national GDP?</li>
@@ -68,24 +79,28 @@ class About extends React.Component {
             <li>How do conflicts impact record availability </li>
           </ul>
 
-          
           <h3 id="gbif">
-            Biodiversity collection: The global biodiversity Information Facility
+            Biodiversity collection: The global biodiversity Information
+            Facility
           </h3>
-          
+
           <p>
-            <a href="https://www.gbif.org">The Global Biodiversity Information Facility (GBIF)</a> provides access to 
-			digitalized information on the geographic distribution of biological species, mostly 
-            georeferenced point occurrences. The data are contributed from scientific
-            institutions and citizen science projects around the world and include
-            among others scientific collections from museums and herbaria,
-            scientific observation records, camera trap pictures or citizen
-            science observations. GBIF to date provides free access to more than 1
-            billion occurrence records collected in over three centuries 
-            around the globe. If you want to learn more about GBIF or access
-            species occurrence information, visit <a href="https://www.gbif.org">GBIF</a>. Bio-Dem fetches
-            the number of occurrence records live from the
-            latest version of GBIF via the <a href="https://www.gbif.org/developer/summary">GBIF API</a>.
+            <a href="https://www.gbif.org">
+              The Global Biodiversity Information Facility (GBIF)
+            </a>{" "}
+            provides access to digitalized information on the geographic
+            distribution of biological species, mostly georeferenced point
+            occurrences. The data are contributed from scientific institutions
+            and citizen science projects around the world and include among
+            others scientific collections from museums and herbaria, scientific
+            observation records, camera trap pictures or citizen science
+            observations. GBIF to date provides free access to more than 1
+            billion occurrence records collected in over three centuries around
+            the globe. If you want to learn more about GBIF or access species
+            occurrence information, visit{" "}
+            <a href="https://www.gbif.org">GBIF</a>. Bio-Dem fetches the number
+            of occurrence records live from the latest version of GBIF via the{" "}
+            <a href="https://www.gbif.org/developer/summary">GBIF API</a>.
           </p>
 
           <h3 id="v-dem">
@@ -93,20 +108,24 @@ class About extends React.Component {
           </h3>
 
           <p>
-            <a href="https://v-dem.net">Varieties of Democracy (V-Dem)</a> is a research project dedicated to the
-            conceptualization and collection of data on democracy. It is one of
-            the largest existent databases on democracy containing over 18 million
-            data points, where the latest version covers 201 countries and the
-            years 1789 to 2017. These data enable to work with both aggregated higher-level
-            concepts such as "electoral democracy" or disaggregated concepts
-            capturing for example women's participation in civil society or
-            freedom of academic expression. The data combine factual data with expert-based 
-			subjective measures through a Bayesian modelling procedure, accounting for coder bias
-            and heterogeneity across countries and years. For more information,
-            visit <a href="https://www.v-dem.net/en/">V-Dem's website</a>, read <a href="http://journals.sagepub.com/doi/abs/10.1177/0192512115622046?journalCode=ipsa">
+            <a href="https://v-dem.net">Varieties of Democracy (V-Dem)</a> is a
+            research project dedicated to the conceptualization and collection
+            of data on democracy. It is one of the largest existent databases on
+            democracy containing over 18 million data points, where the latest
+            version covers 201 countries and the years 1789 to 2017. These data
+            enable to work with both aggregated higher-level concepts such as
+            "electoral democracy" or disaggregated concepts capturing for
+            example women's participation in civil society or freedom of
+            academic expression. The data combine factual data with expert-based
+            subjective measures through a Bayesian modelling procedure,
+            accounting for coder bias and heterogeneity across countries and
+            years. For more information, visit{" "}
+            <a href="https://www.v-dem.net/en/">V-Dem's website</a>, read{" "}
+            <a href="http://journals.sagepub.com/doi/abs/10.1177/0192512115622046?journalCode=ipsa">
               "Measuring high level democratic principles using the V-Dem data"
             </a>{" "}
-            or <a href="https://www.v-dem.net/en/data/data-version-8/">
+            or{" "}
+            <a href="https://www.v-dem.net/en/data/data-version-8/">
               download the data and browse the codebook
             </a>. Bio-Dem currently <a href="https://github.com/AntonelliLab/Bio-Dem/blob/master/public/data/vdem_variables.csv">uses V-Dem version 8</a> and will be updated as
             new versions are being published. The current selected data for the application
@@ -193,31 +212,37 @@ class About extends React.Component {
         
         {/* Second main column */}
         <Grid item className="column" xs={12} sm={6}>
-          
-          
           <h2 id="politicalindicatorvariablesandtheirconnectiontobiodiversitycollections">
             Political indicator variables and their connection to biodiversity
             collections
           </h2>
 
-          { vdemExplanations.map(d => d.id === 'records' ? null : (
-            <div key={d.id}>
-              <h4 id={d.id}>{d.short_name}</h4>
-              
-              <p><em>Description:</em> {d.description}</p>
-              <p><em>Relevance:</em> {d.relevance}</p>
-              <p><em>References:</em> {d.references}</p>
-            </div>
-          )) }
+          {vdemExplanations.map(
+            d =>
+              d.id === "records" ? null : (
+                <div key={d.id}>
+                  <h4 id={d.id}>{d.short_name}</h4>
 
-       </Grid>
+                  <p>
+                    <em>Description:</em> {d.description}
+                  </p>
+                  <p>
+                    <em>Relevance:</em> {d.relevance}
+                  </p>
+                  <p>
+                    <em>References:</em> {d.references}
+                  </p>
+                </div>
+              )
+          )}
+        </Grid>
       </Grid>
     );
   }
 }
 
 About.propTypes = {
-  vdemExplanations: PropTypes.object.isRequired,
+  vdemExplanations: PropTypes.object.isRequired
 };
 
 export default About;
