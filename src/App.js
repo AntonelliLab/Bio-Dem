@@ -584,7 +584,7 @@ class App extends Component {
     delete gbifError['101'];
     this.setState({ fetching: true, gbifError });
     // Query the GBIF API
-    console.log('Query gbif with year facet...');
+    // console.log('Query gbif with year facet...');
     const result = await queryGBIFYearFacet(country, onlyDomestic, onlyWithImage, taxonFilter);
     // If the query errored out set to error state
     if (result.error) {
