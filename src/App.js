@@ -1110,9 +1110,10 @@ class App extends Component {
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   In this interactive scatterplot, each data bubble represents a political country; the size of the bubbles indicates 
-				  the number of occurrence record available from this country and the colour shows the time-aggregated political regime type. 
-				  Hover over any bubble for the country name and the number of records. Use the drop down menus to customize the x- and y-axis 
-				  with different dimensions of democracy. Values for each country are aggregated by median over the chosen time period. 
+				  the number of occurrence record available from this country. 
+				  Hover over any bubble for the country name and the number of records. Use the drop down menus to customize the x- and y-axis
+				  with different dimensions of democracy, or to change the colouring scheme. Values for each country are aggregated by median over the chosen time period. 
+				  Click on a bubble to view the time series of collections from this country in the plot below.
 				  Use the highlight buttons below to choose preselected plots showing particularly exciting results.
                 </Typography>
                 <HighlightsButtonGroup
@@ -1215,8 +1216,7 @@ class App extends Component {
 				  country each year on a logarithmic scale (left y-axis). The overlaid line shows the development of a selected democracy indicator (right y axis). 
 				  Red blocks at the bottom of the bars indicate years with armed conflict on the country territory. Chose any country and democracy indicator 
 				  with the drop-down menus, customize the record count to include only records from domestic 
-				  institutions or records associated with pictures using the tick boxes and filter to certain taxa using the free text field. Use
-				  the buttons below this text to display selected plots that highlight particularly interesting results.
+				  institutions or records associated with pictures using the tick boxes and filter to certain taxa using the free text field. The selected country will be highlighted in the bubble chart. Use the buttons below this text to display selected plots that highlight particularly interesting results.
                 </Typography>
                 <HighlightsButtonGroup
                   highlights={dualChartHighlights}

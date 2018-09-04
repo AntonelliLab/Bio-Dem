@@ -108,7 +108,7 @@ class About extends React.Component {
             </a>{" "}
             or <a href="https://www.v-dem.net/en/data/data-version-8/">
               download the data and browse the codebook
-            </a>. Bio-Dem currently uses V-Dem version 8 and will be updated as
+            </a>. Bio-Dem currently <a href="https://github.com/AntonelliLab/Bio-Dem/blob/master/public/data/vdem_variables.csv">uses V-Dem version 8</a> and will be updated as
             new versions are being published. The current selected data for the application
             can be downloaded <a href={vdemDataUrl} download target="blank">here</a>.
           </p>
