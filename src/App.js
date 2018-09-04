@@ -128,25 +128,10 @@ const regions = {
   'NA': 'NA',
 };
 
-// Some external variables lack data for all countries before or after a certain year
-const startYear = {
-  e_wri_pa: 1990,
-};
-const stopYear = {
-  e_peaveduc: 2010,
-  e_migdppc: 2016,
-  e_wri_pa: 2010,
-};
-
-const regimeColor = d3.scaleSequential(d3.interpolateViridis)
-    .domain([0,3]);
-
-const regionColor = regionCode => {
-  if (regionCode > 0 && regionCode <= 10) {
-    return d3.schemeCategory10[regionCode - 1];
-  }
-  return '#000000';
-}
+const regionOptions = d3.range(0, 11).map(id => ({
+  value: id,
+  label: id === 0 ? 'All regions' : regions[id],
+}));
 
 const colorByOptions = [
   {
@@ -158,6 +143,26 @@ const colorByOptions = [
     label: 'Region',
   },
 ];
+
+const regimeColor = d3.scaleSequential(d3.interpolateViridis)
+    .domain([0,3]);
+
+const regionColor = regionCode => {
+  if (regionCode > 0 && regionCode <= 10) {
+    return d3.schemeCategory10[regionCode - 1];
+  }
+  return '#000000';
+}
+
+// Some external variables lack data for all countries before or after a certain year
+const startYear = {
+  e_wri_pa: 1990,
+};
+const stopYear = {
+  e_peaveduc: 2010,
+  e_migdppc: 2016,
+  e_wri_pa: 2010,
+};
 
 const yAxisLabelGap = {
   e_migdppc: 100,
@@ -410,7 +415,8 @@ class App extends Component {
       xyYearMin: 1960,
       xyYearMax: 2017,
       normalizeByArea: false,
-      colorBy: 'regime',      
+      colorBy: 'regime',
+      regionFilter: 0,
       // DualChart
       country: "SWE",
       vdemVariable: v2x_freexp_altinf,
@@ -783,6 +789,14 @@ class App extends Component {
       this.renderScatterPlot();
     });
   }
+  
+  onScatterPlotChangeRegionFilter = (event) => {
+    this.setState({
+      [event.target.name]: event.target.value,
+    }, () => {
+      this.renderScatterPlot();
+    });
+  }
 
   onScatterPlotChangeNormalization = (event) => {
     const { value, checked } = event.target;
@@ -880,7 +894,7 @@ class App extends Component {
   }
 
   renderScatterPlot() {
-    const { vdemData, vdemX, vdemY, xyYearMin, xyYearMax, vdemExplanations } = this.state;
+    const { vdemData, vdemX, vdemY, xyYearMin, xyYearMax, vdemExplanations, regionFilter } = this.state;
     if (vdemData.length === 0) {
       return;
     }
@@ -908,8 +922,12 @@ class App extends Component {
     })
     .entries(vdemData
       // Aggregate within selected years
-      .filter(d => d.year >= startYear && d.year <= stopYear)
+      .filter(d => d.year >= startYear &&
+        d.year <= stopYear &&
+        (regionFilter === 0 || this.countryMap[d.country].regionCode === regionFilter)
+      )
     );
+
 
     // vdemGrouped.forEach(d => {
     //   if (d.value !== null && gbifCountryFacetData && gbifCountryFacetData[d.key]) {
@@ -1207,6 +1225,17 @@ class App extends Component {
                       value={this.state.colorBy}
                       onChange={this.onScatterPlotChangeColorBy}
                       options={colorByOptions}
+                    />
+                  </FormControl>
+                  <FormControl className="formControl" style={{ minWidth: 320, margin: 10 }}>
+                    <InputLabel htmlFor="regionFilter">
+                      Regions
+                    </InputLabel>
+                    <AutoSelect
+                      input={<Input name="regionFilter" id="regionFilter" />}
+                      value={this.state.regionFilter}
+                      onChange={this.onScatterPlotChangeRegionFilter}
+                      options={regionOptions}
                     />
                   </FormControl>
                   <FormControlLabel
