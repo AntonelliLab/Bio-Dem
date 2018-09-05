@@ -110,6 +110,27 @@ const circleSizeOptions = [
 
 const scatterYOptions = circleSizeOptions.concat(vdemOptions);
 
+const gbifExplanations = [
+  {
+    id: 'records',
+    label: "Number of records",
+    short_name: "Number of records",
+    full_name: "Number of GBIF records",
+    description: "Number of species occurrence records in GBIF in selected years.",
+    relevance: "",
+    references: "",
+  },
+  {
+    id: 'recordsPerArea',
+    label: "Records per area",
+    short_name: "Records per area",
+    full_name: "Number of GBIF records",
+    description: "Number of species occurrence records in GBIF in selected years per country area.",
+    relevance: "",
+    references: "",
+  }
+];
+
 const regimeTypes = {
   0: 'Closed autocracy',
   1: 'Electoral autocracy',
@@ -338,7 +359,8 @@ class App extends Component {
       gbifData: [],
       gbifError: {},
       vdemData: [],
-      vdemExplanations: {},
+      vdemExplanations: [],
+      variableExplanations: {}, // Combination of vdem and gbif explanations mapped by variable id
       loaded: false,
       fetching: false,
       countries: [],
@@ -622,31 +644,17 @@ class App extends Component {
 
   async initData() {
     const data = await this.fetchData();
-    const [vdemData, vdemExplanationsArray, countryData, gbifYearlyCountryData] = data;
-    const vdemExplanations = {};
-    vdemExplanationsArray.forEach(d => {
-      vdemExplanations[d.id] = d;
+    const [vdemData, vdemExplanations, countryData, gbifYearlyCountryData] = data;
+    const variableExplanations = {};
+    vdemExplanations.forEach(d => {
+      variableExplanations[d.id] = d;
     });
-    vdemExplanations['records'] = {
-      id: 'records',
-      label: "Number of records",
-      short_name: "Number of records",
-      full_name: "Number of GBIF records",
-      description: "Number of species occurrence records in GBIF in selected years.",
-      relevance: "",
-      references: "",
-    };
-    vdemExplanations['recordsPerArea'] = {
-      id: 'recordsPerArea',
-      label: "Records per area",
-      short_name: "Records per area",
-      full_name: "Number of GBIF records",
-      description: "Number of species occurrence records in GBIF in selected years per country area.",
-      relevance: "",
-      references: "",
-    };
+    gbifExplanations.forEach(d => {
+      variableExplanations[d.id] = d;
+    });
+
     vdemOptions.forEach(d => {
-      const info = vdemExplanations[d.value];
+      const info = variableExplanations[d.value];
       if (!info) {
         console.log('Missing explanation for value:', d.value);
       } else {
@@ -674,6 +682,7 @@ class App extends Component {
       loaded: true,
       vdemData,
       vdemExplanations,
+      variableExplanations,
       countries: countryData,
       // gbifYearlyCountryData,
     }, () => {
@@ -985,14 +994,14 @@ class App extends Component {
   }
 
   renderScatterPlot() {
-    const { vdemData, vdemX, vdemY, vdemZ, xyYearMin, xyYearMax, vdemExplanations, regionFilter } = this.state;
+    const { vdemData, vdemX, vdemY, vdemZ, xyYearMin, xyYearMax, variableExplanations, regionFilter } = this.state;
     if (vdemData.length === 0) {
       return;
     }
     // const { gbifCountryFacetData } = this.state;
-    const vdemXLabel = vdemExplanations[vdemX] ? vdemExplanations[vdemX].short_name : vdemX;
+    const vdemXLabel = variableExplanations[vdemX] ? variableExplanations[vdemX].short_name : vdemX;
     
-    let vdemYLabel = vdemExplanations[vdemY] ? vdemExplanations[vdemY].short_name : vdemY;
+    let vdemYLabel = variableExplanations[vdemY] ? variableExplanations[vdemY].short_name : vdemY;
     const [startYear, stopYear] = this.getValidYears([vdemX, vdemY], xyYearMin, xyYearMax);
 
     const vdemGrouped = d3.nest()
@@ -1144,12 +1153,12 @@ class App extends Component {
   }
 
   renderDualChart() {
-    const { gbifData, vdemData, yearMin, yearMax, fetching, vdemVariable, vdemExplanations } = this.state;
+    const { gbifData, vdemData, yearMin, yearMax, fetching, vdemVariable, variableExplanations } = this.state;
     if (vdemData.length === 0) {
       return;
     }
     
-    const y2Label = vdemExplanations[vdemVariable] ? vdemExplanations[vdemVariable].short_name : vdemVariable;
+    const y2Label = variableExplanations[vdemVariable] ? variableExplanations[vdemVariable].short_name : vdemVariable;
 
     const vdemFiltered = vdemData
       .filter(d => d.country === this.state.country && d.year >= yearMin && d.year <= yearMax)
@@ -1213,7 +1222,7 @@ class App extends Component {
   }
 
   render() {
-    const { vdemX, vdemY, vdemZ, xyYearMin, gbifError, vdemExplanations } = this.state;
+    const { vdemX, vdemY, vdemZ, xyYearMin, gbifError, variableExplanations } = this.state;
     const xyValidYears = this.getValidYears([vdemX, vdemY], 1960, 2018);
     const xyYearIntervalLimited = xyYearMin < xyValidYears[0] || xyValidYears[1] < 2016;
     return (
@@ -1369,23 +1378,23 @@ class App extends Component {
                   <div style={{ marginTop: 10 }}>
                     <h3>Selected variables:</h3>
                     {
-                      vdemExplanations[vdemY] ? <div>
-                        <h4>{vdemExplanations[vdemY].short_name}</h4>
-                        {vdemExplanations[vdemY].description}
+                      variableExplanations[vdemY] ? <div>
+                        <h4>{variableExplanations[vdemY].short_name}</h4>
+                        {variableExplanations[vdemY].description}
                       </div> : null
                     }
                     
                     {
-                      vdemExplanations[vdemX] ? <div>
-                        <h4>{vdemExplanations[vdemX].short_name}</h4>
-                        {vdemExplanations[vdemX].description}
+                      variableExplanations[vdemX] ? <div>
+                        <h4>{variableExplanations[vdemX].short_name}</h4>
+                        {variableExplanations[vdemX].description}
                       </div> : null
                     }
 
                     {
-                      vdemZ !== vdemY && vdemExplanations[vdemZ] ? <div>
-                        <h4>{vdemExplanations[vdemZ].short_name}</h4>
-                        {vdemExplanations[vdemZ].description}
+                      vdemZ !== vdemY && variableExplanations[vdemZ] ? <div>
+                        <h4>{variableExplanations[vdemZ].short_name}</h4>
+                        {variableExplanations[vdemZ].description}
                       </div> : null
                     }
                   </div>
@@ -1496,8 +1505,8 @@ class App extends Component {
                   </Zoom>
                   <div style={{ marginTop: 10 }}>
                     <h3>Selected variables:</h3>
-                    <h4>{vdemExplanations[this.state.vdemVariable] ? vdemExplanations[this.state.vdemVariable].short_name : ''}</h4>
-                    { vdemExplanations[this.state.vdemVariable] ? vdemExplanations[this.state.vdemVariable].description : '' }
+                    <h4>{variableExplanations[this.state.vdemVariable] ? variableExplanations[this.state.vdemVariable].short_name : ''}</h4>
+                    { variableExplanations[this.state.vdemVariable] ? variableExplanations[this.state.vdemVariable].description : '' }
                   </div>
                 </div>
               </Grid>
@@ -1505,7 +1514,7 @@ class App extends Component {
           </Grid>
 
           <Grid item className="grid-item section section-3" xs={12}>
-            <About vdemExplanations={this.state.vdemExplanations} />
+            <About vdemExplanations={this.state.vdemExplanations} gbifExplanations={gbifExplanations} />
           </Grid>
         </Grid>
       </div>

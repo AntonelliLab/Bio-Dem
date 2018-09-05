@@ -8,8 +8,7 @@ const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
 
 class About extends React.Component {
   render() {
-    const { vdemExplanations: vdem } = this.props;
-    const vdemExplanations = Object.keys(vdem).map(d => vdem[d]);
+    const { vdemExplanations, gbifExplanations } = this.props;
 
     return (
       <Grid container>
@@ -160,7 +159,7 @@ class About extends React.Component {
             structure and society of a country, such as the freedom of movement
             and physical violence. We only included those indicators in Bio-Dem
             which have a
-            <a href="#politicalindicatorvariablesandtheirconnectiontobiodiversitycollections">
+            <a href="#political-indicator-variables">
               mechanistic link
             </a>{" "}
             to biodiversity collections. Indeed, interesting patterns emerge
@@ -332,29 +331,49 @@ class About extends React.Component {
 
         {/* Second main column */}
         <Grid item className="column" xs={12} sm={6}>
-          <h2 id="politicalindicatorvariablesandtheirconnectiontobiodiversitycollections">
+          <h2 id="political-indicator-variables">
             Political indicator variables and their connection to biodiversity
             collections
           </h2>
 
-          {vdemExplanations.map(
-            d =>
-              d.id === "records" ? null : (
-                <div key={d.id}>
-                  <h4 id={d.id}>{d.short_name}</h4>
+          {
+            vdemExplanations.map(d => (
+              <div key={d.id}>
+                <h4 id={d.id}>{d.short_name}</h4>
 
-                  <p>
-                    <em>Description:</em> {d.description}
-                  </p>
-                  <p>
-                    <em>Relevance:</em> {d.relevance}
-                  </p>
-                  <p>
-                    <em>References:</em> {d.references}
-                  </p>
-                </div>
-              )
-          )}
+                <p>
+                  <em>Description:</em> {d.description}
+                </p>
+                <p>
+                  <em>Relevance:</em> {d.relevance}
+                </p>
+                <p>
+                  <em>References:</em> {d.references}
+                </p>
+              </div>
+            ))
+          }
+
+          <h2 id="biodiversity-indicator-variables">
+            Biodiversity indicator variables
+          </h2>
+          {
+            gbifExplanations.map(d => (
+              <div key={d.id}>
+                <h4 id={d.id}>{d.short_name}</h4>
+
+                <p>
+                  <em>Description:</em> {d.description}
+                </p>
+                <p>
+                  <em>Relevance:</em> {d.relevance}
+                </p>
+                <p>
+                  <em>References:</em> {d.references}
+                </p>
+              </div>
+            ))
+          }
         </Grid>
       </Grid>
     );
@@ -362,7 +381,8 @@ class About extends React.Component {
 }
 
 About.propTypes = {
-  vdemExplanations: PropTypes.object.isRequired
+  vdemExplanations: PropTypes.object.isRequired,
+  gbifExplanations: PropTypes.object.isRequired,
 };
 
 export default About;
