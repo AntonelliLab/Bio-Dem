@@ -894,7 +894,7 @@ class App extends Component {
     'xmlns="http://www.w3.org/2000/svg"',
     'xmlns:xlink="http://www.w3.org/1999/xlink"',
     'version="1.1"'].join(' '));
-    svgContent = svgContent.replace(/<\/svg>.*/, '</svg>');
+    svgContent = svgContent.replace(/<\/svg>[\s\S]*/, '</svg>');
     // Safari inserts NS1/NS2 namespaces as xlink is not defined within the svg html
     svgContent = svgContent.replace("NS1", "xlink");
     svgContent = svgContent.replace("NS2", "xlink");
