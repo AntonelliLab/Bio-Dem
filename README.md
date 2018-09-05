@@ -14,7 +14,7 @@ Bio-Dem provides a novel, fun perspective on GBIF data, and can (I) generate nov
 
 
 # Operating instructions
-Bio-Dem is an open-source web-app, avaialble at http://bio-dem.surge.sh. The core of the app are two interactive plots to explore the number of biological collections records in relation to political systems. 
+Bio-Dem is an open-source web-app, available at http://bio-dem.surge.sh. The core of the app are two interactive plots to explore the number of biological collections records in relation to political systems. 
 
 The first plot is a scatterplot of data bubble for each country on Earth. The size of the bubbles indicates the number of occurrence record available from GBIF (fetched live via the GBIF API) from this country and the colour of each bubble shows the time-aggregated political regime type. Drop down menus customize the x- and y-axis with different dimensions of democracy as provided by V-Dem (v8), as well as the colouring scheme. Values for each country are aggregated by median over a user-selected time period. This plot reveals the number of collection records in a two dimensional democracy space. Four example specifications highlighting particularly exciting results can be selected directly via special highlight buttons next to the plot.
 
