@@ -97,15 +97,18 @@ const vdemOptions = [
   { value: e_wri_pa }
 ];
 
-const scatterYOptions = vdemOptions.concat([{
-  value: "records",
-  label: "Number of records",
-  short_name: "Number of records",
-  full_name: "Number of GBIF records",
-  description: "Number of species occurrence records in GBIF in selected years",
-  relevance: "",
-  references: "",
-}]);
+const circleSizeOptions = [
+  {
+    value: "records",
+    label: "Number of records",
+  },
+  {
+    value: "recordsPerArea",
+    label: "Records per area",
+  },
+];
+
+const scatterYOptions = circleSizeOptions.concat(vdemOptions);
 
 const regimeTypes = {
   0: 'Closed autocracy',
@@ -181,7 +184,9 @@ const vdemScaleMax = {
   e_peaveduc: 15,
   e_migdppc: 2e5,
   e_wri_pa: 60,
-  records: 1e9,
+  // records: 1e9,
+  records: 1e8,
+  recordsPerArea: 1e3,
 }
 
 const vdemScaleMin = {
@@ -196,11 +201,30 @@ const vdemScaleMin = {
   e_peaveduc: 0,
   e_migdppc: 2e2,
   e_wri_pa: 0,
-  records: 1,
+  // records: 1,
+  // recordsPerArea: 1e-6,
+  records: 1e2,
+  recordsPerArea: 1e-2,
+}
+
+const aggregationMethod = {
+  v2x_polyarchy: 'median',
+  v2x_freexp_altinf: 'median',
+  v2x_frassoc_thick: 'median',
+  v2xcl_dmove: 'median',
+  v2xcs_ccsi: 'median',
+  v2x_corr: 'median',
+  v2x_clphy: 'median',
+  e_peaveduc: 'median',
+  e_migdppc: 'median',
+  e_wri_pa: 'median',
+  records: 'sum',
+  recordsPerArea: 'sum',
 }
 
 const useLogScale = {
   records: true,
+  recordsPerArea: true,
   e_migdppc: true,
 };
 
@@ -323,9 +347,9 @@ class App extends Component {
       // ScatterPlot:
       vdemX: v2x_freexp_altinf,
       vdemY: v2x_frassoc_thick,
+      vdemZ: 'records',
       xyYearMin: 1960,
       xyYearMax: 2017,
-      normalizeByArea: false,
       colorBy: 'regime',
       regionFilter: 0,
       // DualChart
@@ -596,6 +620,68 @@ class App extends Component {
     return data;
   }
 
+  async initData() {
+    const data = await this.fetchData();
+    const [vdemData, vdemExplanationsArray, countryData, gbifYearlyCountryData] = data;
+    const vdemExplanations = {};
+    vdemExplanationsArray.forEach(d => {
+      vdemExplanations[d.id] = d;
+    });
+    vdemExplanations['records'] = {
+      id: 'records',
+      label: "Number of records",
+      short_name: "Number of records",
+      full_name: "Number of GBIF records",
+      description: "Number of species occurrence records in GBIF in selected years.",
+      relevance: "",
+      references: "",
+    };
+    vdemExplanations['recordsPerArea'] = {
+      id: 'recordsPerArea',
+      label: "Records per area",
+      short_name: "Records per area",
+      full_name: "Number of GBIF records",
+      description: "Number of species occurrence records in GBIF in selected years per country area.",
+      relevance: "",
+      references: "",
+    };
+    vdemOptions.forEach(d => {
+      const info = vdemExplanations[d.value];
+      if (!info) {
+        console.log('Missing explanation for value:', d.value);
+      } else {
+        d.label = info.short_name;
+        // d.description = info.description;
+        // d.relevance = info.relevance;
+        // d.references = info.references;
+        // d.full_name = info.full_name;
+      }
+    });
+
+    // Integrate gbif data into vdem data
+    const gbifDataPerCountryAndYear = {};
+    gbifYearlyCountryData.forEach(d => {
+      gbifDataPerCountryAndYear[`${d.country}-${d.year}`] = d.records;
+    });
+
+    vdemData.forEach(d => {
+      const numRecords = gbifDataPerCountryAndYear[`${d.country}-${d.year}`] || 0;
+      d.records = numRecords;
+      d.recordsPerArea = numRecords / this.countryMap[d.country].area;
+    });
+
+    this.setState({
+      loaded: true,
+      vdemData,
+      vdemExplanations,
+      countries: countryData,
+      // gbifYearlyCountryData,
+    }, () => {
+      this.renderCharts();
+      this.renderBrush();
+    });
+  }
+
   /**
    * Query the GBIF API for a year facet search,
    * prepare and handle negative or postive results.
@@ -670,54 +756,6 @@ class App extends Component {
       }
     );
   };
-
-  async initData() {
-    const data = await this.fetchData();
-    const [vdemData, vdemExplanationsArray, countryData, gbifYearlyCountryData] = data;
-    const vdemExplanations = {};
-    vdemExplanationsArray.forEach(d => {
-      vdemExplanations[d.id] = d;
-    });
-    vdemExplanations['records'] = {
-      id: 'records',
-      label: "Number of records",
-      short_name: "Number of records",
-      full_name: "Number of GBIF records",
-      description: "Number of species occurrence records in GBIF in selected years.",
-      relevance: "",
-      references: "",
-    };
-    vdemOptions.forEach(d => {
-      const info = vdemExplanations[d.value];
-      if (!info) {
-        console.log('Missing explanation for value:', d.value);
-      } else {
-        d.label = info.short_name;
-        // d.description = info.description;
-        // d.relevance = info.relevance;
-        // d.references = info.references;
-        // d.full_name = info.full_name;
-      }
-    });
-    // Integrate gbif data into vdem data
-    const gbifDataPerCountryAndYear = {};
-    gbifYearlyCountryData.forEach(d => {
-      gbifDataPerCountryAndYear[`${d.country}-${d.year}`] = d.records;
-    });
-    vdemData.forEach(d => {
-      d.records = gbifDataPerCountryAndYear[`${d.country}-${d.year}`] || 0;
-    })
-    this.setState({
-      loaded: true,
-      vdemData,
-      vdemExplanations,
-      countries: countryData,
-      // gbifYearlyCountryData,
-    }, () => {
-      this.renderCharts();
-      this.renderBrush();
-    });
-  }
 
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value }, () => {
@@ -841,7 +879,7 @@ class App extends Component {
     });
   }
 
-  onScatterPlotChangeNormalization = (event) => {
+  onScatterPlotChangeBubbleSizeBy = (event) => {
     const { value, checked } = event.target;
     this.setState({
       [value]: checked,
@@ -947,7 +985,7 @@ class App extends Component {
   }
 
   renderScatterPlot() {
-    const { vdemData, vdemX, vdemY, xyYearMin, xyYearMax, vdemExplanations, regionFilter } = this.state;
+    const { vdemData, vdemX, vdemY, vdemZ, xyYearMin, xyYearMax, vdemExplanations, regionFilter } = this.state;
     if (vdemData.length === 0) {
       return;
     }
@@ -967,11 +1005,12 @@ class App extends Component {
       {
         return null;
       }
-      const x = d3.median(values, d => d[vdemX]);
-      const y = d3.median(values, d => d[vdemY]);
+      const x = d3[aggregationMethod[vdemX]](values, d => d[vdemX]);
+      const y = d3[aggregationMethod[vdemY]](values, d => d[vdemY]);
       const z = d3.median(values, d => d.v2x_regime);
-      const records = d3.sum(values, d => d.records);
-      return { x, y, z, records };
+      const records = vdemY === 'records' ? y : d3.sum(values, d => d.records);
+      const recordsPerArea = vdemY === 'recordsPerArea' ? y : d3.sum(values, d => d.recordsPerArea);
+      return { x, y, z, records, recordsPerArea };
     })
     .entries(vdemData
       // Aggregate within selected years
@@ -992,13 +1031,14 @@ class App extends Component {
     // Filter countries lacking values on the x y dimensions or have zero records (log safe)
     const vdemFiltered = vdemGrouped.filter(d => d.value !== null && d.value.records > 0);
     // If the y axis is set to display number of records, replace the y axis with records
-    if (vdemY === "records") {
-      vdemYLabel = 'Number of records';
-      vdemFiltered.forEach(d => {
-        d.value.y = d.value.records;
-      });
-    }
+    // if (vdemY === "records") {
+    //   vdemYLabel = 'Number of records';
+    //   vdemFiltered.forEach(d => {
+    //     d.value.y = d.value.records;
+    //   });
+    // }
     
+
     // console.log('vdemData:', vdemData);
     // console.log('vdemGrouped:', vdemGrouped);
     // console.log('vdemFiltered:', vdemFiltered);
@@ -1020,11 +1060,12 @@ class App extends Component {
       xMax: vdemScaleMax[vdemX],
       yMin: vdemScaleMin[vdemY],
       yMax: vdemScaleMax[vdemY],
-      valueMin: 1,
-      valueMax: this.state.normalizeByArea ? 1e3 : vdemScaleMax['records'],
+      valueMin: vdemScaleMin[vdemZ],
+      valueMax: vdemScaleMax[vdemZ],
+      zLogScale: useLogScale[vdemZ],
       x: d => d.value.x,
       y: d => d.value.y,
-      value: d => this.state.normalizeByArea ? d.value.records / this.countryMap[d.key].area : d.value.records,
+      value: d => d.value[vdemZ],
       color: d => {
         switch (this.state.colorBy) {
           case 'regime':
@@ -1172,7 +1213,7 @@ class App extends Component {
   }
 
   render() {
-    const { vdemX, vdemY, xyYearMin, gbifError, vdemExplanations } = this.state;
+    const { vdemX, vdemY, vdemZ, xyYearMin, gbifError, vdemExplanations } = this.state;
     const xyValidYears = this.getValidYears([vdemX, vdemY], 1960, 2018);
     const xyYearIntervalLimited = xyYearMin < xyValidYears[0] || xyValidYears[1] < 2016;
     return (
@@ -1304,16 +1345,17 @@ class App extends Component {
                       options={regionOptions}
                     />
                   </FormControl>
-                  <FormControlLabel
-                    control={
-                    <Checkbox
-                      checked={this.state.normalizeByArea}
-                      onChange={this.onScatterPlotChangeNormalization}
-                      value="normalizeByArea"
+                  <FormControl className="formControl" style={{ minWidth: 200, margin: 10 }}>
+                    <InputLabel htmlFor="vdemZ">
+                      Circle size by
+                    </InputLabel>
+                    <AutoSelect
+                      input={<Input name="vdemZ" id="vdemZ" />}
+                      value={this.state.vdemZ}
+                      onChange={this.handleChange}
+                      options={circleSizeOptions}
                     />
-                    }
-                    label="Normalize records by country area"
-                  />
+                  </FormControl>
                   <Zoom in={xyYearIntervalLimited} mountOnEnter unmountOnExit>
                     <Notice variant="warning" message={
                       <span>Yearly data only available in the sub interval <strong>[{xyValidYears.toString()}]</strong> for the selected dimensions</span>
@@ -1326,10 +1368,26 @@ class App extends Component {
                   </Zoom>
                   <div style={{ marginTop: 10 }}>
                     <h3>Selected variables:</h3>
-                    <h4>{vdemExplanations[this.state.vdemY] ? vdemExplanations[this.state.vdemY].short_name : ''}</h4>
-                    { vdemExplanations[this.state.vdemY] ? vdemExplanations[this.state.vdemY].description : '' }
-                    <h4>{vdemExplanations[this.state.vdemX] ? vdemExplanations[this.state.vdemX].short_name : ''}</h4>
-                    { vdemExplanations[this.state.vdemX] ? vdemExplanations[this.state.vdemX].description : '' }
+                    {
+                      vdemExplanations[vdemY] ? <div>
+                        <h4>{vdemExplanations[vdemY].short_name}</h4>
+                        {vdemExplanations[vdemY].description}
+                      </div> : null
+                    }
+                    
+                    {
+                      vdemExplanations[vdemX] ? <div>
+                        <h4>{vdemExplanations[vdemX].short_name}</h4>
+                        {vdemExplanations[vdemX].description}
+                      </div> : null
+                    }
+
+                    {
+                      vdemZ !== vdemY && vdemExplanations[vdemZ] ? <div>
+                        <h4>{vdemExplanations[vdemZ].short_name}</h4>
+                        {vdemExplanations[vdemZ].description}
+                      </div> : null
+                    }
                   </div>
                 </div>
               </Grid>
