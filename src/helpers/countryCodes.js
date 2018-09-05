@@ -10,6 +10,10 @@ export default {
       // TODO: Palestine West Bank in v-dem?
       return 'Palestinian Territory';
     }
+    if (code === 'LBY') {
+      // Old name in library
+      return 'Libya';
+    }
     return countryCodes.getName(code, 'en');
   },
 
