@@ -258,7 +258,7 @@ class About extends React.Component {
             Varieties of Democracy (V-Dem) Project.
           </p>
           <p>
-            Chadwick, B.P. “Fisheries, Sovereignties and Red Herrings”.{" "}
+            Chadwick, B.P. (1995) “Fisheries, Sovereignties and Red Herrings”.{" "}
             <em>Journal of International Affars</em>, vol. 48(2): 559-584.
           </p>
           <p>
