@@ -368,9 +368,6 @@ class About extends React.Component {
                 <p>
                   <em>Relevance:</em> {d.relevance}
                 </p>
-                <p>
-                  <em>References:</em> {d.references}
-                </p>
               </div>
             ))
           }

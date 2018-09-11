@@ -112,22 +112,24 @@ const scatterYOptions = circleSizeOptions.concat(vdemOptions);
 
 const gbifExplanations = [
   {
-    id: 'records',
+    id: "records",
     label: "Number of records",
     short_name: "Number of records",
     full_name: "Number of GBIF records",
-    description: "Number of species occurrence records in GBIF in selected years.",
-    relevance: "",
-    references: "",
+    description:
+      "Number of species occurrence records in GBIF in selected years.",
+    relevance:
+      "This variable indicates the level of scientific knowledge and information available of biodiversity records in a country, as defined by GBIF."
   },
   {
-    id: 'recordsPerArea',
+    id: "recordsPerArea",
     label: "Records per area",
     short_name: "Records per area",
     full_name: "Number of GBIF records",
-    description: "Number of species occurrence records in GBIF in selected years per country area.",
-    relevance: "",
-    references: "",
+    description:
+      "Number of species occurrence records in GBIF in selected years per country area.",
+    relevance:
+      "This variable accounts for the fact that the size of a country might affect the absolute number of records collected."
   }
 ];
 
