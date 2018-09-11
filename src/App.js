@@ -84,6 +84,11 @@ const e_migdppc = "e_migdppc";
 // Protected areas
 const e_wri_pa = "e_wri_pa";
 
+// Error codes used within the app
+const yearFacetQueryErrorCoded = '101';
+const countryFacetQueryErrorCoded = '102';
+const autocompletesQueryErrorCoded = '103';
+
 const vdemOptions = [
   { value: v2x_polyarchy },
   { value: v2x_freexp_altinf },
@@ -701,7 +706,7 @@ class App extends Component {
     const { onlyDomestic, onlyWithImage, taxonFilter } = this.state;
     // Build up state for a query
     const gbifError = Object.assign({}, this.state.gbifError);
-    delete gbifError['101'];
+    delete gbifError[yearFacetQueryErrorCoded];
     this.setState({ fetching: true, gbifError });
     // Query the GBIF API
     // console.log('Query gbif with year facet...');
@@ -709,7 +714,7 @@ class App extends Component {
     // If the query errored out set to error state
     if (result.error) {
       const gbifError = Object.assign({}, this.state.gbifError);
-      gbifError['101'] = result.error;
+      gbifError[yearFacetQueryErrorCoded] = result.error;
       this.setState({ fetching: false, gbifError });
       return;
     }
@@ -733,7 +738,7 @@ class App extends Component {
   makeCountryFacetQuery = async () => {
     // Build up state for a query
     const gbifError = Object.assign({}, this.state.gbifError);
-    delete gbifError['102'];
+    delete gbifError[countryFacetQueryErrorCoded];
     this.setState({ fetching: true, gbifError });
     // Query the GBIF API
     console.log('Query gbif with country facet...');
@@ -744,7 +749,7 @@ class App extends Component {
     // If the query errored out set to error state
     if (result.error) {
       const gbifError = Object.assign({}, this.state.gbifError);
-      gbifError['102'] = result.error;
+      gbifError[countryFacetQueryErrorCoded] = result.error;
       this.setState({ fetching: false, gbifError });
       return;
     }
@@ -800,7 +805,7 @@ class App extends Component {
   makeAutocompletesQuery = async newValue => {
     // Build up state for a query
     const gbifError = Object.assign({}, this.state.gbifError);
-    delete gbifError['103'];
+    delete gbifError[autocompletesQueryErrorCoded];
     this.setState({ fetching: true, gbifError });
     // TODO: This queries the suggest API of GBIF which is not really good customizable
     // TODO: Maybe some result filtering to not show "synonyms" or only specific ranks
@@ -811,7 +816,7 @@ class App extends Component {
     // If the query errored out set to error state
     if (result.error) {
       const gbifError = Object.assign({}, this.state.gbifError);
-      gbifError['103'] = result.error;
+      gbifError[autocompletesQueryErrorCoded] = result.error;
       this.setState({ fetching: false, gbifError });
       return;
     }
@@ -1372,7 +1377,7 @@ class App extends Component {
                       <span>Yearly data only available in the sub interval <strong>[{xyValidYears.toString()}]</strong> for the selected dimensions</span>
                     }/>
                   </Zoom>
-                  <Zoom in={gbifError['102']} mountOnEnter unmountOnExit>
+                  <Zoom in={gbifError[countryFacetQueryErrorCoded]} mountOnEnter unmountOnExit>
                     <Notice variant="error" message={
                       <span>Error: Querying the GBIF API for country facet data failed</span>
                     }/>
@@ -1495,12 +1500,12 @@ class App extends Component {
                     }
                     label="Only show records with photo"
                   />
-                  <Zoom in={gbifError['101']} mountOnEnter unmountOnExit>
+                  <Zoom in={gbifError[yearFacetQueryErrorCoded]} mountOnEnter unmountOnExit>
                     <Notice variant="error" message={
                       <span>Error: Querying the GBIF API for year facet data failed</span>
                     } />
                   </Zoom>
-                  <Zoom in={gbifError['103']} mountOnEnter unmountOnExit>
+                  <Zoom in={gbifError[autocompletesQueryErrorCoded]} mountOnEnter unmountOnExit>
                     <Notice variant="error" message={
                       <span>Error: Querying the GBIF API for taxon data failed</span>
                     } />
