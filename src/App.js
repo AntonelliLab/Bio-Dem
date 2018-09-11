@@ -14,8 +14,6 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Zoom from '@material-ui/core/Zoom';
 import ToggleButton, { ToggleButtonGroup } from "@material-ui/lab/ToggleButton";
-// import Tabs from '@material-ui/core/Tabs';
-// import Tab from '@material-ui/core/Tab';
 import IconDownload from '@material-ui/icons/CloudDownload';
 // import IconPlay from '@material-ui/icons/PlayCircleOutline';
 // import IconPause from '@material-ui/icons/PauseCircleOutline';
@@ -27,7 +25,6 @@ import {
   queryGBIFYearFacet,
   queryGBIFCountryFacet,
   queryAutocompletesGBIF,
-  // fetchRecordsPerCountryPerYear,
 } from "./api/gbif";
 import About from './About';
 import logo from './logo.svg';
@@ -50,7 +47,6 @@ import './d3/d3.css';
 AFG,1960,0,0.0878861649162364,0.190868685410209,0.125512007338669,0.266093357150313,0.242432454719204,0.48274120527295,0.37271631597475,14,0.31028929,2744,NA,0
  */
 const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
-// const vdemDataUrl = `https://raw.githubusercontent.com/AntonelliLab/Vdem-Biodiversity/master/analyses/input/vdem_variables.csv?token=AG-YjnEhdZQC1HdaThLt5uEBQRmdT1zLks5bV-6-wA%3D%3D`;
 
 /**
  * V-dem variables explanations
@@ -196,12 +192,10 @@ const stopYear = {
 };
 
 const yAxisLabelGap = {
-  e_migdppc: 80,
-  // records: 120
+  e_migdppc: 80
 }
 
 const vdemScaleMax = {
-  // v2x_regime: 3,
   v2x_polyarchy: 1,
   v2x_freexp_altinf: 1,
   v2x_frassoc_thick: 1,
@@ -212,13 +206,11 @@ const vdemScaleMax = {
   e_peaveduc: 15,
   e_migdppc: 2e5,
   e_wri_pa: 60,
-  // records: 1e9,
   records: 1e8,
   recordsPerArea: 1e3,
 }
 
 const vdemScaleMin = {
-  // v2x_regime: 0,
   v2x_polyarchy: 0,
   v2x_freexp_altinf: 0,
   v2x_frassoc_thick: 0,
@@ -229,8 +221,6 @@ const vdemScaleMin = {
   e_peaveduc: 0,
   e_migdppc: 2e2,
   e_wri_pa: 0,
-  // records: 1,
-  // recordsPerArea: 1e-6,
   records: 1e2,
   recordsPerArea: 1e-2,
 }
@@ -700,7 +690,6 @@ class App extends Component {
     delete gbifError[countryFacetQueryErrorCoded];
     this.setState({ fetching: true, gbifError });
     // Query the GBIF API
-    console.log('Query gbif with country facet...');
     const result = await queryGBIFCountryFacet(this.state.xyYearMin);
     // If the query errored out set to error state
     if (result.error) {
@@ -868,7 +857,6 @@ class App extends Component {
     // Safari inserts NS1/NS2 namespaces as xlink is not defined within the svg html
     svgContent = svgContent.replace("NS1", "xlink");
     svgContent = svgContent.replace("NS2", "xlink");
-    // console.log("svgContent after:", svgContent.substring(0, 250));
     
     const url = URL.createObjectURL(new Blob([svgContent], { type: 'image/svg+xml' }));
     return url;
@@ -935,7 +923,6 @@ class App extends Component {
   onBrush = throttle((domain) => {
     const [xyYearMin, xyYearMax] = domain.map(d => d.getFullYear());
     if (xyYearMin !== this.state.xyYearMin || xyYearMax !== this.state.xyYearMax) {
-      // console.log('###### onBrush:', xyYearMin, xyYearMax);
       this.setState({
         xyYearMin,
         xyYearMax,

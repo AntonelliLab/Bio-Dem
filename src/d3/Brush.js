@@ -29,7 +29,6 @@ export default function Brush(el, properties) {
     fillOpacity: d => 0.5,
     xLabel: "Year",
     yLabel: "",
-    // title: "",
     fetching: false,
     onBrush: (domain) => { console.log(`Brushed: ${domain}`); },
     selectedYears: null,
@@ -71,7 +70,6 @@ export default function Brush(el, properties) {
   const xExtent = getExtent(data, props.x, props.xMin, props.xMax);
   const yExtent = getExtent(data, props.y, props.yMin, props.yMax);
   const timeExtent = xExtent.map(parseYear);
-  // const selectedExtent = props.selectedYears || timeExtent;
 
   const x = d3.scaleTime()
             .domain(timeExtent)
@@ -86,8 +84,6 @@ export default function Brush(el, properties) {
             .domain(yExtent)
             .range([5, height]);
   
-  // const xDateAccessor = (d) => parseYear(props.x(d))
-
   const yLogFriendlyAccessor = (d) => {
     const y = props.y(d);
     return Math.max(1, y);
@@ -96,21 +92,8 @@ export default function Brush(el, properties) {
   const xAxis = d3.axisBottom(x)
     .tickSizeOuter(0)
     .ticks(totalWidth / props.xTickGap);
-    // .tickValues(d3.ticks(timeExtent[0], timeExtent[1], totalWidth / props.xTickGap));
   
   const yAxis = d3.axisLeft(y);
-
-  // const area = d3.area()
-  //   .curve(d3.curveMonotoneX)
-  //   // .x(d => x(props.x(d)))
-  //   .x(d => x(xDateAccessor(d)))
-  //   .y0(height)
-  //   // .y1(d => y(yLogFriendlyAccessor(d)));
-  //   .y1(d => y(props.y(d)));
-  
-  // const color = (d) => {
-  //   return props.fetching ? '#aaa' : props.color(d);
-  // }
   
   const brush = d3.brushX()
     .extent([[0, 0], [width, height]]);
@@ -155,15 +138,6 @@ export default function Brush(el, properties) {
         .text(props.title);
   }
   
-  // g.append("path")
-  //   .datum(data)
-  //   .attr("class", "brush")
-  //   .style("stroke", color)
-  //   .style("fill", color)
-  //   .style("fill-opacity", 0.5)
-  //   .attr("d", area);
-  
-
   g.selectAll(".bar")
     .data(data)
   .enter().append("rect")
@@ -180,8 +154,6 @@ export default function Brush(el, properties) {
   g.append("g")
     .attr("class", "brush")
     .call(brush)
-    // .call(brush.move, x.range());
-    // .call(brush.move, selectedExtent.map(x));
 
   brush.on("brush end", brushed);
 
@@ -189,8 +161,6 @@ export default function Brush(el, properties) {
   function brushed() {
     const selection = d3.event.selection;
     const domain = selection ? selection.map(x.invert, x) : timeExtent;
-    // console.log('!!!!!!! brushed selection:', selection, '--> domain:', domain);
-    // console.log('brushed new domain:', domain, 'old:', selectedExtent);
     props.onBrush(domain);
   }
 }

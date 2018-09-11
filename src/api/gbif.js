@@ -1,5 +1,4 @@
 import axios from "axios";
-// import { range } from 'd3';
 import countryCodes from '../helpers/countryCodes';
 import { countries } from './data';
 import sortyBy from 'lodash/sortBy';
@@ -69,32 +68,10 @@ export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = 2017) => {
 
 export const fetchRecordsPerCountryPerYear = async ({ yearMin, yearMax } = { yearMin: 1960, yearMax: 2017 }) => {
   // Construct the GBIF occurrences API url with facets for country counts
-  // const years = range(yearMin, yearMax + 1);
-  // console.log('Fetching country facet data per year:', years);
-  // const responses = await Promise.all(years.map(year => queryGBIFCountryFacet(year, year)));
-  // // console.log('responses:', responses);
-  // const recordsPerCountryPerYear = {};
-  // for (let i = 0; i < years.length; ++i) {
-  //   const res = responses[i];
-  //   if (res.error) {
-  //     return { error: res.error };
-  //   }
-  //   const year = years[i];
-  //   recordsPerCountryPerYear[year] = {};
-  //   res.response.data.facets[0].counts.forEach(d => {
-  //     recordsPerCountryPerYear[year][countryCodes.alpha2ToAlpha3(d.name)] = {
-  //       records: d.count,
-  //     };
-  //   });
-  // }
   let result = [];
-  // const d1 = new Date();
-  // console.log('fetching year facet per country:', years);
   const responses = await Promise.all(countries.map(country => 
     queryGBIFYearFacet(countryCodes.alpha3ToAlpha2(country))
   ));
-  // const d2 = new Date();
-  // console.log('@@@@@ elapsed time:', d2 - d1, responses);
   responses.forEach((res, i) => {
     if (res.error) {
       return { error: res.error };
@@ -108,7 +85,6 @@ export const fetchRecordsPerCountryPerYear = async ({ yearMin, yearMax } = { yea
     });
   });
   result = sortyBy(result, ['country', 'year']);
-  // console.log(result.map(d => `${d.country},${d.year},${d.records}`).join('\n'));
   return result;
 };
 
