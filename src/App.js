@@ -320,38 +320,9 @@ const HighlightsButtonGroup = (props) => (
   </div>
 );
 
-// const HighlightTabs = (props) => (
-//   <div>
-//     <AppBar position="static" color="default">
-//       <Tabs
-//         value={props.value === null ? false : props.value}
-//         onChange={props.onChange}
-//         indicatorColor="primary"
-//         textColor="primary"
-//         scrollable
-//         scrollButtons="auto"
-//       >
-//         {
-//           props.highlights.map((h, index) => (
-//             <Tab key={index} label={h.buttonLabel} />
-//           ))
-//         }
-//       </Tabs>
-//     </AppBar>
-//     {
-//       props.value === null ? null : (
-//         <Typography variant="body1" gutterBottom>
-//           { props.highlights[props.value].explanation }
-//         </Typography>
-//       )
-//     }
-//   </div>
-// );
-
-const CountryHighlight = ({ code, name, onMouseOver, onClick }) =>
+const CountryHighlight = ({ code, name, onClick }) =>
   <strong
     className="country-highlight"
-    onMouseOver={() => onMouseOver(code)}
     onClick={() => onClick(code)}
   >
     { name }
@@ -359,7 +330,6 @@ const CountryHighlight = ({ code, name, onMouseOver, onClick }) =>
 
 
 class App extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -399,7 +369,7 @@ class App extends Component {
     this.refDualChart = React.createRef();
 
     const Country = ({ code, name }) => 
-      <CountryHighlight code={code} name={name} onMouseOver={this.onMouseOverHighlightCountry} onClick={this.onClickHighlightCountry}/>
+      <CountryHighlight code={code} name={name} onClick={this.onClickHighlightCountry}/>
 
     this.scatterPlotHighlights = [
       {
@@ -531,7 +501,9 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    // Add an event listener that fires when the window get's resized
     window.addEventListener('resize', this.onResize, false);
+    // Load the initial batch of data required on app start
     await this.initData();
   }
 
@@ -547,13 +519,6 @@ class App extends Component {
       // Get alpha2 ISO code for this country, as this is what GBIF requires as query
       await this.makeYearFacetQuery(countryCodes.alpha3ToAlpha2(this.state.country));
     }
-
-    // Changes in state that require a new GBIF country facet query
-    // const fetchNewYearCondition = this.state.xyYearMin !== prevState.xyYearMin;
-
-    // if (fetchNewYearCondition) {
-    //   await this.makeCountryFacetQuery();
-    // }
   }
 
   onResize = () => {
@@ -666,10 +631,6 @@ class App extends Component {
         console.log('Missing explanation for value:', d.value);
       } else {
         d.label = info.short_name;
-        // d.description = info.description;
-        // d.relevance = info.relevance;
-        // d.references = info.references;
-        // d.full_name = info.full_name;
       }
     });
 
@@ -691,7 +652,6 @@ class App extends Component {
       vdemExplanations,
       variableExplanations,
       countries: countryData,
-      // gbifYearlyCountryData,
     }, () => {
       this.renderCharts();
       this.renderBrush();
@@ -709,7 +669,6 @@ class App extends Component {
     delete gbifError[yearFacetQueryErrorCoded];
     this.setState({ fetching: true, gbifError });
     // Query the GBIF API
-    // console.log('Query gbif with year facet...');
     const result = await queryGBIFYearFacet(country, onlyDomestic, onlyWithImage, taxonFilter);
     // If the query errored out set to error state
     if (result.error) {
@@ -743,9 +702,6 @@ class App extends Component {
     // Query the GBIF API
     console.log('Query gbif with country facet...');
     const result = await queryGBIFCountryFacet(this.state.xyYearMin);
-    // const recordsPerCountryPerYear = await fetchRecordsPerCountryPerYear();
-    // console.log('recordsPerCountryPerYear:', recordsPerCountryPerYear);
-
     // If the query errored out set to error state
     if (result.error) {
       const gbifError = Object.assign({}, this.state.gbifError);
@@ -777,6 +733,10 @@ class App extends Component {
     this.setState({ [event.target.name]: event.target.value }, () => {
       this.renderCharts();
     });
+  };
+
+  handleCountryChange = async event => {
+    this.setState({ [event.target.name]: event.target.value });
   };
 
   /**
@@ -811,7 +771,6 @@ class App extends Component {
     // TODO: Maybe some result filtering to not show "synonyms" or only specific ranks
     // TODO: One more filter option for this API is by rank, maybe good idea to query for only the higher ranks and Promise all together
     // Query autocompletes API
-    console.log('Query gbif autocompletes API ...');
     const result = await queryAutocompletesGBIF(newValue);
     // If the query errored out set to error state
     if (result.error) {
@@ -827,11 +786,6 @@ class App extends Component {
     }));
     // Save retrieved taxa to state
     this.setState({ taxaAutocompletes, fetching: false });
-  };
-
-  handleCountryChange = async event => {
-    // console.log('querying for this country: ', event.target.value);
-    this.setState({ [event.target.name]: event.target.value });
   };
 
   onScatterPlotClickCountry = d => {
@@ -956,10 +910,6 @@ class App extends Component {
     });    
   }
 
-  onMouseOverHighlightCountry = (code) => {
-    // console.log('highlight country:', code);
-  }
-
   onClickHighlightCountry = (code) => {
     this.setState({
       country: code,
@@ -1005,7 +955,6 @@ class App extends Component {
     if (vdemData.length === 0) {
       return;
     }
-    // const { gbifCountryFacetData } = this.state;
     const vdemXLabel = variableExplanations[vdemX] ? variableExplanations[vdemX].short_name : vdemX;
     
     let vdemYLabel = variableExplanations[vdemY] ? variableExplanations[vdemY].short_name : vdemY;
@@ -1036,42 +985,17 @@ class App extends Component {
         (regionFilter === 0 || this.countryMap[d.country].regionCode === regionFilter)
       )
     );
-
-
-    // vdemGrouped.forEach(d => {
-    //   if (d.value !== null && gbifCountryFacetData && gbifCountryFacetData[d.key]) {
-    //     d.value.records = gbifCountryFacetData[d.key].collections;
-    //   }
-    // });
     
     // Filter countries lacking values on the x y dimensions or have zero records (log safe)
     const vdemFiltered = vdemGrouped.filter(d => d.value !== null && d.value.records > 0);
-    // If the y axis is set to display number of records, replace the y axis with records
-    // if (vdemY === "records") {
-    //   vdemYLabel = 'Number of records';
-    //   vdemFiltered.forEach(d => {
-    //     d.value.y = d.value.records;
-    //   });
-    // }
-    
-
-    // console.log('vdemData:', vdemData);
-    // console.log('vdemGrouped:', vdemGrouped);
-    // console.log('vdemFiltered:', vdemFiltered);
-    // console.log('countryFacetData', gbifCountryFacetData);
 
     ScatterPlot(this.refScatterPlot.current, {
-      // data: vdemData,
-      // data: vdemFiltered,
-      // data: vdemGrouped,
       left: yAxisLabelGap[vdemY] || 70,
       xTickGap: 120,
       yLogScale: useLogScale[vdemY],
       xLogScale: useLogScale[vdemX],
       data: vdemFiltered,
       height: 300,
-      // x: d => d[vdemX],
-      // y: d => d[vdemY],
       xMin: vdemScaleMin[vdemX],
       xMax: vdemScaleMax[vdemX],
       yMin: vdemScaleMin[vdemY],
@@ -1133,8 +1057,6 @@ class App extends Component {
       )
     );
     
-    // console.log('recordsPerYear:', recordsPerYear);
-
     Brush(this.refBrush.current, {
       data: recordsPerYear,
       height: 70,
@@ -1145,15 +1067,10 @@ class App extends Component {
       xTickGap: 140,
       xMin: startYear,
       xMax: stopYear,
-      // yMin: 1,
-      // yMax: 50000000,
       x: d => d.key,
       y: d => d.value.records,
       barColor: d => regimeColor(d.value.regime),
       xLabel: '',
-      // yLabel: 'Number of records',
-      // title: 'Number of public species records per country and year',
-      // fetching
       onBrush: this.onBrush,
       selectedYears: [startYear, stopYear].map(year => new Date(year, 0)),
     });
@@ -1170,10 +1087,6 @@ class App extends Component {
     const vdemFiltered = vdemData
       .filter(d => d.country === this.state.country && d.year >= yearMin && d.year <= yearMax)
     
-    // const gbifDataFiltered = gbifData
-    //   .filter(d => d.year >= yearMin && d.year <= yearMax)
-    //   .sort((a,b) => a.year - b.year)
-    
     // Merge gbif data into vdem data 
     const gbifRecordsByYear = {};
     gbifData.forEach(d => {
@@ -1182,19 +1095,14 @@ class App extends Component {
     vdemFiltered.forEach(d => {
       d.records = gbifRecordsByYear[d.year] || 0;
     });
-    // console.log('gbifRecordsByYear:', gbifRecordsByYear);
-    // console.log('vdemFiltered:', vdemFiltered);
 
-    // console.log('renderCharts with fethcing:', fetching);
     DualChart(this.refDualChart.current, {
-      // data: gbifDataFiltered,
       data: vdemFiltered,
       height: 300,
       left: 70,
       right: yAxisLabelGap[vdemVariable] || 70,
       xTickGap: 140,
       xMin: yearMin,
-      // xMax: yearMax,
       yMin: 1,
       yMax: 50000000,
       y2LogScale: useLogScale[vdemVariable],
@@ -1202,12 +1110,9 @@ class App extends Component {
       y: d => d.records,
       y2: d => d[vdemVariable],
       aux: d => d.confl,
-      // aux: d => d.year < 2000,
       auxLabel: 'Conflict',
-      // z: d => d.v2x_regime,
       color: d => regimeColor(d.v2x_regime),
       fillOpacity: d => 0.75,
-      // zLabel: d => regimeTypes[d.v2x_regime],
       y2Min: 0,
       y2Max: vdemScaleMax[vdemVariable],
       xLabel: 'Year',
