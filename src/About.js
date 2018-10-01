@@ -85,7 +85,7 @@ class About extends React.Component {
           </h3>
 
           <p>
-            <a href="https://www.gbif.org">
+            <a target="_blank" rel="noopener noreferrer" href="https://www.gbif.org">
               The Global Biodiversity Information Facility (GBIF)
             </a>{" "}
             provides access to digitalized information on the geographic
@@ -98,9 +98,9 @@ class About extends React.Component {
             billion occurrence records collected in over three centuries around
             the globe. If you want to learn more about GBIF or access species
             occurrence information, visit{" "}
-            <a href="https://www.gbif.org">GBIF</a>. Bio-Dem fetches the number
+            <a target="_blank" rel="noopener noreferrer" href="https://www.gbif.org">GBIF</a>. Bio-Dem fetches the number
             of occurrence records live from the latest version of GBIF via the{" "}
-            <a href="https://www.gbif.org/developer/summary">GBIF API</a>.
+            <a target="_blank" rel="noopener noreferrer" href="https://www.gbif.org/developer/summary">GBIF API</a>.
           </p>
 
           <h3 id="v-dem">
@@ -108,7 +108,7 @@ class About extends React.Component {
           </h3>
 
           <p>
-            <a href="https://v-dem.net">Varieties of Democracy (V-Dem)</a> is a
+            <a target="_blank" rel="noopener noreferrer" href="https://v-dem.net">Varieties of Democracy (V-Dem)</a> is a
             research project dedicated to the conceptualization and collection
             of data on democracy. It is one of the largest existent databases on
             democracy containing over 18 million data points, where the latest
@@ -120,21 +120,21 @@ class About extends React.Component {
             subjective measures through a Bayesian modelling procedure,
             accounting for coder bias and heterogeneity across countries and
             years. For more information, visit{" "}
-            <a href="https://www.v-dem.net/en/">V-Dem's website</a>, read{" "}
-            <a href="http://journals.sagepub.com/doi/abs/10.1177/0192512115622046?journalCode=ipsa">
+            <a target="_blank" rel="noopener noreferrer" href="https://www.v-dem.net/en/">V-Dem's website</a>, read{" "}
+            <a target="_blank" rel="noopener noreferrer" href="http://journals.sagepub.com/doi/abs/10.1177/0192512115622046?journalCode=ipsa">
               "Measuring high level democratic principles using the V-Dem data"
             </a>{" "}
             or{" "}
-            <a href="https://www.v-dem.net/en/data/data-version-8/">
+            <a target="_blank" rel="noopener noreferrer" href="https://www.v-dem.net/en/data/data-version-8/">
               download the data and browse the codebook
             </a>
             . Bio-Dem currently{" "}
-            <a href="https://github.com/AntonelliLab/Bio-Dem/blob/master/public/data/vdem_variables.csv">
+            <a target="_blank" rel="noopener noreferrer" href="https://github.com/AntonelliLab/Bio-Dem/blob/master/public/data/vdem_variables.csv">
               uses V-Dem version 8
             </a>{" "}
             and will be updated as new versions are being published. The current
             selected data for the application can be downloaded{" "}
-            <a href={vdemDataUrl} download target="blank">
+            <a target="_blank" rel="noopener noreferrer" href={vdemDataUrl} download >
               here
             </a>
             .
@@ -146,7 +146,7 @@ class About extends React.Component {
             records from any given country and the political situation in this
             country. It must be noted that, in general, correlation is not
             causation (see{" "}
-            <a href="http://www.tylervigen.com/spurious-correlations">here</a>{" "}
+            <a target="_blank" rel="noopener noreferrer" href="http://www.tylervigen.com/spurious-correlations">here</a>{" "}
             for illustrative examples) and that, in particular, there are some
             caveats related to the data used by Bio-Dem. For instance, the
             amount of occurrence information available from GBIF is only a crude
@@ -193,18 +193,18 @@ class About extends React.Component {
 
           <h2 id="contact">Contact</h2>
           <div>
-            <a href="https://alexanderzizka.net/">Alexander Zizka</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://alexanderzizka.net/">Alexander Zizka</a>
           </div>
           <div>
-            <a href="http://icelab.se/about/team/daniel-edler/">
+            <a target="_blank" rel="noopener noreferrer" href="http://icelab.se/about/team/daniel-edler/">
               Daniel Edler
             </a>
           </div>
           <div>
-            <a href="https://www.linkedin.com/in/oskarryden/">Oskar Ryden</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/oskarryden/">Oskar Ryden</a>
           </div>
           <div>
-            <a href="https://www.linkedin.com/in/dr-johannes-klein-220479127/">
+            <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/dr-johannes-klein-220479127/">
               Johannes Klein
             </a>
           </div>
@@ -212,9 +212,9 @@ class About extends React.Component {
           <p>
             <a href="mailto:bio-dem@googlegroups.com">Contact us</a>, check out
             the{" "}
-            <a href="https://github.com/AntonelliLab/Bio-Dem">source code</a> or
+            <a target="_blank" rel="noopener noreferrer" href="https://github.com/AntonelliLab/Bio-Dem">source code</a> or
             file a{" "}
-            <a href="https://github.com/AntonelliLab/Bio-Dem/issues">
+            <a target="_blank" rel="noopener noreferrer" href="https://github.com/AntonelliLab/Bio-Dem/issues">
               bug report
             </a>
             .
