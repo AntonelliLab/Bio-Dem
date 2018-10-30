@@ -3,7 +3,7 @@ import countryCodes from '../helpers/countryCodes';
 import { countries } from './data';
 import sortyBy from 'lodash/sortBy';
 
-const baseURL = "http://api.gbif.org/v1/";
+const baseURL = "https://api.gbif.org/v1/";
 const occ = "occurrence/search";
 const autoc = "species/suggest";
 

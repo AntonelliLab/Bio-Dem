@@ -34,7 +34,7 @@
     "eject": "react-scripts eject",
     "deploy-test-A": "surge build/ a.bio-dem.surge.sh",
     "deploy-test-B": "surge build/ b.bio-dem.surge.sh",
-    "deploy": "surge build/ bio-dem.surge.sh"
+    "deploy": "surge build/ https://bio-dem.surge.sh"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

@@ -378,8 +378,8 @@ class About extends React.Component {
 }
 
 About.propTypes = {
-  vdemExplanations: PropTypes.object.isRequired,
-  gbifExplanations: PropTypes.object.isRequired,
+  vdemExplanations: PropTypes.array.isRequired,
+  gbifExplanations: PropTypes.array.isRequired,
 };
 
 export default About;
