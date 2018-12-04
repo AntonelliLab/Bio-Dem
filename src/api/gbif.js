@@ -3,12 +3,14 @@ import countryCodes from '../helpers/countryCodes';
 import { countries } from './data';
 import sortyBy from 'lodash/sortBy';
 
+const countriesFiltered = countries.filter(alpha3 => countryCodes.alpha3ToAlpha2(alpha3));
+
 const baseURL = "https://api.gbif.org/v1/";
 const occ = "occurrence/search";
 const autoc = "species/suggest";
 
 
-export const queryGBIFYearFacet = async (country, onlyDomestic, onlyWithImages, taxonFilter) => {
+export const queryGBIFYearFacet = async (country, { onlyDomestic = false, onlyWithImage = false, taxonFilter = '' }) => {
   // Construct the GBIF occurrences API url with facets for year counts
   const url = `${baseURL}${occ}`;
   const params = {
@@ -23,7 +25,7 @@ export const queryGBIFYearFacet = async (country, onlyDomestic, onlyWithImages, 
   if (taxonFilter) {
     params.taxonKey = taxonFilter;
   }
-  if (onlyWithImages) {
+  if (onlyWithImage) {
     params.mediaType = 'StillImage';
   }
 
@@ -36,7 +38,7 @@ export const queryGBIFYearFacet = async (country, onlyDomestic, onlyWithImages, 
     .catch(error => {
       console.log(
         "Error in fetching results from the GBIF API",
-        error
+        error.message
       );
       return { error };
     });
@@ -60,23 +62,25 @@ export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = 2017) => {
   .catch(error => {
     console.log(
       "Error in fetching results from the GBIF API",
-      error
+      error.message
     );
     return { error };
   });
 };
 
-export const fetchRecordsPerCountryPerYear = async ({ yearMin, yearMax } = { yearMin: 1960, yearMax: 2017 }) => {
+
+export const fetchRecordsPerCountryPerYear = async ({ yearMin = 1960, yearMax = 2017, taxonFilter = '' }) => {
   // Construct the GBIF occurrences API url with facets for country counts
   let result = [];
-  const responses = await Promise.all(countries.map(country => 
-    queryGBIFYearFacet(countryCodes.alpha3ToAlpha2(country))
+
+  const responses = await Promise.all(countriesFiltered.map(country => 
+    queryGBIFYearFacet(countryCodes.alpha3ToAlpha2(country), { taxonFilter })
   ));
   responses.forEach((res, i) => {
     if (res.error) {
       return { error: res.error };
     }
-    const country = countries[i];
+    const country = countriesFiltered[i];
     res.response.data.facets[0].counts.forEach(d => {
       const year = +d.name;
       if (year >= yearMin && year <= yearMax) {

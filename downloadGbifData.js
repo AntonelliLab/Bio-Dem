@@ -1,4 +1,14 @@
 require('@babel/register');
-const downloadGbifData = require('./bin/downloadGbifData').default;
+const api = require('./bin/downloadGbifData');
+const { downloadRecords, downloadRecordsByTaxons } = api;
 
-downloadGbifData();
+// const [,,taxonKey] = process.argv;
+const taxonFilters = process.argv.slice(2) || [''];
+
+if(taxonFilters.length === 0) {
+  downloadRecords();
+} else {
+  // If using multiple taxon filters, use 'all' as first to not 
+  // miss records by the left join
+  downloadRecordsByTaxons(taxonFilters);
+}

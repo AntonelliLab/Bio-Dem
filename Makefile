@@ -1,7 +1,7 @@
 VDEM_DATA_FILENAME = vdem_variables.csv
 VDEM_EXPLANATIONS_FILENAME = vdem_variables_explanations.csv
 
-.phony: data
+.phony: data download-taxon-data
 
 data: public/data/$(VDEM_DATA_FILENAME) public/data/gbif_data.csv
 	@true
@@ -16,3 +16,6 @@ public/data/$(VDEM_EXPLANATIONS_FILENAME):
 
 public/data/gbif_data.csv:
 	node downloadGbifData.js
+
+download-taxon-data:
+	node downloadGbifData.js all Mammalia Amphibia Reptilia
