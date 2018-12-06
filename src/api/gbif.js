@@ -69,12 +69,13 @@ export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = 2017) => {
 };
 
 
-export const fetchRecordsPerCountryPerYear = async ({ yearMin = 1960, yearMax = 2017, taxonFilter = '' }) => {
+export const fetchRecordsPerCountryPerYear = async ({
+  yearMin = 1960, yearMax = 2017, taxonFilter = '', onlyDomestic = false }) => {
   // Construct the GBIF occurrences API url with facets for country counts
   let result = [];
 
   const responses = await Promise.all(countriesFiltered.map(country => 
-    queryGBIFYearFacet(countryCodes.alpha3ToAlpha2(country), { taxonFilter })
+    queryGBIFYearFacet(countryCodes.alpha3ToAlpha2(country), { taxonFilter, onlyDomestic })
   ));
   responses.forEach((res, i) => {
     if (res.error) {

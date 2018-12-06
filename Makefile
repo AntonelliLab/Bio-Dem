@@ -19,3 +19,6 @@ public/data/gbif_data.csv:
 
 download-taxon-data:
 	node downloadGbifData.js all Mammalia Amphibia Reptilia
+
+download-taxon-data-split-by-domestic-records:
+	node downloadGbifData.js all Mammalia Amphibia Reptilia --add-domestic

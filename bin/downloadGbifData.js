@@ -29,9 +29,9 @@ export async function downloadRecords() {
  * Reptilia: 358
  * Amphibia: 131
  */
-export async function downloadRecordsByTaxon(taxonFilter) {
+export async function downloadRecordsByTaxon(taxonFilter, { onlyDomestic = false } = {}) {
   try {
-    console.log(`Download records with taxon filter:`, taxonFilter);
+    console.log(`Download records (onlyDomestic = ${onlyDomestic}) with taxon filter:`, taxonFilter);
     let taxon = { name: 'all', key: undefined };
     if (taxonFilter && taxonFilter !== 'all') {
       let taxonKey = +taxonFilter;
@@ -45,7 +45,7 @@ export async function downloadRecordsByTaxon(taxonFilter) {
       console.log('Using taxon filter:', JSON.stringify(taxon));
     }
     console.log(`Fetching occurrences records per country per year from gbif...`);
-    const records = await fetchRecordsPerCountryPerYear({ taxonFilter: taxon.key });
+    const records = await fetchRecordsPerCountryPerYear({ taxonFilter: taxon.key, onlyDomestic });
     console.log(`Got ${records.length} records!`);
     return { name: taxon.name, records };
   }
@@ -60,8 +60,9 @@ export async function downloadRecordsByTaxon(taxonFilter) {
  * Examples: ['all', 'mammalia', 'reptilia', 'amphibia'].
  * The results will be merged to the records of the first search result
  * The search term 'all' means no filter.
+ * @param addDomestic for each filter, add a column with the number of records from domestic institutions
  */
-export async function downloadRecordsByTaxons(taxonFilters = []) {
+export async function downloadRecordsByTaxons(taxonFilters = [], { addDomestic = false } = {}) {
   try {
     if (taxonFilters.length === 0) {
       console.error(`No taxon filter specified. Use 'all' or empty string for all records.`);
@@ -76,6 +77,11 @@ export async function downloadRecordsByTaxons(taxonFilters = []) {
     for (let filter of filters) {
       const result = await downloadRecordsByTaxon(filter);
       data.push(result);
+      if (addDomestic) {
+        const domesticResult = await downloadRecordsByTaxon(filter, { onlyDomestic: true });
+        domesticResult.name = `${domesticResult.name}-domestic`;
+        data.push(domesticResult);
+      }
     }
     
     console.log(`Got ${data.length} resulting datasets:`, JSON.stringify(data.map(r => {
@@ -110,4 +116,20 @@ export async function downloadRecordsByTaxons(taxonFilters = []) {
     console.error('Error:', err);
     return [];
   }
+}
+
+export default async function run(argv) {
+  const cli = require('minimist')(argv);
+  
+  const taxonFilters = cli._;
+  const addDomestic = cli['add-domestic'];
+
+  if(taxonFilters.length === 0) {
+    downloadRecords();
+  } else {
+    // If using multiple taxon filters, use 'all' as first to not 
+    // miss records by the left join
+    downloadRecordsByTaxons(taxonFilters, { addDomestic });
+  }
+
 }
