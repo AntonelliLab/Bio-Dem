@@ -31,3 +31,14 @@ yarn-error.log*
 
 # manuscript
 /manuscript
+nee_examples/
+output/
+data/
+old/
+input/
+
+# figures
+figures/*.jpg
+figures/*.svg
+figures/*.png
+
