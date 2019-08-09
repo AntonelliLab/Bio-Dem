@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2018.12.7)  9 AUG 2019 14:49
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2018.12.7)  9 AUG 2019 19:25
 entering extended mode
 **./Bio-Dem_manuscript.tex
 (Bio-Dem_manuscript.tex
@@ -867,12 +867,12 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [2] [3] [4] [5] [6] [7]
-<figures/Figure1_biodiversity_democracy.pdf, id=79, 1156.32pt x 829.34746pt>
+<figures/Figure1_biodiversity_democracy.pdf, id=79, 1156.32pt x 794.97pt>
 File: figures/Figure1_biodiversity_democracy.pdf Graphic file (type pdf)
 <use figures/Figure1_biodiversity_democracy.pdf>
 Package pdftex.def Info: figures/Figure1_biodiversity_democracy.pdf  used on in
 put line 171.
-(pdftex.def)             Requested size: 469.75385pt x 336.92157pt.
+(pdftex.def)             Requested size: 469.75385pt x 322.95576pt.
 <figures/Figure2_biodem.pdf, id=80, 597.51233pt x 691.5215pt>
 File: figures/Figure2_biodem.pdf Graphic file (type pdf)
 <use figures/Figure2_biodem.pdf>
@@ -892,13 +892,13 @@ Package rerunfilecheck Info: File `Bio-Dem_manuscript.out' has not changed.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 179.
  ) 
 Here is how much of TeX's memory you used:
- 14055 strings out of 492970
- 212274 string characters out of 3125262
- 320586 words of memory out of 3000000
+ 14057 strings out of 492970
+ 212296 string characters out of 3125262
+ 321586 words of memory out of 3000000
  17620 multiletter control sequences out of 15000+200000
- 58028 words of font info for 90 fonts, out of 3000000 for 9000
+ 58119 words of font info for 91 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 36i,10n,43p,1292b,358s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 36i,10n,43p,1319b,358s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/lm-ec
 .enc}<C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/lm
 /lmbx12.pfb><C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pu
@@ -907,9 +907,9 @@ pe1/public/lm/lmr17.pfb><C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 2.9/fo
 nts/type1/public/lm/lmri10.pfb><C:/Users/az64mycy/AppData/Local/Programs/MiKTeX
  2.9/fonts/type1/public/lm/lmri12.pfb><C:/Users/az64mycy/AppData/Local/Programs
 /MiKTeX 2.9/fonts/type1/public/lm/lmss8.pfb>
-Output written on Bio-Dem_manuscript.pdf (9 pages, 1181004 bytes).
+Output written on Bio-Dem_manuscript.pdf (9 pages, 1275782 bytes).
 PDF statistics:
- 1189 PDF objects out of 1200 (max. 8388607)
+ 1203 PDF objects out of 1440 (max. 8388607)
  29 named destinations out of 1000 (max. 500000)
  14387 words of extra memory for PDF output out of 14400 (max. 10000000)
 
