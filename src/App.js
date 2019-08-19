@@ -13,7 +13,10 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Zoom from '@material-ui/core/Zoom';
-import ToggleButton, { ToggleButtonGroup } from "@material-ui/lab/ToggleButton";
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconDownload from '@material-ui/icons/CloudDownload';
 // import IconPlay from '@material-ui/icons/PlayCircleOutline';
 // import IconPause from '@material-ui/icons/PauseCircleOutline';
@@ -288,25 +291,31 @@ ColorLegend.propTypes = {
   type: PropTypes.oneOf(['regime', 'region']),
 };
 
-const HighlightsButtonGroup = (props) => (
+const HighlightsPanel = (props) => (
   <div className="highlightsContainer">
-    <Typography variant="subheading" gutterBottom style={{ paddingLeft: 0 }}>
+    <Typography variant="subtitle1" gutterBottom style={{ paddingLeft: 0 }}>
       Highlights
     </Typography>
-    <ToggleButtonGroup {...props} exclusive selected={false} >
+    <React.Fragment>
       {
         props.highlights.map((h, index) => (
-          <ToggleButton key={index} value={index}>
-            <Typography variant="body1" gutterBottom>
-              {h.buttonLabel}
+          <ExpansionPanel key={index} expanded={props.value === index} onChange={() => props.onChange(index)}>
+          <ExpansionPanelSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls={`${props.label}_panel${index}-content`}
+            id={`${props.label}_panel${index}-header`}
+          >
+            <Typography>{h.buttonLabel}</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <Typography variant="body2">
+              {props.highlights[index].explanation}
             </Typography>
-          </ToggleButton>
+          </ExpansionPanelDetails>
+          </ExpansionPanel>
         ))
       }
-    </ToggleButtonGroup>
-    <Typography variant="body1" gutterBottom>
-      { props.value !== null ? props.highlights[props.value].explanation : null }
-    </Typography>
+    </React.Fragment>
   </div>
 );
 
@@ -367,7 +376,7 @@ class App extends Component {
         explanation: <span>
           The majority of high record countries (large bubbles) are democracies (yellow or green) and located in the lower right corner of the plot. The majority of low record countries (small bubbles) are in the lower left corner, indicating that higher polyarchy corresponds to more collected records. There are four countries, two closed autocracies (<Country code="BTN" name="Bhutan"/> and <Country code="SAU" name="Saudi Arabia"/>, purple), one electoral autocracy (Seychelles, blue) and one electoral democracy (Venezuela), that protect a relatively large share of land area.
         </span>,
-        onActvatedNewState:
+        onActivatedNewState:
         {
           vdemY: e_wri_pa,
           vdemX: v2x_polyarchy,
@@ -380,7 +389,7 @@ class App extends Component {
         explanation: <span>
           The majority of high record countries are liberal democracies (large, yellow bubbles) and have little corruption. Furthermore, record collection seems largely independent of the level of corruption (large bubbles are distributed horizontally) and corrupt countries can have many collection records. Additionally, corrupt countries can have relatively larger share of protected areas.
         </span>,
-        onActvatedNewState:
+        onActivatedNewState:
         {
           vdemY: e_wri_pa,
           vdemX: v2x_corr,
@@ -393,7 +402,7 @@ class App extends Component {
         explanation: <span>
           Democratic and economically developed countries often have many GBIF records (large bubbles cluster in the upper right corner of the plot). However, some economically rich countries have very few records (small bubbles with high values on the y-axis: <Country code="CYP" name="Cyprus"/>, <Country code="LBY" name="Libya"/>), and some relatively less developed countries have a large number of records (<Country code="CHN" name="China"/>, <Country code="IND" name="India"/>, <Country code="TZA" name="Tanzania"/> and <Country code="BTN" name="Uganda"/>), indicating heterogeneity of biological record collection across both democracy and economic development.
         </span>,
-        onActvatedNewState:
+        onActivatedNewState:
         {
           vdemY: e_migdppc,
           vdemX: v2x_polyarchy,
@@ -406,7 +415,7 @@ class App extends Component {
         explanation: <span>
           The number of available occurrence records increases with GDP per capita and length of education (bubble size increases from the lower left to the upper right corner). For instance, <Country code="BDI" name="Burundi"/> (purple bubble in the lower left corner) and <Country code="CAN" name="Canada"/> (yellow bubble in the upper right corner), are typical examples for this trend. In contrast <Country code="IND" name="India"/> does not follow the general pattern, being a large bubble in the lower left corner.
         </span>,
-        onActvatedNewState:
+        onActivatedNewState:
         {
           vdemY: e_peaveduc,
           vdemX: e_migdppc,
@@ -422,7 +431,7 @@ class App extends Component {
         explanation: <span>
           The Angolan Civil War. In 1975, when the Angolan Civil War broke out, the collection activity drops drastically. This pattern is valid up until the end of the 1990's, a couple of years before the war ended and is visible for domestic and total collections. Ticking the "only domestic records box" furthermore reveals the importance of foreign collections for the country, especially until the mid 1990ies.
         </span>,
-        onActvatedNewState:
+        onActivatedNewState:
         {
           country: 'AGO',
           vdemVariable: v2x_polyarchy,
@@ -436,7 +445,7 @@ class App extends Component {
         explanation: <span>
           The Emergency in India 1975 and domestic records. From 1975 and 1977, "The Emergency" took place in India, an event of political turmoil where the prime minister declared a state of emergency and put political rights on freeze in order to take control over the rule. We see that this instability event coincides with a drop in domestic biological record collection.
         </span>,
-        onActvatedNewState:
+        onActivatedNewState:
         {
           country: 'IND',
           vdemVariable: v2x_polyarchy,
@@ -450,7 +459,7 @@ class App extends Component {
         explanation: <span>
           The fall of the Soviet Union. In Czechia, record availability from domestic institutions only starts after the Soviet Union collapsed. Possibly a partial effect from the political liberalization and the country's independence."
         </span>,
-        onActvatedNewState:
+        onActivatedNewState:
         {
           country: 'CZE',
           vdemVariable: v2x_polyarchy,
@@ -464,7 +473,7 @@ class App extends Component {
         explanation: <span>
           Decades of political instability in Cambodia. Starting in the 1970\'s, Cambodia experienced a long period of conflicts and autocratization, which coincides with a decrease in biological record collection during this period.
         </span>,
-        onActvatedNewState:
+        onActivatedNewState:
         {
           country: 'KHM',
           vdemVariable: v2x_polyarchy,
@@ -478,7 +487,7 @@ class App extends Component {
         explanation: <span>
           Economic development and domestic collections in Indonesia. In the beginning of the 1980\'s, we see a start of domestic record collection that which increases following Indonesia\'s acceleration in gross domestic product per capita increase in the 1990\'ies. Displaying all records show that the proportion collected by domestic institutions also increases.
         </span>,
-        onActvatedNewState:
+        onActivatedNewState:
         {
           country: 'IDN',
           vdemVariable: e_migdppc,
@@ -788,14 +797,14 @@ class App extends Component {
    */
   onScatterPlotHighlightsChange = (index) => {
     // Set state for button being selected
-    this.setState({ activeScatterPlotHighlight: index });
+    this.setState({ activeScatterPlotHighlight: index === this.state.activeScatterPlotHighlight ? null : index });
     // If the current highlight is deselected, do nothing
     if (index === null) {
       return;
     }
     // Set the state of the ScatterPlot as defined in the highlights array
     this.setState(
-      this.scatterPlotHighlights[index].onActvatedNewState,
+      this.scatterPlotHighlights[index].onActivatedNewState,
       () => {
         this.renderScatterPlot();
       }
@@ -807,14 +816,14 @@ class App extends Component {
    */
   onDualChartHighlightsChange = (index) => {
     // Set state for button being selected
-    this.setState({ activeDualChartHighlight: index });
+    this.setState({ activeDualChartHighlight: index === this.state.activeDualChartHighlight ? null : index });
     // If the current highlight is deselected, do nothing
     if (index === null) {
       return;
     }
     // Set the state of the DualChart as defined in the highlights array
     this.setState(
-      this.dualChartHighlights[index].onActvatedNewState,
+      this.dualChartHighlights[index].onActivatedNewState,
       () => {
         this.renderDualChart();
       }
@@ -1128,14 +1137,14 @@ class App extends Component {
       <div className="App">
         <AppBar color="primary" position="fixed" className="appbar">
           <Toolbar variant="dense">
-            <IconButton href="#top" color="inherit" aria-label="Home">
+            <IconButton href="#top" color="inherit" aria-label="Home" style={{ padding: 0 }}>
               <BioDemLogo className="appbar-logo" alt="appbar-logo" />
             </IconButton>
             <Button href="#about" color="inherit">About</Button>
             <Button href="#tutorials" color="inherit">Tutorials</Button>
             <Button href="#contact" color="inherit">Contact</Button>
             <span style={{ flexGrow: 1 }} />
-            <IconButton href="https://github.com/AntonelliLab/Bio-Dem" color="inherit" aria-label="Github">
+            <IconButton href="https://github.com/AntonelliLab/Bio-Dem" color="inherit" aria-label="Github" style={{ padding: 8 }}>
               <IconGithub />
             </IconButton>
           </Toolbar>
@@ -1146,11 +1155,11 @@ class App extends Component {
             <Grid container direction="column" alignItems="center">
               <Grid item style={{ marginTop: 0, padding: '40px 0' }}>
                 <Grid container direction="column" alignItems="center">
-                  <Typography variant="display2" gutterBottom className="heading">
+                  <Typography variant="h3" gutterBottom className="heading" style={{ color: 'rgba(0, 0, 0, 0.54)'}}>
                     Bio-Dem
                   </Typography>
                   <div style={{ borderTop: '1px solid #ccc', marginTop: -10, paddingTop: 10 }}>
-                    <Typography variant="headline" gutterBottom className="heading" style={{ color: '#666' }}>
+                    <Typography variant="h5" gutterBottom className="heading" style={{ color: '#666' }}>
                       <strong>Biodiversity</strong> knowledge &amp; <strong>democracy</strong>
                     </Typography>
                   </div>
@@ -1161,15 +1170,15 @@ class App extends Component {
           <Grid item className="grid-item section section-1" xs={12}>
             <Grid container>
               <Grid item className="grid-item" xs={12} style={{ paddingTop: 10 }}>
-                <Typography variant="subheading" gutterBottom>
+                <Typography variant="subtitle1" gutterBottom>
                   Welcome to explore the connection between <em>biodiversity</em> data and dimensions of <em>democracy</em> across the globe, using open data from <a href="#gbif"><strong>GBIF</strong></a> and <a href="#v-dem"><strong>V-Dem</strong></a>. Checkout our <a href="#tutorials">video tutorial</a> to get started!
                 </Typography>
               </Grid>
               <Grid item className="grid-item" xs={12} md={4}>
-                <Typography variant="headline" gutterBottom className="heading">
+                <Typography variant="h5" gutterBottom className="heading">
                   Biodiversity knowledge &amp; political regimes
                 </Typography>
-                <Typography variant="body1" gutterBottom>
+                <Typography variant="body2" gutterBottom>
                   In this interactive scatterplot, each data bubble represents a political country; the size of the bubbles indicates 
 				  the number of occurrence record available from this country. 
 				  Hover over any bubble for the country name and the number of records. Use the drop down menus to customize the x- and y-axis
@@ -1177,19 +1186,20 @@ class App extends Component {
 				  Click on a bubble to view the time series of collections from this country in the plot below.
 				  Use the highlight buttons below to choose preselected plots showing particularly exciting results.
                 </Typography>
-                <HighlightsButtonGroup
+                <HighlightsPanel
+                  label="scatterplot-highlights"
                   highlights={this.scatterPlotHighlights}
                   onChange={this.onScatterPlotHighlightsChange}
                   value={this.state.activeScatterPlotHighlight}
                 />
                 {
                   this.state.downloadUrlScatterPlot ? (
-                    <Button variant="raised" size="small" color="primary" href={this.state.downloadUrlScatterPlot} onClick={this.onClickDownloadScatterPlot} download="bio-dem_scatterplot.svg" target="blank">
+                    <Button variant="contained" size="small" color="primary" href={this.state.downloadUrlScatterPlot} onClick={this.onClickDownloadScatterPlot} download="bio-dem_scatterplot.svg" target="blank">
                       <IconDownload style={{ marginRight: 5 }}/>
                       Download svg
                     </Button> 
                   ) : (
-                    <Button variant="raised" size="small" onClick={this.onClickGenerateSvgScatterPlot}>
+                    <Button variant="contained" size="small" onClick={this.onClickGenerateSvgScatterPlot}>
                       Generate svg...
                     </Button>
                   )
@@ -1305,29 +1315,30 @@ class App extends Component {
           <Grid item className="grid-item section section-2" xs={12}>
             <Grid container>
               <Grid item className="grid-item" xs={12} md={4}>
-                <Typography variant="headline" gutterBottom className="heading">
+                <Typography variant="h5" gutterBottom className="heading">
                   Biodiversity knowledge through time 
                 </Typography>
-                <Typography variant="body1" gutterBottom>
+                <Typography variant="body2" gutterBottom>
                   The evolution of species occurrence recording through time. The bars show the number of occurrence records collected from the selected 
 				  country each year on a logarithmic scale (left y-axis). The overlaid line shows the development of a selected democracy indicator (right y axis). 
 				  Red blocks at the bottom of the bars indicate years with armed conflict on the country territory. Chose any country and democracy indicator 
 				  with the drop-down menus, customize the record count to include only records from domestic 
 				  institutions or records associated with pictures using the tick boxes and filter to certain taxa using the free text field. The selected country will be highlighted in the bubble chart. Use the buttons below this text to display selected plots that highlight particularly interesting results.
                 </Typography>
-                <HighlightsButtonGroup
+                <HighlightsPanel
+                  label="timeplot-highlights"
                   highlights={this.dualChartHighlights}
                   onChange={this.onDualChartHighlightsChange}
                   value={this.state.activeDualChartHighlight}
                 />
                 {
                   this.state.downloadUrlDualChart ? (
-                    <Button variant="raised" size="small" color="primary" href={this.state.downloadUrlDualChart} onClick={this.onClickDownloadDualChart} download="bio-dem_dualchart.svg" target="blank">
+                    <Button variant="contained" size="small" color="primary" href={this.state.downloadUrlDualChart} onClick={this.onClickDownloadDualChart} download="bio-dem_dualchart.svg" target="blank">
                       <IconDownload style={{ marginRight: 5 }}/>
                       Download svg
                     </Button> 
                   ) : (
-                    <Button variant="raised" size="small" onClick={this.onClickGenerateSvgDualChart}>
+                    <Button variant="contained" size="small" onClick={this.onClickGenerateSvgDualChart}>
                       Generate svg...
                     </Button>
                   )
