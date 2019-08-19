@@ -1,10 +1,46 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
+import Box from '@material-ui/core/Box';
 import Youtube from 'react-youtube';
 import './About.css';
+import { Typography } from '@material-ui/core';
 
 const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
+
+
+const partners = [
+  {
+    short: 'GGBC',
+    long: 'Gothenburg Global Biodiversity Center',
+    logo: `${process.env.PUBLIC_URL}/logos/ggbc.png`,
+    url: 'https://ggbc.gu.se'
+  },
+  {
+    short: 'Kew',
+    long: 'Royal Botanic Gardens, Kew',
+    logo: `${process.env.PUBLIC_URL}/logos/kew.png`,
+    url: 'https://www.kew.org'
+  },
+  {
+    short: 'V-Dem',
+    long: 'Varieties of Democracy',
+    logo: `${process.env.PUBLIC_URL}/logos/v-dem.png`,
+    url: 'https://www.v-dem.net'
+  },
+  {
+    short: 'iDiv',
+    long: 'German Centre for Integrative Biodiversity Research',
+    logo: `${process.env.PUBLIC_URL}/logos/idiv.png`,
+    url: 'https://www.idiv.de/'
+  },
+  {
+    short: 'BECC',
+    long: 'Biodiversity and Ecosystem services in a Changing Climate',
+    logo: `${process.env.PUBLIC_URL}/logos/becc.png`,
+    url: 'https://www.becc.lu.se'
+  },
+];
 
 class About extends React.Component {
   render() {
@@ -191,9 +227,12 @@ class About extends React.Component {
           </div>
           
 
-          <h2 id="contact">Contact</h2>
+          <h2 id="team">Team</h2>
           <div>
             <a target="_blank" rel="noopener noreferrer" href="https://alexanderzizka.net/">Alexander Zizka</a>
+          </div>
+          <div>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/oskarryden/">Oskar Ryden</a>
           </div>
           <div>
             <a target="_blank" rel="noopener noreferrer" href="http://icelab.se/about/team/daniel-edler/">
@@ -201,13 +240,32 @@ class About extends React.Component {
             </a>
           </div>
           <div>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/oskarryden/">Oskar Ryden</a>
-          </div>
-          <div>
             <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/dr-johannes-klein-220479127/">
               Johannes Klein
             </a>
           </div>
+          <div>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.v-dem.net/en/v-dem-institute/staff/">
+              Staffan Lindberg
+            </a>
+          </div>
+          <div>
+            <a target="_blank" rel="noopener noreferrer" href="https://www.kew.org/science/our-science/people/alexandre-antonelli">
+              Alexandre Antonelli
+            </a>
+          </div>
+
+          <h3>Partners</h3>
+          { partners.map(partner => <div key={partner.short}><a href={partner.url}>{`${partner.short} - ${partner.long}`}</a></div>) }
+
+          <Box id="partners" display="flex" flexWrap="wrap">
+            { partners.map(partner => (
+              <Box key={partner.short} display="flex" flexDirection="column" alignItems="center" component="a" href={partner.url} p={1} title={partner.long}>
+                { partner.logo ? <img alt={partner.short} src={partner.logo} height={80} /> : null }
+                { false ? <Typography>{partner.long}</Typography> : null }
+              </Box>
+            ))}
+          </Box>
 
           <p>
             <a href="mailto:bio-dem@googlegroups.com">Contact us</a>, check out

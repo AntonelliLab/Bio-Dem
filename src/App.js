@@ -1142,7 +1142,7 @@ class App extends Component {
             </IconButton>
             <Button href="#about" color="inherit">About</Button>
             <Button href="#tutorials" color="inherit">Tutorials</Button>
-            <Button href="#contact" color="inherit">Contact</Button>
+            <Button href="#team" color="inherit">Team</Button>
             <span style={{ flexGrow: 1 }} />
             <IconButton href="https://github.com/AntonelliLab/Bio-Dem" color="inherit" aria-label="Github" style={{ padding: 8 }}>
               <IconGithub />
