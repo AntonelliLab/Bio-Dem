@@ -71,6 +71,7 @@ a, strong {
 
 .heading {
   font-family: 'Playfair Display', serif !important;
+  color: rgba(0, 0, 0, 0.87);
 }
 
 .formControl {

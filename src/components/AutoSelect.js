@@ -3,6 +3,7 @@ import ReactSelect from "react-select";
 import PropTypes from "prop-types";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import { Input, MenuItem } from "@material-ui/core";
+import Select from '@material-ui/core/Select';
 
 const ITEM_HEIGHT = 48;
 
@@ -144,5 +145,16 @@ AutoSelect.defaultProps = {
   isClearable: false,
 };
 
+const MuiSelect = ({ options, value, onChange, input }) => (
+  <Select
+    value={value}
+    onChange={onChange}
+    input={input}
+  >
+  { options.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>) }
+  </Select>
+);
+
 // export default withStyles(styles, { withTheme: true })(AutoSelect);
-export default AutoSelect;
+// export default AutoSelect;
+export default MuiSelect;

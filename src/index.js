@@ -3,16 +3,17 @@ import { render } from 'react-dom';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
+import { createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles';
 import muiTheme from './theme';
 
-const theme = createMuiTheme(muiTheme);
+const theme = responsiveFontSizes(createMuiTheme(muiTheme));
 
 const Index = () => (
-  <MuiThemeProvider theme={theme}>
+  <ThemeProvider theme={theme}>
     <CssBaseline />
     <App />
-  </MuiThemeProvider>
+  </ThemeProvider>
 )
 
 const rootElement = document.getElementById('root');
