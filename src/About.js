@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import Youtube from 'react-youtube';
+import ReactPlayer from 'react-player'
 import './About.css';
 import { Typography } from '@material-ui/core';
 
@@ -216,14 +216,20 @@ class About extends React.Component {
             Tutorial 1 - Biodiversity knowledge & political regimes
           </h3>
           <div className="youtube-wrapper">
-            <Youtube videoId="dkUHRdBRUj0" />
+            <ReactPlayer
+              url="https://www.youtube.com/watch?v=dkUHRdBRUj0"
+              config={{ youtube: { playerVars: { origin: window.location.origin } } }}
+            />
           </div>
 
           <h3 id="tutorial2Biodiversityknowledgethroughtime">
             Tutorial 2 - Biodiversity knowledge through time
           </h3>
           <div className="youtube-wrapper">
-            <Youtube videoId="9c4-qgBXYw4" />
+            <ReactPlayer
+              url="https://www.youtube.com/watch?v=9c4-qgBXYw4"
+              config={{ youtube: { playerVars: { origin: window.location.origin } } }}
+            />
           </div>
           
 
