@@ -1145,6 +1145,7 @@ class App extends Component {
             <Button href="#tutorials" color="inherit">Tutorials</Button>
             <Button href="#team" color="inherit">Team</Button>
             <span style={{ flexGrow: 1 }} />
+            <span>{`${process.env.REACT_APP_VERSION}`}</span>
             <IconButton href="https://github.com/AntonelliLab/Bio-Dem" color="inherit" aria-label="Github" style={{ padding: 8 }}>
               <IconGithub />
             </IconButton>
