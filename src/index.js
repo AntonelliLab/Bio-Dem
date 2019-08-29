@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import App from './App';
-import registerServiceWorker from './registerServiceWorker';
+import * as serviceWorker from './serviceWorker';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles';
@@ -19,4 +19,4 @@ const Index = () => (
 const rootElement = document.getElementById('root');
 render(<Index />, rootElement);
 
-registerServiceWorker();
+serviceWorker.unregister();
