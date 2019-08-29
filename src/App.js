@@ -37,7 +37,7 @@ import Brush from './d3/Brush';
 import { haveNaN } from './d3/helpers';
 import countryCodes from './helpers/countryCodes';
 import { hexToRGBA } from './helpers/colors';
-import AutoSelect from './components/AutoSelect';
+import AutoSelect, { MuiSelect } from './components/AutoSelect';
 import Notice from './components/Notice';
 import IconGithub from './components/Github';
 import './App.css';
@@ -728,7 +728,8 @@ class App extends Component {
   };
 
   handleChange = event => {
-    this.setState({ [event.target.name]: event.target.value }, () => {
+    const { name, value } = event.target;
+    this.setState({ [name]: value }, () => {
       this.renderCharts();
     });
   };
@@ -1225,7 +1226,7 @@ class App extends Component {
                 <div className="controls">
                   <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
                     <InputLabel htmlFor="vdemY">Y axis</InputLabel>
-                    <AutoSelect
+                    <MuiSelect
                       input={<Input name="vdemY" id="vdemY" />}
                       value={this.state.vdemY}
                       onChange={this.handleChange}
@@ -1234,7 +1235,7 @@ class App extends Component {
                   </FormControl>
                   <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
                     <InputLabel htmlFor="vdemX">X axis</InputLabel>
-                    <AutoSelect
+                    <MuiSelect
                       input={<Input name="vdemX" id="vdemX" />}
                       value={this.state.vdemX}
                       onChange={this.handleChange}
@@ -1245,7 +1246,7 @@ class App extends Component {
                     <InputLabel htmlFor="colorBy">
                       Color by
                     </InputLabel>
-                    <AutoSelect
+                    <MuiSelect
                       input={<Input name="colorBy" id="colorBy" />}
                       value={this.state.colorBy}
                       onChange={this.onScatterPlotChangeColorBy}
@@ -1256,7 +1257,7 @@ class App extends Component {
                     <InputLabel htmlFor="regionFilter">
                       Regions
                     </InputLabel>
-                    <AutoSelect
+                    <MuiSelect
                       input={<Input name="regionFilter" id="regionFilter" />}
                       value={this.state.regionFilter}
                       onChange={this.onScatterPlotChangeRegionFilter}
@@ -1267,7 +1268,7 @@ class App extends Component {
                     <InputLabel htmlFor="vdemZ">
                       Circle size by
                     </InputLabel>
-                    <AutoSelect
+                    <MuiSelect
                       input={<Input name="vdemZ" id="vdemZ" />}
                       value={this.state.vdemZ}
                       onChange={this.handleChange}
@@ -1354,7 +1355,7 @@ class App extends Component {
                 <div className="controls">
                   <FormControl className="formControl" style={{ minWidth: 260, margin: 10 }}>
                     <InputLabel htmlFor="country">Country</InputLabel>
-                    <AutoSelect
+                    <MuiSelect
                       input={<Input name="country" id="country" />}
                       value={this.state.country}
                       onChange={this.handleCountryChange}
@@ -1365,7 +1366,7 @@ class App extends Component {
                     <InputLabel htmlFor="vdemVariable">
                       Political variable
                     </InputLabel>
-                    <AutoSelect
+                    <MuiSelect
                       input={<Input name="vdemVariable" id="vdemVariable" />}
                       value={this.state.vdemVariable}
                       onChange={this.onDualChartChange}
@@ -1373,16 +1374,14 @@ class App extends Component {
                     />
                   </FormControl>
                   <FormControl className="formControl" style={{ minWidth: 240, margin: 10 }}>
-                    <InputLabel htmlFor="taxonFilter">
-                      Taxon filter
-                    </InputLabel>
                     <AutoSelect
-                      input={<Input name="taxonFilter" id="taxonFilter" />}
-                      value={this.state.taxonFilter}
+                      name="taxonFilter"
+                      label="Taxon filter"
                       onChange={this.onDualChartChange}
                       onInputChange={this.onInputChangeTaxonFilter}
                       options={this.state.taxaAutocompletes}
                       isClearable
+                      allowNoSelection
                     />
                   </FormControl>
                   <FormControlLabel
