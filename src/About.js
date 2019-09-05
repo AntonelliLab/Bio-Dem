@@ -12,14 +12,14 @@ const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
 const partners = [
   {
     short: 'GGBC',
-    long: 'Gothenburg Global Biodiversity Center',
+    long: 'Gothenburg Global Biodiversity Centre',
     logo: `${process.env.PUBLIC_URL}/logos/ggbc.png`,
     url: 'https://ggbc.gu.se'
   },
   {
     short: 'Kew',
     long: 'Royal Botanic Gardens, Kew',
-    logo: `${process.env.PUBLIC_URL}/logos/kew.png`,
+    logo: `${process.env.PUBLIC_URL}/logos/kew.svg`,
     url: 'https://www.kew.org'
   },
   {
@@ -266,7 +266,7 @@ class About extends React.Component {
 
           <Box id="partners" display="flex" flexWrap="wrap">
             { partners.map(partner => (
-              <Box key={partner.short} display="flex" flexDirection="column" alignItems="center" component="a" href={partner.url} p={1} title={partner.long}>
+              <Box key={partner.short} className="partner" display="flex" flexDirection="column" alignItems="center" component="a" href={partner.url} p={1} title={partner.long}>
                 { partner.logo ? <img alt={partner.short} src={partner.logo} height={80} /> : null }
                 { false ? <Typography>{partner.long}</Typography> : null }
               </Box>
