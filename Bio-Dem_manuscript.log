@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2018.12.7)  10 SEP 2019 19:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2018.12.7)  11 SEP 2019 16:59
 entering extended mode
 **./Bio-Dem_manuscript.tex
 (Bio-Dem_manuscript.tex
@@ -674,36 +674,269 @@ Package: lineno 2005/11/02 line numbers on paragraphs v4.41
 \bframesep=\dimen152
 \bframebox=\box34
 LaTeX Info: Redefining \\ on input line 3056.
-) (Bio-Dem_manuscript.aux)
+)
+("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\biblatex\biblat
+ex.sty"
+Package: biblatex 2018/11/02 v3.12 programmable bibliographies (PK/MW)
+
+("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\logreq\logreq.s
+ty"
+Package: logreq 2010/08/04 v1.0 xml request logger
+\lrq@indent=\count135
+
+("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\logreq\logreq.d
+ef"
+File: logreq.def 2010/08/04 v1.0 logreq spec v1.0
+)) ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\ifthen.
+sty"
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\c@tabx@nest=\count136
+\c@listtotal=\count137
+\c@listcount=\count138
+\c@liststart=\count139
+\c@liststop=\count140
+\c@citecount=\count141
+\c@citetotal=\count142
+\c@multicitecount=\count143
+\c@multicitetotal=\count144
+\c@instcount=\count145
+\c@maxnames=\count146
+\c@minnames=\count147
+\c@maxitems=\count148
+\c@minitems=\count149
+\c@citecounter=\count150
+\c@maxcitecounter=\count151
+\c@savedcitecounter=\count152
+\c@uniquelist=\count153
+\c@uniquename=\count154
+\c@refsection=\count155
+\c@refsegment=\count156
+\c@maxextratitle=\count157
+\c@maxextratitleyear=\count158
+\c@maxextraname=\count159
+\c@maxextradate=\count160
+\c@maxextraalpha=\count161
+\c@abbrvpenalty=\count162
+\c@highnamepenalty=\count163
+\c@lownamepenalty=\count164
+\c@maxparens=\count165
+\c@parenlevel=\count166
+\blx@tempcnta=\count167
+\blx@tempcntb=\count168
+\blx@tempcntc=\count169
+\blx@maxsection=\count170
+\blx@maxsegment@0=\count171
+\blx@notetype=\count172
+\blx@parenlevel@text=\count173
+\blx@parenlevel@foot=\count174
+\blx@sectionciteorder@0=\count175
+\blx@entrysetcounter=\count176
+\labelnumberwidth=\skip64
+\labelalphawidth=\skip65
+\biblabelsep=\skip66
+\bibitemsep=\skip67
+\bibnamesep=\skip68
+\bibinitsep=\skip69
+\bibparsep=\skip70
+\bibhang=\skip71
+\blx@bcfin=\read1
+\blx@bcfout=\write3
+\c@mincomprange=\count177
+\c@maxcomprange=\count178
+\c@mincompwidth=\count179
+Package biblatex Info: Trying to load biblatex default data model...
+Package biblatex Info: ... file 'blx-dm.def' found.
+
+("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\biblatex\blx-dm
+.def"
+File: blx-dm.def 2018/11/02 v3.12 biblatex localization (PK/MW)
+)
+Package biblatex Info: Trying to load biblatex custom data model...
+Package biblatex Info: ... file 'biblatex-dm.cfg' not found.
+\c@afterword=\count180
+\c@savedafterword=\count181
+\c@annotator=\count182
+\c@savedannotator=\count183
+\c@author=\count184
+\c@savedauthor=\count185
+\c@bookauthor=\count186
+\c@savedbookauthor=\count187
+\c@commentator=\count188
+\c@savedcommentator=\count189
+\c@editor=\count190
+\c@savededitor=\count191
+\c@editora=\count192
+\c@savededitora=\count193
+\c@editorb=\count194
+\c@savededitorb=\count195
+\c@editorc=\count196
+\c@savededitorc=\count197
+\c@foreword=\count198
+\c@savedforeword=\count199
+\c@holder=\count266
+\c@savedholder=\count267
+\c@introduction=\count268
+\c@savedintroduction=\count269
+\c@namea=\count270
+\c@savednamea=\count271
+\c@nameb=\count272
+\c@savednameb=\count273
+\c@namec=\count274
+\c@savednamec=\count275
+\c@translator=\count276
+\c@savedtranslator=\count277
+\c@shortauthor=\count278
+\c@savedshortauthor=\count279
+\c@shorteditor=\count280
+\c@savedshorteditor=\count281
+\c@labelname=\count282
+\c@savedlabelname=\count283
+\c@institution=\count284
+\c@savedinstitution=\count285
+\c@lista=\count286
+\c@savedlista=\count287
+\c@listb=\count288
+\c@savedlistb=\count289
+\c@listc=\count290
+\c@savedlistc=\count291
+\c@listd=\count292
+\c@savedlistd=\count293
+\c@liste=\count294
+\c@savedliste=\count295
+\c@listf=\count296
+\c@savedlistf=\count297
+\c@location=\count298
+\c@savedlocation=\count299
+\c@organization=\count300
+\c@savedorganization=\count301
+\c@origlocation=\count302
+\c@savedoriglocation=\count303
+\c@origpublisher=\count304
+\c@savedorigpublisher=\count305
+\c@publisher=\count306
+\c@savedpublisher=\count307
+\c@language=\count308
+\c@savedlanguage=\count309
+\c@origlanguage=\count310
+\c@savedoriglanguage=\count311
+\c@pageref=\count312
+\c@savedpageref=\count313
+\shorthandwidth=\skip72
+\shortjournalwidth=\skip73
+\shortserieswidth=\skip74
+\shorttitlewidth=\skip75
+\shortauthorwidth=\skip76
+\shorteditorwidth=\skip77
+\locallabelnumberwidth=\skip78
+\locallabelalphawidth=\skip79
+\localshorthandwidth=\skip80
+\localshortjournalwidth=\skip81
+\localshortserieswidth=\skip82
+\localshorttitlewidth=\skip83
+\localshortauthorwidth=\skip84
+\localshorteditorwidth=\skip85
+Package biblatex Info: Trying to load compatibility code...
+Package biblatex Info: ... file 'blx-compat.def' found.
+
+("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\biblatex\blx-co
+mpat.def"
+File: blx-compat.def 2018/11/02 v3.12 biblatex compatibility (PK/MW)
+)
+Package biblatex Info: Trying to load generic definitions...
+Package biblatex Info: ... file 'biblatex.def' found.
+
+("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\biblatex\biblat
+ex.def"
+File: biblatex.def 2018/11/02 v3.12 biblatex compatibility (PK/MW)
+\c@textcitecount=\count314
+\c@textcitetotal=\count315
+\c@textcitemaxnames=\count316
+\c@biburlnumpenalty=\count317
+\c@biburlucpenalty=\count318
+\c@biburllcpenalty=\count319
+\c@smartand=\count320
+)
+Package biblatex Info: Trying to load bibliography style 'numeric'...
+Package biblatex Info: ... file 'numeric.bbx' found.
+
+("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\biblatex\bbx\nu
+meric.bbx"
+File: numeric.bbx 2018/11/02 v3.12 biblatex bibliography style (PK/MW)
+Package biblatex Info: Trying to load bibliography style 'standard'...
+Package biblatex Info: ... file 'standard.bbx' found.
+
+("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\biblatex\bbx\st
+andard.bbx"
+File: standard.bbx 2018/11/02 v3.12 biblatex bibliography style (PK/MW)
+\c@bbx:relatedcount=\count321
+\c@bbx:relatedtotal=\count322
+))
+Package biblatex Info: Trying to load citation style 'numeric'...
+Package biblatex Info: ... file 'numeric.cbx' found.
+
+("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\biblatex\cbx\nu
+meric.cbx"
+File: numeric.cbx 2018/11/02 v3.12 biblatex citation style (PK/MW)
+Package biblatex Info: Redefining '\cite'.
+Package biblatex Info: Redefining '\parencite'.
+Package biblatex Info: Redefining '\footcite'.
+Package biblatex Info: Redefining '\footcitetext'.
+Package biblatex Info: Redefining '\smartcite'.
+Package biblatex Info: Redefining '\supercite'.
+Package biblatex Info: Redefining '\textcite'.
+Package biblatex Info: Redefining '\textcites'.
+Package biblatex Info: Redefining '\cites'.
+Package biblatex Info: Redefining '\parencites'.
+Package biblatex Info: Redefining '\smartcites'.
+)
+Package biblatex Info: Trying to load configuration file...
+Package biblatex Info: ... file 'biblatex.cfg' found.
+
+("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\biblatex\biblat
+ex.cfg"
+File: biblatex.cfg 
+))
+Package biblatex Info: Trying to load language 'english'...
+Package biblatex Info: ... file 'english.lbx' found.
+
+("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\biblatex\lbx\en
+glish.lbx"
+File: english.lbx 2018/11/02 v3.12 biblatex localization (PK/MW)
+)
+\@quotelevel=\count323
+\@quotereset=\count324
+(Bio-Dem_manuscript.aux)
 \openout1 = `Bio-Dem_manuscript.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 99.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 99.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 100.
+LaTeX Font Info:    ... okay on input line 100.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 100.
+LaTeX Font Info:    ... okay on input line 100.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 100.
+LaTeX Font Info:    ... okay on input line 100.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 100.
+LaTeX Font Info:    ... okay on input line 100.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 100.
+LaTeX Font Info:    ... okay on input line 100.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 100.
+LaTeX Font Info:    ... okay on input line 100.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 100.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 100.
+
 ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\ts1cmr.fd"
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Try loading font information for T1+lmr on input line 99.
+LaTeX Font Info:    ... okay on input line 100.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 100.
+LaTeX Font Info:    ... okay on input line 100.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 100.
+LaTeX Font Info:    ... okay on input line 100.
+LaTeX Font Info:    Try loading font information for T1+lmr on input line 100.
 ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\lm\t1lmr.fd"
 File: t1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Info: Redefining \microtypecontext on input line 99.
+LaTeX Info: Redefining \microtypecontext on input line 100.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
@@ -754,7 +987,7 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 \AtBeginShipoutBox=\box35
-Package hyperref Info: Link coloring OFF on input line 99.
+Package hyperref Info: Link coloring OFF on input line 100.
 
 ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\hyperref\namere
 f.sty"
@@ -764,29 +997,29 @@ Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 itlestring.sty"
 Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
-\c@section@level=\count135
+\c@section@level=\count325
 )
-LaTeX Info: Redefining \ref on input line 99.
-LaTeX Info: Redefining \pageref on input line 99.
-LaTeX Info: Redefining \nameref on input line 99.
+LaTeX Info: Redefining \ref on input line 100.
+LaTeX Info: Redefining \pageref on input line 100.
+LaTeX Info: Redefining \nameref on input line 100.
 (Bio-Dem_manuscript.out) (Bio-Dem_manuscript.out)
-\@outlinefile=\write3
-\openout3 = `Bio-Dem_manuscript.out'.
+\@outlinefile=\write4
+\openout4 = `Bio-Dem_manuscript.out'.
 
 
 ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\context\base\supp-pdf
 .mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count136
+\scratchcounter=\count326
 \scratchdimen=\dimen153
 \scratchbox=\box36
-\nofMPsegments=\count137
-\nofMParguments=\count138
+\nofMPsegments=\count327
+\nofMParguments=\count328
 \everyMPshowfont=\toks29
-\MPscratchCnt=\count139
+\MPscratchCnt=\count329
 \MPscratchDim=\dimen154
-\MPnumerator=\count140
-\makeMPintoPDFobject=\count141
+\MPnumerator=\count330
+\makeMPintoPDFobject=\count331
 \everyMPtoPDFconversion=\toks30
 )
 ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\oberdiek\epstop
@@ -807,38 +1040,48 @@ G,.JBIG2,.JB2,.eps]
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: End \AtBeginDocument code.
-LaTeX Font Info:    Try loading font information for T1+lmss on input line 100.
+Package biblatex Info: Input encoding 'utf8' detected.
+Package biblatex Info: Automatic encoding selection.
+(biblatex)             Assuming data encoding 'utf8'.
+\openout3 = `Bio-Dem_manuscript.bcf'.
+
+Package biblatex Info: Trying to load bibliographic data...
+Package biblatex Info: ... file 'Bio-Dem_manuscript.bbl' not found.
+No file Bio-Dem_manuscript.bbl.
+Package biblatex Info: Reference section=0 on input line 100.
+Package biblatex Info: Reference segment=0 on input line 100.
+LaTeX Font Info:    Try loading font information for T1+lmss on input line 101.
 
 ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\lm\t1lmss.fd"
 File: t1lmss.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 100.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 101.
 
 ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\lm\ot1lmr.fd"
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OML+lmm on input line 100.
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 101.
 
 ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\lm\omllmm.fd"
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 100
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 101
 .
 ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\lm\omslmsy.fd"
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMX+lmex on input line 100
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 101
 .
 ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\lm\omxlmex.fd"
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <14.4> on input line 100.
+(Font)              <14.4> on input line 101.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 100.
+(Font)              <10> on input line 101.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 100.
-LaTeX Font Info:    Try loading font information for U+msa on input line 100.
+(Font)              <7> on input line 101.
+LaTeX Font Info:    Try loading font information for U+msa on input line 101.
 
 ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsfonts\umsa.f
 d"
@@ -848,7 +1091,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 a.cfg"
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 100.
+LaTeX Font Info:    Try loading font information for U+msb on input line 101.
 
 ("C:\Users\az64mycy\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsfonts\umsb.f
 d"
@@ -861,70 +1104,65 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 
 {C:/Users/az64mycy/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 125.
+(Font)              <12> on input line 128.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 125.
+(Font)              <8> on input line 128.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 125.
+(Font)              <6> on input line 128.
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 14.49998pt.
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[2] [3] [4] [5]
-Overfull \hbox (69.25627pt too wide) in paragraph at lines 167--169
-[][]\T1/lmr/m/n/12 (-20) 6. Coppedge, M. \T1/lmr/m/it/12 (-20) et al. \T1/lmr/m
-/n/12 (-20) V-Dem Country-Year Dataset, 2019. (2019). doi:[]https://doi.org/10.
-23696/vdemcy19[] 
- []
-
-[6] [7] [8]
-<figures/Figure1_biodiversity_democracy.pdf, id=102, 1156.32pt x 794.97pt>
+[2] [3] [4] [5] [6] [7] [8] [9]
+<figures/Figure1_biodiversity_democracy.pdf, id=110, 1156.32pt x 794.97pt>
 File: figures/Figure1_biodiversity_democracy.pdf Graphic file (type pdf)
 <use figures/Figure1_biodiversity_democracy.pdf>
 Package pdftex.def Info: figures/Figure1_biodiversity_democracy.pdf  used on in
-put line 212.
+put line 226.
 (pdftex.def)             Requested size: 469.75385pt x 322.95576pt.
-<figures/Figure2_biodem.pdf, id=103, 597.51233pt x 691.5215pt>
+<figures/Figure2_biodem.pdf, id=111, 597.51233pt x 691.5215pt>
 File: figures/Figure2_biodem.pdf Graphic file (type pdf)
 <use figures/Figure2_biodem.pdf>
-Package pdftex.def Info: figures/Figure2_biodem.pdf  used on input line 216.
+Package pdftex.def Info: figures/Figure2_biodem.pdf  used on input line 230.
 (pdftex.def)             Requested size: 469.75935pt x 543.66861pt.
-[9 <./figures/Figure1_biodiversity_democracy.pdf>]
+[10 <./figures/Figure1_biodiversity_democracy.pdf>]
 Overfull \vbox (33.73859pt too high) has occurred while \output is active []
 
-[10 <./figures/Figure2_biodem.pdf>]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 220.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 220.
+[11 <./figures/Figure2_biodem.pdf>]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 234.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 234.
 (Bio-Dem_manuscript.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 220.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 220.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 234.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 234.
 Package rerunfilecheck Info: File `Bio-Dem_manuscript.out' has not changed.
 (rerunfilecheck)             Checksum: EE7FD113E029C0512175487011CE8C39;523.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 220.
+Package logreq Info: Writing requests to 'Bio-Dem_manuscript.run.xml'.
+\openout1 = `Bio-Dem_manuscript.run.xml'.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 234.
  ) 
 Here is how much of TeX's memory you used:
- 14128 strings out of 492970
- 213361 string characters out of 3125262
- 322046 words of memory out of 3000000
- 17660 multiletter control sequences out of 15000+200000
- 76612 words of font info for 112 fonts, out of 3000000 for 9000
+ 20248 strings out of 492970
+ 331202 string characters out of 3125262
+ 788875 words of memory out of 3000000
+ 23733 multiletter control sequences out of 15000+200000
+ 73564 words of font info for 110 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 36i,10n,43p,1412b,358s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 36i,10n,43p,1825b,745s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/lm-ec
 .enc}<C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/lm
 /lmbx12.pfb><C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pu
-blic/lm/lmbx8.pfb><C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 2.9/fonts/ty
-pe1/public/lm/lmr12.pfb><C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 2.9/fo
-nts/type1/public/lm/lmr17.pfb><C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 
-2.9/fonts/type1/public/lm/lmr8.pfb><C:/Users/az64mycy/AppData/Local/Programs/Mi
-KTeX 2.9/fonts/type1/public/lm/lmri10.pfb><C:/Users/az64mycy/AppData/Local/Prog
-rams/MiKTeX 2.9/fonts/type1/public/lm/lmri12.pfb><C:/Users/az64mycy/AppData/Loc
-al/Programs/MiKTeX 2.9/fonts/type1/public/lm/lmss8.pfb>
-Output written on Bio-Dem_manuscript.pdf (10 pages, 1333075 bytes).
+blic/lm/lmr12.pfb><C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 2.9/fonts/ty
+pe1/public/lm/lmr17.pfb><C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 2.9/fo
+nts/type1/public/lm/lmr8.pfb><C:/Users/az64mycy/AppData/Local/Programs/MiKTeX 2
+.9/fonts/type1/public/lm/lmri10.pfb><C:/Users/az64mycy/AppData/Local/Programs/M
+iKTeX 2.9/fonts/type1/public/lm/lmri12.pfb><C:/Users/az64mycy/AppData/Local/Pro
+grams/MiKTeX 2.9/fonts/type1/public/lm/lmss8.pfb>
+Output written on Bio-Dem_manuscript.pdf (11 pages, 1314928 bytes).
 PDF statistics:
- 1237 PDF objects out of 1440 (max. 8388607)
- 44 named destinations out of 1000 (max. 500000)
+ 1243 PDF objects out of 1440 (max. 8388607)
+ 49 named destinations out of 1000 (max. 500000)
  16435 words of extra memory for PDF output out of 17280 (max. 10000000)
 

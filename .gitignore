@@ -36,6 +36,7 @@ output/
 data/
 old/
 input/
+*.pdf
 
 # figures
 figures/*.jpg
