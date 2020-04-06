@@ -42,7 +42,7 @@
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
     "@babel/register": "^7.5.5",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.3",
     "surge": "^0.21.3"
   },
   "browserslist": {
