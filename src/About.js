@@ -148,7 +148,7 @@ class About extends React.Component {
             research project dedicated to the conceptualization and collection
             of data on democracy. It is one of the largest existent databases on
             democracy containing over 18 million data points, where the latest
-            version covers 201 countries and the years 1789 to 2017. These data
+            version covers 201 countries and the years 1789 to 2019. These data
             enable to work with both aggregated higher-level concepts such as
             "electoral democracy" or disaggregated concepts capturing for
             example women's participation in civil society or freedom of
@@ -166,7 +166,7 @@ class About extends React.Component {
             </a>
             . Bio-Dem currently{" "}
             <a target="_blank" rel="noopener noreferrer" href="https://github.com/AntonelliLab/Bio-Dem/blob/master/public/data/vdem_variables.csv">
-              uses V-Dem version 8
+              uses V-Dem version 10
             </a>{" "}
             and will be updated as new versions are being published. The current
             selected data for the application can be downloaded{" "}
@@ -313,13 +313,15 @@ class About extends React.Component {
             Long-Run Economic Development”. Maddison Working Paper 10.
           </p>
           <p>
-            Coppedge, M., J. Gerring, C.H. Knutsen, S.I. Lindberg, S-E.
-            Skaaning, J. Teorell, D. Altman, M. Bernhard, A. Cornell, M.S. Fish,
-            H, Gjerløw, A. Glynn, A. Hicken, J. Krusell, A. Lührmann, K.L.
-            Marquardt, K. McMann, V. Mechkova, M. Olin, P. Paxton, D. Pemstein,
-            B. Seim, R. Sigman, J. Staton, A. Sundtröm, E. Tzelgov, L. Uberti,
-            Y-T. Wang, T. Wig, and D. Ziblatt (2018). “V-Dem Codebook v8”,
-            Varieties of Democracy (V-Dem) Project.
+            Coppedge, Michael, John Gerring, Carl Henrik Knutsen, Staffan I. 
+            Lindberg, Jan Teorell, David Altman, Michael Bernhard, M. Steven 
+            Fish, Adam Glynn, Allen Hicken, Anna Lührmann, Kyle L. Marquardt, 
+            Kelly McMann, Pamela Paxton, Daniel Pemstein, Brigitte Seim, Rachel 
+            Sigman, Svend-Erik Skaaning, Jeffrey Staton, Agnes Cornell, Lisa 
+            Gastaldi, Haakon Gjerløw, Valeriya Mechkova, Johannes von Römer, 
+            Aksel Sundtröm, Eitan Tzelgov, Luca Uberti, Yi-ting Wang, Tore Wig, 
+            and Daniel Ziblatt. 2020. ”V-Dem Codebook v10” Varieties of 
+            Democracy (V-Dem) Project.
           </p>
           <p>
             Chadwick, B.P. (1995) “Fisheries, Sovereignties and Red Herrings”.{" "}

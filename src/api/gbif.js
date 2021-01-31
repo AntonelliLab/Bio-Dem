@@ -44,7 +44,7 @@ export const queryGBIFYearFacet = async (country, { onlyDomestic = false, onlyWi
     });
 };
 
-export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = 2017) => {
+export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = 2019) => {
   // Construct the GBIF occurrences API url with facets for country counts
   const url = `${baseURL}${occ}`;
   const params = {
@@ -70,7 +70,7 @@ export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = 2017) => {
 
 
 export const fetchRecordsPerCountryPerYear = async ({
-  yearMin = 1960, yearMax = 2017, taxonFilter = '', onlyDomestic = false }) => {
+  yearMin = 1960, yearMax = 2019, taxonFilter = '', onlyDomestic = false } = {}) => {
   // Construct the GBIF occurrences API url with facets for country counts
   let result = [];
 

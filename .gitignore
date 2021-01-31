@@ -2,6 +2,7 @@
 
 # data file can be generated
 gbif_data.csv
+vdem_variables.csv
 
 # dependencies
 /node_modules

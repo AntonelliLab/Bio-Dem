@@ -46,7 +46,7 @@ import './d3/d3.css';
 
 /**
  * V-dem variables
- * country,year,v2x_regime,v2x_polyarchy,v2x_freexp_altinf,v2x_frassoc_thick,v2xcl_dmove,v2xcs_ccsi,v2x_corr,v2x_clphy,e_regiongeo,e_peaveduc,e_migdppc,e_wri_pa,confl
+ * country,year,v2x_regime,v2x_polyarchy,v2x_freexp_altinf,v2x_frassoc_thick,v2xcl_dmove,v2xcs_ccsi,v2x_corr,v2x_clphy,e_regiongeo,e_peaveduc,e_migdppc,confl
 AFG,1960,0,0.0878861649162364,0.190868685410209,0.125512007338669,0.266093357150313,0.242432454719204,0.48274120527295,0.37271631597475,14,0.31028929,2744,NA,0
  */
 const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
@@ -80,8 +80,6 @@ const v2x_frassoc_thick = "v2x_frassoc_thick";
 const v2x_corr = "v2x_corr";
 const e_peaveduc = "e_peaveduc";
 const e_migdppc = "e_migdppc";
-// Protected areas
-const e_wri_pa = "e_wri_pa";
 
 // Error codes used within the app
 const yearFacetQueryErrorCoded = '101';
@@ -98,7 +96,6 @@ const vdemOptions = [
   { value: "v2x_clphy" },
   { value: e_peaveduc },
   { value: e_migdppc },
-  { value: e_wri_pa }
 ];
 
 const circleSizeOptions = [
@@ -186,12 +183,10 @@ const regionColor = regionCode => {
 
 // Some external variables lack data for all countries before or after a certain year
 const startYear = {
-  e_wri_pa: 1990,
 };
 const stopYear = {
   e_peaveduc: 2010,
   e_migdppc: 2016,
-  e_wri_pa: 2010,
 };
 
 const yAxisLabelGap = {
@@ -208,7 +203,6 @@ const vdemScaleMax = {
   v2x_clphy: 1,
   e_peaveduc: 15,
   e_migdppc: 2e5,
-  e_wri_pa: 60,
   records: 1e8,
   recordsPerArea: 1e3,
 }
@@ -223,7 +217,6 @@ const vdemScaleMin = {
   v2x_clphy: 0,
   e_peaveduc: 0,
   e_migdppc: 2e2,
-  e_wri_pa: 0,
   records: 1e2,
   recordsPerArea: 1e-2,
 }
@@ -238,7 +231,6 @@ const aggregationMethod = {
   v2x_clphy: 'median',
   e_peaveduc: 'median',
   e_migdppc: 'median',
-  e_wri_pa: 'median',
   records: 'sum',
   recordsPerArea: 'sum',
 }
@@ -341,13 +333,13 @@ class App extends Component {
       fetching: false,
       countries: [],
       yearMin: 1960,
-      yearMax: 2018,
+      yearMax: 2020,
       // ScatterPlot:
       vdemX: v2x_freexp_altinf,
       vdemY: v2x_frassoc_thick,
       vdemZ: 'records',
       xyYearMin: 1960,
-      xyYearMax: 2017,
+      xyYearMax: 2019,
       colorBy: 'regime',
       regionFilter: 0,
       // DualChart
@@ -371,32 +363,6 @@ class App extends Component {
       <CountryHighlight code={code} name={name} onClick={this.onClickHighlightCountry}/>
 
     this.scatterPlotHighlights = [
-      {
-        buttonLabel: "Protected areas",
-        explanation: <span>
-          The majority of high record countries (large bubbles) are democracies (yellow or green) and located in the lower right corner of the plot. The majority of low record countries (small bubbles) are in the lower left corner, indicating that higher polyarchy corresponds to more collected records. There are four countries, two closed autocracies (<Country code="BTN" name="Bhutan"/> and <Country code="SAU" name="Saudi Arabia"/>, purple), one electoral autocracy (Seychelles, blue) and one electoral democracy (Venezuela), that protect a relatively large share of land area.
-        </span>,
-        onActivatedNewState:
-        {
-          vdemY: e_wri_pa,
-          vdemX: v2x_polyarchy,
-          xyYearMin: 1990,
-          colorBy: 'regime'
-        }
-      },
-      {
-        buttonLabel: "Corruption",
-        explanation: <span>
-          The majority of high record countries are liberal democracies (large, yellow bubbles) and have little corruption. Furthermore, record collection seems largely independent of the level of corruption (large bubbles are distributed horizontally) and corrupt countries can have many collection records. Additionally, corrupt countries can have relatively larger share of protected areas.
-        </span>,
-        onActivatedNewState:
-        {
-          vdemY: e_wri_pa,
-          vdemX: v2x_corr,
-          xyYearMin: 1990,
-          colorBy: 'regime'
-        }
-      },
       {
         buttonLabel: "GDP",
         explanation: <span>
@@ -557,7 +523,6 @@ class App extends Component {
         v2x_clphy: +row.v2x_clphy,
         e_peaveduc: +row.e_peaveduc,
         e_migdppc: +row.e_migdppc,
-        e_wri_pa: +row.e_wri_pa,
         confl: +row.confl
       };
     });
@@ -921,7 +886,7 @@ class App extends Component {
    * @param {Number} defaultStartYear default value if not constrained
    * @returns {Array<Number>} an array with [startYear, endYear]
    */
-  getValidYears(dimension, defaultStartYear = 1960, defaultEndYear = 2017) {
+  getValidYears(dimension, defaultStartYear = 1960, defaultEndYear = 2019) {
     const dim = Array.isArray(dimension) ? dimension : [dimension];
     return [
       d3.max([...dim.map(d => startYear[d]), defaultStartYear]),
@@ -1034,7 +999,7 @@ class App extends Component {
     if (vdemData.length === 0) {
       return;
     }
-    const [startYear, stopYear] = [1960, 2017];
+    const [startYear, stopYear] = [1960, 2019];
     const recordsPerYear = d3.nest()
     .key(d => d.year)
     .rollup(values => {

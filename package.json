@@ -2,6 +2,15 @@
   "name": "v-dem-biodiversity-app",
   "version": "1.1.1",
   "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "deploy-test-A": "surge build/ https://bio-dem-A.surge.sh",
+    "deploy-test-B": "surge build/ https://bio-dem-B.surge.sh",
+    "deploy": "surge build/ https://bio-dem.surge.sh"
+  },
   "dependencies": {
     "@material-ui/core": "^4.3.3",
     "@material-ui/icons": "^4.2.1",
@@ -28,15 +37,6 @@
     "react-dom": "^16.9.0",
     "react-player": "^1.12.0",
     "react-scripts": "3.1.1"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
-    "deploy-test-A": "surge build/ https://bio-dem-A.surge.sh",
-    "deploy-test-B": "surge build/ https://bio-dem-B.surge.sh",
-    "deploy": "surge build/ https://bio-dem.surge.sh"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
