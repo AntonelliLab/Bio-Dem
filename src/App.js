@@ -957,7 +957,7 @@ class App extends Component {
       yLogScale: useLogScale[vdemY],
       xLogScale: useLogScale[vdemX],
       data: vdemFiltered,
-      height: 300,
+      height: 400,
       xMin: vdemScaleMin[vdemX],
       xMax: vdemScaleMax[vdemX],
       yMin: vdemScaleMin[vdemY],
@@ -1060,7 +1060,7 @@ class App extends Component {
 
     DualChart(this.refDualChart.current, {
       data: vdemFiltered,
-      height: 300,
+      height: 400,
       left: 70,
       right: yAxisLabelGap[vdemVariable] || 70,
       xTickGap: 140,
