@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import ReactPlayer from 'react-player'
+import ReactPlayer from 'react-player/youtube';
 import './About.css';
 import { Typography } from '@material-ui/core';
 

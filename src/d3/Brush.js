@@ -158,8 +158,7 @@ export default function Brush(el, properties) {
   brush.on("brush end", brushed);
 
   //create brush function redraw scatterplot with selection
-  function brushed() {
-    const selection = d3.event.selection;
+  function brushed({selection}) {
     const domain = selection ? selection.map(x.invert, x) : timeExtent;
     props.onBrush(domain);
   }

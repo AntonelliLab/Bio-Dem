@@ -13,9 +13,9 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Zoom from '@material-ui/core/Zoom';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconDownload from '@material-ui/icons/CloudDownload';
 // import IconPlay from '@material-ui/icons/PlayCircleOutline';
@@ -292,20 +292,20 @@ const HighlightsPanel = (props) => (
     <React.Fragment>
       {
         props.highlights.map((h, index) => (
-          <ExpansionPanel key={index} expanded={props.value === index} onChange={() => props.onChange(index)}>
-          <ExpansionPanelSummary
+          <Accordion key={index} expanded={props.value === index} onChange={() => props.onChange(index)}>
+          <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls={`${props.label}_panel${index}-content`}
             id={`${props.label}_panel${index}-header`}
           >
             <Typography>{h.buttonLabel}</Typography>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
+          </AccordionSummary>
+          <AccordionDetails>
             <Typography variant="body2">
               {props.highlights[index].explanation}
             </Typography>
-          </ExpansionPanelDetails>
-          </ExpansionPanel>
+          </AccordionDetails>
+          </Accordion>
         ))
       }
     </React.Fragment>
@@ -936,35 +936,33 @@ class App extends Component {
       return;
     }
     const [startYear, stopYear] = this.getValidYears([vdemX, vdemY], xyYearMin, xyYearMax);
-    const vdemGrouped = d3.nest()
-    .key(d => d.country)
-    .rollup(values => {
-      if (haveNaN([values[0][vdemX], values[0][vdemY], values[0].v2x_regime]) ||
-        haveNaN(values, d => d[vdemX]) ||
-        haveNaN(values, d => d[vdemY]) ||
-        haveNaN(values, d => d.v2x_regime))
-      {
-        return null;
-      }
-      const x = d3[aggregationMethod[vdemX]](values, d => d[vdemX]);
-      const y = d3[aggregationMethod[vdemY]](values, d => d[vdemY]);
-      const z = d3.median(values, d => d.v2x_regime);
-      const records = vdemY === 'records' ? y : d3.sum(values, d => d.records);
-      const recordsPerArea = vdemY === 'recordsPerArea' ? y : d3.sum(values, d => d.recordsPerArea);
-      return { x, y, z, records, recordsPerArea };
-    })
-    .entries(vdemData
-      // Aggregate within selected years
-      .filter(d =>
+    const vdemGrouped = d3.rollup(
+      vdemData.filter(d =>
         d.year >= startYear &&
         d.year <= stopYear &&
         (regionFilter === 0 || this.countryMap[d.country].regionCode === regionFilter)
-      )
+      ),
+      values => {
+        if (haveNaN([values[0][vdemX], values[0][vdemY], values[0].v2x_regime]) ||
+          haveNaN(values, d => d[vdemX]) ||
+          haveNaN(values, d => d[vdemY]) ||
+          haveNaN(values, d => d.v2x_regime))
+        {
+          return null;
+        }
+        const x = d3[aggregationMethod[vdemX]](values, d => d[vdemX]);
+        const y = d3[aggregationMethod[vdemY]](values, d => d[vdemY]);
+        const z = d3.median(values, d => d.v2x_regime);
+        const records = vdemY === 'records' ? y : d3.sum(values, d => d.records);
+        const recordsPerArea = vdemY === 'recordsPerArea' ? y : d3.sum(values, d => d.recordsPerArea);
+        return { x, y, z, records, recordsPerArea };
+      },
+      d => d.country
     );
     
     // Filter countries lacking values on the x y dimensions or have zero records (log safe)
-    const vdemFiltered = vdemGrouped.filter(d => d.value !== null && d.value.records > 0);
-    return vdemFiltered;
+    return Array.from(vdemGrouped, ([key, value]) => ({key, value}))
+      .filter(d => d.value !== null && d.value.records > 0);
   }
 
   renderScatterPlot() {
@@ -1026,23 +1024,24 @@ class App extends Component {
       return;
     }
     const [startYear, stopYear] = [1960, 2019];
-    const recordsPerYear = d3.nest()
-    .key(d => d.year)
-    .rollup(values => {
-      const numRecords = d3.sum(values, d => d.records);
-      const regime = d3.mean(values, d => d.v2x_regime);
-      return {
-        records: numRecords,
-        regime,
-      };
-    })
-    .entries(vdemData
-      // Aggregate within selected years
-      .filter(d => 
-        d.year >= startYear &&
-        d.year <= stopYear &&
-        (regionFilter === 0 || this.countryMap[d.country].regionCode === regionFilter)
-      )
+    const recordsPerYear = Array.from(
+      d3.rollup(
+        vdemData.filter(d => 
+          d.year >= startYear &&
+          d.year <= stopYear &&
+          (regionFilter === 0 || this.countryMap[d.country].regionCode === regionFilter)
+        ),
+        values => {
+          const numRecords = d3.sum(values, d => d.records);
+          const regime = d3.mean(values, d => d.v2x_regime);
+          return {
+            records: numRecords,
+            regime,
+          };
+        },
+        d => d.year
+      ),
+      ([key, value]) => ({key, value}),
     );
     
     Brush(this.refBrush.current, {

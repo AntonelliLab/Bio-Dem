@@ -105,10 +105,10 @@ export default function ScatterPlot(el, properties) {
     .ticks(height / props.yTickGap);
 
   // create a Voronoi diagram for snapping tooltips to nearest points
-  const voronoiDiagram = d3.voronoi()
-    .x(d => x(props.x(d)))
-    .y(d => y(props.y(d)))
-    .size([width, height])(data);
+  const delaunay = d3.Delaunay.from(data,
+    d => x(props.x(d)),
+    d => y(props.y(d)),
+  );
   const voronoiRadius = width / 10;
 
   // x axis
@@ -235,16 +235,16 @@ export default function ScatterPlot(el, properties) {
     }
   }
 
-  function onMouseMove() {
+  function onMouseMove(event) {
     // get the current mouse position relative to parent element
-    const [mx, my] = d3.mouse(this);
+    const [mx, my] = d3.pointer(event);
     
-    // use the new diagram.find() function to find the Voronoi site
-    // closest to the mouse, limited by max distance voronoiRadius
-    const site = voronoiDiagram.find(mx, my, voronoiRadius);
-
-    // highlight the point if we found one
-    highlight(site && site.data);
+    const i = delaunay.find(mx, my);
+    if (Math.abs(delaunay.points[i*2] - mx) < voronoiRadius) {
+      highlight(data[i]);
+    } else {
+      highlight(null);
+    }
   }
 
   function onMouseLeave() {
@@ -252,17 +252,22 @@ export default function ScatterPlot(el, properties) {
     highlight(null);
   }
 
-  function onMouseClick() {
+  function onMouseClick(event) {
     if (props.onClick) {
-      const [mx, my] = d3.mouse(this);
+      const [mx, my] = d3.pointer(event);
       
-      // use the new diagram.find() function to find the Voronoi site
-      // closest to the mouse, limited by max distance voronoiRadius
-      const site = voronoiDiagram.find(mx, my, voronoiRadius);
-      if (site && site.data) {
+      const i = delaunay.find(mx, my);
+      if (Math.abs(delaunay.points[i*2] - mx) < voronoiRadius) {
+
+        const d = data[i];
+        console.log('Click', mx, my, '=> i:', i, 'd:', d);
         highlight(null);
-        props.onClick(site.data);
-      }
+        props.onClick(data[i]);
+      } 
+      // if (site && site.data) {
+      //   highlight(null);
+      //   props.onClick(site.data);
+      // }
     }
   }
 

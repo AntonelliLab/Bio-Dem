@@ -262,7 +262,7 @@ AutoSelect.defaultProps = {
 
 export const MuiSelect = ({ options, value, onChange, input }) => (
   <Select
-    value={value}
+    value={options.length === 0 ? '' : value}
     onChange={onChange}
     input={input}
   >
