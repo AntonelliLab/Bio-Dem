@@ -33,7 +33,7 @@
     "downshift": "^3.2.12",
     "file-saver": "^2.0.5",
     "i18n-iso-countries": "^4.3.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-player": "^1.12.0",
