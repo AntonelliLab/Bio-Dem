@@ -24,6 +24,7 @@ import * as d3 from 'd3';
 import { csv } from 'd3-fetch';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
+import { saveAs } from 'file-saver';
 import {
   queryGBIFYearFacet,
   queryGBIFCountryFacet,
@@ -182,9 +183,9 @@ const regionColor = regionCode => {
 }
 
 // Some external variables lack data for all countries before or after a certain year
-const startYear = {
+const customStartYear = {
 };
-const stopYear = {
+const customStopYear = {
   e_peaveduc: 2010,
   e_migdppc: 2016,
 };
@@ -822,7 +823,7 @@ class App extends Component {
     });
   }
 
-  generateSVGFileUrl(parent) {
+  generateSVGContent = (parent) => {
     let svgContent = parent.innerHTML;
     svgContent = svgContent.replace(/^<svg/, ['<svg',
     'xmlns="http://www.w3.org/2000/svg"',
@@ -833,32 +834,49 @@ class App extends Component {
     svgContent = svgContent.replace("NS1", "xlink");
     svgContent = svgContent.replace("NS2", "xlink");
     
-    const url = URL.createObjectURL(new Blob([svgContent], { type: 'image/svg+xml' }));
-    return url;
+    return new Blob([svgContent], { type: 'image/svg+xml' });
   }
 
-  onClickGenerateSvgScatterPlot = () => {
-    if (this.state.downloadUrlScatterPlot) {
-      URL.revokeObjectURL(this.state.downloadUrlScatterPlot);
-    }
-    const url = this.generateSVGFileUrl(this.refScatterPlot.current);
-    this.setState({ downloadUrlScatterPlot: url });
+  onClickSaveScatterPlotData = () => {
+    const { vdemX, vdemY } = this.state;
+
+    // [{ key, value: { records, recordsPerArea, x, y }}]
+    // key is language code, x and y is axis values
+    const data = this.generateScatterPlotData();
+    const lines = [`country,records,records_per_area,${vdemX},${vdemY}`];
+    data.forEach(d => {
+      const { records, recordsPerArea, x, y } = d.value;
+      lines.push(`${d.key},${records},${recordsPerArea},${x},${y}`);
+    })
+    lines.push('\n');
+    
+    const blob = new Blob([lines.join('\n')], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, "bio-dem_scatterplot.csv");
   }
 
-  onClickDownloadScatterPlot = () => {
-    this.setState({ downloadUrlScatterPlot: null });
+  onClickSaveDualChartData = () => {
+    const { vdemVariable } = this.state;
+
+    // [{ confl, country, records, recordsPerArea, y2, year}]
+    const data = this.generateDualChartData();
+    const lines = [`country,year,records,records_per_area,${vdemVariable},conflict`];
+    data.forEach(d => {
+      lines.push(`${d.country},${d.year},${d.records},${d.recordsPerArea},${d.y2},${d.confl ? '1' : '0'}`);
+    })
+    lines.push('\n');
+    
+    const blob = new Blob([lines.join('\n')], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, "bio-dem_dualchart.csv");
   }
 
-  onClickGenerateSvgDualChart = () => {
-    if (this.state.downloadUrlDualChart) {
-      URL.revokeObjectURL(this.state.downloadUrlDualChart);
-    }
-    const url = this.generateSVGFileUrl(this.refDualChart.current);
-    this.setState({ downloadUrlDualChart: url });
+  onClickSaveScatterPlotSVG = () => {
+    const blob = this.generateSVGContent(this.refScatterPlot.current);
+    saveAs(blob, "bio-dem_scatterplot.svg");
   }
 
-  onClickDownloadDualChart = () => {
-    this.setState({ downloadUrlDualChart: null });
+  onClickSaveDualChartSVG = () => {
+    const blob = this.generateSVGContent(this.refDualChart.current);
+    saveAs(blob, "bio-dem_dualchart.svg");
   }
 
   onClickPlay = () => {
@@ -889,8 +907,8 @@ class App extends Component {
   getValidYears(dimension, defaultStartYear = 1960, defaultEndYear = 2019) {
     const dim = Array.isArray(dimension) ? dimension : [dimension];
     return [
-      d3.max([...dim.map(d => startYear[d]), defaultStartYear]),
-      d3.min([...dim.map(d => stopYear[d]), defaultEndYear])
+      d3.max([...dim.map(d => customStartYear[d]), defaultStartYear]),
+      d3.min([...dim.map(d => customStopYear[d]), defaultEndYear])
     ];
   }
 
@@ -912,16 +930,12 @@ class App extends Component {
     this.renderDualChart();
   }
 
-  renderScatterPlot() {
-    const { vdemData, vdemX, vdemY, vdemZ, xyYearMin, xyYearMax, variableExplanations, regionFilter } = this.state;
+  generateScatterPlotData() {
+    const { vdemData, vdemX, vdemY, xyYearMin, xyYearMax, regionFilter } = this.state;
     if (vdemData.length === 0) {
       return;
     }
-    const vdemXLabel = variableExplanations[vdemX] ? variableExplanations[vdemX].short_name : vdemX;
-    
-    let vdemYLabel = variableExplanations[vdemY] ? variableExplanations[vdemY].short_name : vdemY;
     const [startYear, stopYear] = this.getValidYears([vdemX, vdemY], xyYearMin, xyYearMax);
-
     const vdemGrouped = d3.nest()
     .key(d => d.country)
     .rollup(values => {
@@ -950,6 +964,18 @@ class App extends Component {
     
     // Filter countries lacking values on the x y dimensions or have zero records (log safe)
     const vdemFiltered = vdemGrouped.filter(d => d.value !== null && d.value.records > 0);
+    return vdemFiltered;
+  }
+
+  renderScatterPlot() {
+    const { vdemData, vdemX, vdemY, vdemZ, variableExplanations } = this.state;
+    if (vdemData.length === 0) {
+      return;
+    }
+    
+    const vdemFiltered = this.generateScatterPlotData();
+    const vdemXLabel = variableExplanations[vdemX] ? variableExplanations[vdemX].short_name : vdemX;
+    const vdemYLabel = variableExplanations[vdemY] ? variableExplanations[vdemY].short_name : vdemY;
 
     ScatterPlot(this.refScatterPlot.current, {
       left: yAxisLabelGap[vdemY] || 70,
@@ -1038,14 +1064,12 @@ class App extends Component {
     });
   }
 
-  renderDualChart() {
-    const { gbifData, vdemData, yearMin, yearMax, fetching, vdemVariable, variableExplanations } = this.state;
+  generateDualChartData() {
+    const { gbifData, vdemData, yearMin, yearMax, vdemVariable } = this.state;
     if (vdemData.length === 0) {
       return;
     }
     
-    const y2Label = variableExplanations[vdemVariable] ? variableExplanations[vdemVariable].short_name : vdemVariable;
-
     const vdemFiltered = vdemData
       .filter(d => d.country === this.state.country && d.year >= yearMin && d.year <= yearMax)
     
@@ -1056,7 +1080,19 @@ class App extends Component {
     });
     vdemFiltered.forEach(d => {
       d.records = gbifRecordsByYear[d.year] || 0;
+      d.y2 = d[vdemVariable];
     });
+    return vdemFiltered;
+  }
+
+  renderDualChart() {
+    const { vdemData, yearMin, fetching, vdemVariable, variableExplanations } = this.state;
+    if (vdemData.length === 0) {
+      return;
+    }
+    
+    const vdemFiltered = this.generateDualChartData();
+    const y2Label = variableExplanations[vdemVariable] ? variableExplanations[vdemVariable].short_name : vdemVariable;
 
     DualChart(this.refDualChart.current, {
       data: vdemFiltered,
@@ -1070,7 +1106,7 @@ class App extends Component {
       y2LogScale: useLogScale[vdemVariable],
       x: d => d.year,
       y: d => d.records,
-      y2: d => d[vdemVariable],
+      y2: d => d.y2,
       aux: d => d.confl,
       auxLabel: 'Conflict',
       color: d => regimeColor(d.v2x_regime),
@@ -1159,18 +1195,6 @@ class App extends Component {
                   onChange={this.onScatterPlotHighlightsChange}
                   value={this.state.activeScatterPlotHighlight}
                 />
-                {
-                  this.state.downloadUrlScatterPlot ? (
-                    <Button variant="contained" size="small" color="primary" href={this.state.downloadUrlScatterPlot} onClick={this.onClickDownloadScatterPlot} download="bio-dem_scatterplot.svg" target="blank">
-                      <IconDownload style={{ marginRight: 5 }}/>
-                      Download svg
-                    </Button> 
-                  ) : (
-                    <Button variant="contained" size="small" onClick={this.onClickGenerateSvgScatterPlot}>
-                      Generate svg...
-                    </Button>
-                  )
-                }
               </Grid>
               <Grid item className="grid-item" xs={12} md={8}>
                 <div id="scatterPlot" ref={this.refScatterPlot} />
@@ -1252,7 +1276,16 @@ class App extends Component {
                     }/>
                   </Zoom>
                   <div style={{ marginTop: 10 }}>
-                    <h3>Selected variables:</h3>
+                    <h3>Selected variables:
+                      <Button variant="outlined" size="small" style={{ marginLeft: 8 }} download="bio-dem_scatterplot.csv" onClick={this.onClickSaveScatterPlotData}>
+                        <IconDownload fontSize="small" style={{ marginRight: 5 }}/>
+                        CSV
+                      </Button>
+                      <Button variant="outlined" size="small" style={{ marginLeft: 8}} download="bio-dem_scatterplot.svg" onClick={this.onClickSaveScatterPlotSVG}>
+                        <IconDownload fontSize="small" style={{ marginRight: 5 }}/>
+                        SVG
+                      </Button>
+                    </h3>
                     {
                       variableExplanations[vdemY] ? <div>
                         <h4>{variableExplanations[vdemY].short_name}</h4>
@@ -1298,18 +1331,6 @@ class App extends Component {
                   onChange={this.onDualChartHighlightsChange}
                   value={this.state.activeDualChartHighlight}
                 />
-                {
-                  this.state.downloadUrlDualChart ? (
-                    <Button variant="contained" size="small" color="primary" href={this.state.downloadUrlDualChart} onClick={this.onClickDownloadDualChart} download="bio-dem_dualchart.svg" target="blank">
-                      <IconDownload style={{ marginRight: 5 }}/>
-                      Download svg
-                    </Button> 
-                  ) : (
-                    <Button variant="contained" size="small" onClick={this.onClickGenerateSvgDualChart}>
-                      Generate svg...
-                    </Button>
-                  )
-                }
               </Grid>
 
               <Grid item className="grid-item" xs={12} md={8}>
@@ -1379,7 +1400,16 @@ class App extends Component {
                     } />
                   </Zoom>
                   <div style={{ marginTop: 10 }}>
-                    <h3>Selected variables:</h3>
+                    <h3>Selected variables:
+                      <Button variant="outlined" size="small" style={{ marginLeft: 8 }} download="bio-dem_dualchart.csv" onClick={this.onClickSaveDualChartData}>
+                        <IconDownload fontSize="small" style={{ marginRight: 5 }}/>
+                        CSV
+                      </Button>
+                      <Button variant="outlined" size="small" style={{ marginLeft: 8}} download="bio-dem_dualchart.svg" onClick={this.onClickSaveDualChartSVG}>
+                        <IconDownload fontSize="small" style={{ marginRight: 5 }}/>
+                        SVG
+                      </Button>
+                    </h3>
                     <h4>{variableExplanations[this.state.vdemVariable] ? variableExplanations[this.state.vdemVariable].short_name : ''}</h4>
                     { variableExplanations[this.state.vdemVariable] ? variableExplanations[this.state.vdemVariable].description : '' }
                   </div>
