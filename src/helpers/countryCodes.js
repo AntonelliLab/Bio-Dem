@@ -1,20 +1,19 @@
-
-import countryCodes from 'i18n-iso-countries';
-import countryCodesEn from 'i18n-iso-countries/langs/en.json';
+import countryCodes from "i18n-iso-countries";
+import countryCodesEn from "i18n-iso-countries/langs/en.json";
 
 countryCodes.registerLocale(countryCodesEn);
 
 export default {
   getName(code) {
-    if (code === 'PSE') {
+    if (code === "PSE") {
       // TODO: Palestine West Bank in v-dem?
-      return 'Palestinian Territory';
+      return "Palestinian Territory";
     }
-    if (code === 'LBY') {
+    if (code === "LBY") {
       // Old name in library
-      return 'Libya';
+      return "Libya";
     }
-    return countryCodes.getName(code, 'en');
+    return countryCodes.getName(code, "en");
   },
 
   alpha2ToAlpha3(code) {

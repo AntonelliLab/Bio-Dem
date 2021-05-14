@@ -1,26 +1,25 @@
-
 const theme = {
   typography: {
     fontSize: 16,
     fontFamily: [
       '"Open Sans"',
-      'Roboto',
+      "Roboto",
       '"Helvetica Neue"',
-      'Helvetica',
-      'Arial',
-      'sans-serif',
-    ].join(','),
+      "Helvetica",
+      "Arial",
+      "sans-serif",
+    ].join(","),
   },
   palette: {
     primary: {
-      main: '#75B176',
-      contrastText: '#ffffff',
+      main: "#75B176",
+      contrastText: "#ffffff",
     },
     secondary: {
-      main: '#861b58',
-      contrastText: '#ffffff',
+      main: "#861b58",
+      contrastText: "#ffffff",
     },
   },
-}
+};
 
 export default theme;

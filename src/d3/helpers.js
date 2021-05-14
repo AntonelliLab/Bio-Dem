@@ -1,10 +1,10 @@
-import * as d3 from 'd3';
+import * as d3 from "d3";
 
 /**
  * Get extent with optional specified limits
- * 
+ *
  * Example: const xExtent = getExtent(data, x, xMin, xMax);
- * 
+ *
  * @param {Array} data the data
  * @param {Function} accessor the accessor function for a choosen dimension
  * @param {Number} min optional minimum value, default to data minimum
@@ -13,12 +13,12 @@ import * as d3 from 'd3';
  */
 export const getExtent = (data, accessor, min = null, max = null) => {
   if (min == null && max == null) {
-    return d3.extent(data, d => accessor(d));
+    return d3.extent(data, (d) => accessor(d));
   }
-  const minValue = min == null ? d3.min(data, d => accessor(d)) : min;
-  const maxValue = max == null ? d3.max(data, d => accessor(d)) : max;
+  const minValue = min == null ? d3.min(data, (d) => accessor(d)) : min;
+  const maxValue = max == null ? d3.max(data, (d) => accessor(d)) : max;
   return [minValue, maxValue];
-}
+};
 
 /**
  * Check if array have any NaN values
@@ -26,10 +26,10 @@ export const getExtent = (data, accessor, min = null, max = null) => {
  * @param {Function} accessor the accessor function for the potential NaN values, default to identity
  * @returns {Boolean} true if a NaN is found
  */
-export const haveNaN = (data, accessor = d => d) => {
-  return data.findIndex(d => Number.isNaN(accessor(d))) !== -1;
+export const haveNaN = (data, accessor = (d) => d) => {
+  return data.findIndex((d) => Number.isNaN(accessor(d))) !== -1;
   // return data.findIndex(d => accessor(d) > 0) !== -1;
-}
+};
 
 /**
  * Check if value(s) are within the closed interval [minValue, maxValue]
@@ -39,8 +39,8 @@ export const haveNaN = (data, accessor = d => d) => {
  */
 export const isWithin = (value, [minValue, maxValue]) => {
   const values = Array.isArray(value) ? value : [value];
-  return values.findIndex(v => v < minValue || v > maxValue) === -1;
-}
+  return values.findIndex((v) => v < minValue || v > maxValue) === -1;
+};
 
 /**
  * Get start and end index of first contigous set of numbers in an array
@@ -50,8 +50,8 @@ export const isWithin = (value, [minValue, maxValue]) => {
  * @returns {Array<Number>} Closed index interval [startIndex, endIndex], where data[startIndex]
  * is the first number and data[endIndex] is the last number in the first contigous set of numbers.
  */
-export const getFirstContiguousRangeNotNaN = (data, accessor = d => d) => {
-  const valueStartIndex = data.findIndex(d => !Number.isNaN(accessor(d)));
+export const getFirstContiguousRangeNotNaN = (data, accessor = (d) => d) => {
+  const valueStartIndex = data.findIndex((d) => !Number.isNaN(accessor(d)));
   if (valueStartIndex === -1) {
     return [-1, -1];
   }
@@ -61,4 +61,4 @@ export const getFirstContiguousRangeNotNaN = (data, accessor = d => d) => {
     }
   }
   return [valueStartIndex, data.length - 1];
-}
+};

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
 // import deburr from 'lodash/deburr';
-import Downshift from 'downshift';
-import { makeStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Paper from '@material-ui/core/Paper';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
+import Downshift from "downshift";
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import Paper from "@material-ui/core/Paper";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
 
 function renderInput(inputProps) {
   const { InputProps, classes, ref, ...other } = inputProps;
@@ -35,7 +35,13 @@ renderInput.propTypes = {
 };
 
 function renderOption(optionProps) {
-  const { option, index, itemProps, highlightedIndex, selectedItem } = optionProps;
+  const {
+    option,
+    index,
+    itemProps,
+    highlightedIndex,
+    selectedItem,
+  } = optionProps;
   const isHighlighted = highlightedIndex === index;
   const isSelected = selectedItem && selectedItem.value === option.value;
 
@@ -55,7 +61,10 @@ function renderOption(optionProps) {
 }
 
 renderOption.propTypes = {
-  highlightedIndex: PropTypes.oneOfType([PropTypes.oneOf([null]), PropTypes.number]).isRequired,
+  highlightedIndex: PropTypes.oneOfType([
+    PropTypes.oneOf([null]),
+    PropTypes.number,
+  ]).isRequired,
   index: PropTypes.number.isRequired,
   itemProps: PropTypes.object.isRequired,
   selectedItem: PropTypes.string.isRequired,
@@ -65,16 +74,16 @@ renderOption.propTypes = {
   }).isRequired,
 };
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
   container: {
     flexGrow: 1,
-    position: 'relative',
+    position: "relative",
   },
   paper: {
-    position: 'absolute',
+    position: "absolute",
     zIndex: 1,
     marginTop: theme.spacing(1),
     left: 0,
@@ -84,10 +93,10 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(0.5, 0.25),
   },
   inputRoot: {
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
   },
   inputInput: {
-    width: 'auto',
+    width: "auto",
     flexGrow: 1,
   },
   divider: {
@@ -96,8 +105,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 // const itemToString = ({ value, label } = {}) => label || value || '';
-const itemToString = (item) => item? (item.label || item.value || '') : '';
-const getSelectedOption = (options, value) => options.find(option => option.value === value);
+const itemToString = (item) => (item ? item.label || item.value || "" : "");
+const getSelectedOption = (options, value) =>
+  options.find((option) => option.value === value);
 
 export default function AutoSelect(props) {
   const classes = useStyles();
@@ -113,17 +123,17 @@ export default function AutoSelect(props) {
     // const inputValue = deburr(value.trim()).toLowerCase();
     // const inputLength = inputValue.length;
     // let count = 0;
-  
+
     // return inputLength === 0 && !showEmpty
     //   ? []
     //   : options.filter(option => {
     //       const keep =
     //         count < 5 && option.label.slice(0, inputLength).toLowerCase() === inputValue;
-  
+
     //       if (keep) {
     //         count += 1;
     //       }
-  
+
     //       return keep;
     //     });
   }
@@ -132,15 +142,15 @@ export default function AutoSelect(props) {
     target: {
       name,
       value: newValue,
-    }
+    },
   });
 
   const onChange = (item) => {
     if (!item && !props.allowNoSelection) {
       return;
     }
-    props.onChange(getChangeEvent(item? item.value : ''));
-  }
+    props.onChange(getChangeEvent(item ? item.value : ""));
+  };
 
   // const onStateChange = (data) => {
   //   if (data.type === Downshift.stateChangeTypes.changeInput) {
@@ -158,8 +168,7 @@ export default function AutoSelect(props) {
     if (props.onInputChange) {
       props.onInputChange(newInputValue);
     }
-  }
-
+  };
 
   return (
     <div className={classes.root}>
@@ -189,16 +198,25 @@ export default function AutoSelect(props) {
             placeholder: props.placeholder,
             onFocus: openMenu,
             onClick: openMenu,
-            onKeyDown: event => {
-              if (event.key === 'Enter' && props.allowNoSelection && !inputValue) {
+            onKeyDown: (event) => {
+              if (
+                event.key === "Enter" &&
+                props.allowNoSelection &&
+                !inputValue
+              ) {
                 selectItem({});
                 closeMenu();
               }
             },
           });
 
-          const isMatch = selectedOption && (inputValue === selectedOption.value || inputValue === selectedOption.label);
-          const displayValue = isMatch ? itemToString(selectedItem) : inputValue;
+          const isMatch =
+            selectedOption &&
+            (inputValue === selectedOption.value ||
+              inputValue === selectedOption.label);
+          const displayValue = isMatch
+            ? itemToString(selectedItem)
+            : inputValue;
           // console.log(`!!! renderInput with inputProps.value: '${inputProps.value}',
           // selectedOption: ${JSON.stringify(selectedOption)}, selectedItem: ${JSON.stringify(selectedItem)},
           //  inputValue: '${inputValue}', isMatch? ${isMatch}, isOpen? ${isOpen}, ==> value: '${displayValue}'`);
@@ -241,10 +259,7 @@ export default function AutoSelect(props) {
 
 AutoSelect.propTypes = {
   options: PropTypes.array.isRequired,
-  value: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-  ]),
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   placeholder: PropTypes.string.isRequired,
   onChange: PropTypes.func,
   onInputChange: PropTypes.func,
@@ -255,17 +270,21 @@ AutoSelect.propTypes = {
 };
 
 AutoSelect.defaultProps = {
-  label: '',
-  placeholder: 'Select...',
+  label: "",
+  placeholder: "Select...",
   isClearable: false,
 };
 
 export const MuiSelect = ({ options, value, onChange, input }) => (
   <Select
-    value={options.length === 0 ? '' : value}
+    value={options.length === 0 ? "" : value}
     onChange={onChange}
     input={input}
   >
-  { options.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>) }
+    {options.map((o) => (
+      <MenuItem key={o.value} value={o.value}>
+        {o.label}
+      </MenuItem>
+    ))}
   </Select>
 );

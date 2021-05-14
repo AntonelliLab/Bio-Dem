@@ -1,44 +1,43 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import ReactPlayer from 'react-player/youtube';
-import './About.css';
-import { Typography } from '@material-ui/core';
+import React from "react";
+import PropTypes from "prop-types";
+import Grid from "@material-ui/core/Grid";
+import Box from "@material-ui/core/Box";
+import ReactPlayer from "react-player/youtube";
+import "./About.css";
+import { Typography } from "@material-ui/core";
 
 const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
 
-
 const partners = [
   {
-    short: 'GGBC',
-    long: 'Gothenburg Global Biodiversity Centre',
+    short: "GGBC",
+    long: "Gothenburg Global Biodiversity Centre",
     logo: `${process.env.PUBLIC_URL}/logos/ggbc.png`,
-    url: 'https://ggbc.gu.se'
+    url: "https://ggbc.gu.se",
   },
   {
-    short: 'Kew',
-    long: 'Royal Botanic Gardens, Kew',
+    short: "Kew",
+    long: "Royal Botanic Gardens, Kew",
     logo: `${process.env.PUBLIC_URL}/logos/kew.svg`,
-    url: 'https://www.kew.org'
+    url: "https://www.kew.org",
   },
   {
-    short: 'V-Dem',
-    long: 'Varieties of Democracy',
+    short: "V-Dem",
+    long: "Varieties of Democracy",
     logo: `${process.env.PUBLIC_URL}/logos/v-dem.png`,
-    url: 'https://www.v-dem.net'
+    url: "https://www.v-dem.net",
   },
   {
-    short: 'iDiv',
-    long: 'German Centre for Integrative Biodiversity Research',
+    short: "iDiv",
+    long: "German Centre for Integrative Biodiversity Research",
     logo: `${process.env.PUBLIC_URL}/logos/idiv.png`,
-    url: 'https://www.idiv.de/'
+    url: "https://www.idiv.de/",
   },
   {
-    short: 'BECC',
-    long: 'Biodiversity and Ecosystem services in a Changing Climate',
+    short: "BECC",
+    long: "Biodiversity and Ecosystem services in a Changing Climate",
     logo: `${process.env.PUBLIC_URL}/logos/becc.png`,
-    url: 'https://www.becc.lu.se'
+    url: "https://www.becc.lu.se",
   },
 ];
 
@@ -121,7 +120,11 @@ class About extends React.Component {
           </h3>
 
           <p>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.gbif.org">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.gbif.org"
+            >
               The Global Biodiversity Information Facility (GBIF)
             </a>{" "}
             provides access to digitalized information on the geographic
@@ -134,9 +137,23 @@ class About extends React.Component {
             billion occurrence records collected in over three centuries around
             the globe. If you want to learn more about GBIF or access species
             occurrence information, visit{" "}
-            <a target="_blank" rel="noopener noreferrer" href="https://www.gbif.org">GBIF</a>. Bio-Dem fetches the number
-            of occurrence records live from the latest version of GBIF via the{" "}
-            <a target="_blank" rel="noopener noreferrer" href="https://www.gbif.org/developer/summary">GBIF API</a>.
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.gbif.org"
+            >
+              GBIF
+            </a>
+            . Bio-Dem fetches the number of occurrence records live from the
+            latest version of GBIF via the{" "}
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.gbif.org/developer/summary"
+            >
+              GBIF API
+            </a>
+            .
           </p>
 
           <h3 id="v-dem">
@@ -144,33 +161,63 @@ class About extends React.Component {
           </h3>
 
           <p>
-            <a target="_blank" rel="noopener noreferrer" href="https://v-dem.net">Varieties of Democracy (V-Dem)</a> is a
-            research project dedicated to the conceptualization and collection
-            of data on democracy. It is one of the largest existent databases on
-            democracy containing over 18 million data points, where the latest
-            version covers 201 countries and the years 1789 to 2019. These data
-            enable to work with both aggregated higher-level concepts such as
-            "electoral democracy" or disaggregated concepts capturing for
-            example women's participation in civil society or freedom of
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://v-dem.net"
+            >
+              Varieties of Democracy (V-Dem)
+            </a>{" "}
+            is a research project dedicated to the conceptualization and
+            collection of data on democracy. It is one of the largest existent
+            databases on democracy containing over 18 million data points, where
+            the latest version covers 201 countries and the years 1789 to 2019.
+            These data enable to work with both aggregated higher-level concepts
+            such as "electoral democracy" or disaggregated concepts capturing
+            for example women's participation in civil society or freedom of
             academic expression. The data combine factual data with expert-based
             subjective measures through a Bayesian modelling procedure,
             accounting for coder bias and heterogeneity across countries and
             years. For more information, visit{" "}
-            <a target="_blank" rel="noopener noreferrer" href="https://www.v-dem.net/en/">V-Dem's website</a>, read{" "}
-            <a target="_blank" rel="noopener noreferrer" href="http://journals.sagepub.com/doi/abs/10.1177/0192512115622046?journalCode=ipsa">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.v-dem.net/en/"
+            >
+              V-Dem's website
+            </a>
+            , read{" "}
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="http://journals.sagepub.com/doi/abs/10.1177/0192512115622046?journalCode=ipsa"
+            >
               "Measuring high level democratic principles using the V-Dem data"
             </a>{" "}
             or{" "}
-            <a target="_blank" rel="noopener noreferrer" href="https://www.v-dem.net/en/data/data-version-8/">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.v-dem.net/en/data/data-version-8/"
+            >
               download the data and browse the codebook
             </a>
             . Bio-Dem currently{" "}
-            <a target="_blank" rel="noopener noreferrer" href="https://github.com/AntonelliLab/Bio-Dem/blob/master/public/data/vdem_variables.csv">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/AntonelliLab/Bio-Dem/blob/master/public/data/vdem_variables.csv"
+            >
               uses V-Dem version 10
             </a>{" "}
             and will be updated as new versions are being published. The current
             selected data for the application can be downloaded{" "}
-            <a target="_blank" rel="noopener noreferrer" href={vdemDataUrl} download >
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={vdemDataUrl}
+              download
+            >
               here
             </a>
             .
@@ -182,7 +229,13 @@ class About extends React.Component {
             records from any given country and the political situation in this
             country. It must be noted that, in general, correlation is not
             causation (see{" "}
-            <a target="_blank" rel="noopener noreferrer" href="http://www.tylervigen.com/spurious-correlations">here</a>{" "}
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="http://www.tylervigen.com/spurious-correlations"
+            >
+              here
+            </a>{" "}
             for illustrative examples) and that, in particular, there are some
             caveats related to the data used by Bio-Dem. For instance, the
             amount of occurrence information available from GBIF is only a crude
@@ -195,10 +248,8 @@ class About extends React.Component {
             structure and society of a country, such as the freedom of movement
             and physical violence. We only included those indicators in Bio-Dem
             which have a
-            <a href="#political-indicator-variables">
-              mechanistic link
-            </a>{" "}
-            to biodiversity collections. Indeed, interesting patterns emerge
+            <a href="#political-indicator-variables">mechanistic link</a> to
+            biodiversity collections. Indeed, interesting patterns emerge
             globally and for individual countries through time as shown by the
             example plots. We consider Bio-Dem primarily as an exploration tool
             to reveal interesting patterns and inspire new thoughts on research,
@@ -218,7 +269,9 @@ class About extends React.Component {
           <div className="youtube-wrapper">
             <ReactPlayer
               url="https://www.youtube.com/watch?v=dkUHRdBRUj0"
-              config={{ youtube: { playerVars: { origin: window.location.origin } } }}
+              config={{
+                youtube: { playerVars: { origin: window.location.origin } },
+              }}
             />
           </div>
 
@@ -228,47 +281,92 @@ class About extends React.Component {
           <div className="youtube-wrapper">
             <ReactPlayer
               url="https://www.youtube.com/watch?v=9c4-qgBXYw4"
-              config={{ youtube: { playerVars: { origin: window.location.origin } } }}
+              config={{
+                youtube: { playerVars: { origin: window.location.origin } },
+              }}
             />
           </div>
-          
 
           <h2 id="team">Team</h2>
           <div>
-            <a target="_blank" rel="noopener noreferrer" href="https://alexanderzizka.net/">Alexander Zizka</a>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://alexanderzizka.net/"
+            >
+              Alexander Zizka
+            </a>
           </div>
           <div>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/oskarryden/">Oskar Ryden</a>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.linkedin.com/in/oskarryden/"
+            >
+              Oskar Ryden
+            </a>
           </div>
           <div>
-            <a target="_blank" rel="noopener noreferrer" href="http://icelab.se/about/team/daniel-edler/">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="http://icelab.se/about/team/daniel-edler/"
+            >
               Daniel Edler
             </a>
           </div>
           <div>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/dr-johannes-klein-220479127/">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.linkedin.com/in/dr-johannes-klein-220479127/"
+            >
               Johannes Klein
             </a>
           </div>
           <div>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.v-dem.net/en/v-dem-institute/staff/">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.v-dem.net/en/v-dem-institute/staff/"
+            >
               Staffan Lindberg
             </a>
           </div>
           <div>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.kew.org/science/our-science/people/alexandre-antonelli">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.kew.org/science/our-science/people/alexandre-antonelli"
+            >
               Alexandre Antonelli
             </a>
           </div>
 
           <h3>Partners</h3>
-          { partners.map(partner => <div key={partner.short}><a href={partner.url}>{`${partner.short} - ${partner.long}`}</a></div>) }
+          {partners.map((partner) => (
+            <div key={partner.short}>
+              <a href={partner.url}>{`${partner.short} - ${partner.long}`}</a>
+            </div>
+          ))}
 
           <Box id="partners" display="flex" flexWrap="wrap">
-            { partners.map(partner => (
-              <Box key={partner.short} className="partner" display="flex" flexDirection="column" alignItems="center" component="a" href={partner.url} p={1} title={partner.long}>
-                { partner.logo ? <img alt={partner.short} src={partner.logo} height={80} /> : null }
-                { false ? <Typography>{partner.long}</Typography> : null }
+            {partners.map((partner) => (
+              <Box
+                key={partner.short}
+                className="partner"
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                component="a"
+                href={partner.url}
+                p={1}
+                title={partner.long}
+              >
+                {partner.logo ? (
+                  <img alt={partner.short} src={partner.logo} height={80} />
+                ) : null}
+                {false ? <Typography>{partner.long}</Typography> : null}
               </Box>
             ))}
           </Box>
@@ -276,9 +374,19 @@ class About extends React.Component {
           <p>
             <a href="mailto:bio-dem@googlegroups.com">Contact us</a>, check out
             the{" "}
-            <a target="_blank" rel="noopener noreferrer" href="https://github.com/AntonelliLab/Bio-Dem">source code</a> or
-            file a{" "}
-            <a target="_blank" rel="noopener noreferrer" href="https://github.com/AntonelliLab/Bio-Dem/issues">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/AntonelliLab/Bio-Dem"
+            >
+              source code
+            </a>{" "}
+            or file a{" "}
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/AntonelliLab/Bio-Dem/issues"
+            >
               bug report
             </a>
             .
@@ -313,14 +421,14 @@ class About extends React.Component {
             Long-Run Economic Development”. Maddison Working Paper 10.
           </p>
           <p>
-            Coppedge, Michael, John Gerring, Carl Henrik Knutsen, Staffan I. 
-            Lindberg, Jan Teorell, David Altman, Michael Bernhard, M. Steven 
-            Fish, Adam Glynn, Allen Hicken, Anna Lührmann, Kyle L. Marquardt, 
-            Kelly McMann, Pamela Paxton, Daniel Pemstein, Brigitte Seim, Rachel 
-            Sigman, Svend-Erik Skaaning, Jeffrey Staton, Agnes Cornell, Lisa 
-            Gastaldi, Haakon Gjerløw, Valeriya Mechkova, Johannes von Römer, 
-            Aksel Sundtröm, Eitan Tzelgov, Luca Uberti, Yi-ting Wang, Tore Wig, 
-            and Daniel Ziblatt. 2020. ”V-Dem Codebook v10” Varieties of 
+            Coppedge, Michael, John Gerring, Carl Henrik Knutsen, Staffan I.
+            Lindberg, Jan Teorell, David Altman, Michael Bernhard, M. Steven
+            Fish, Adam Glynn, Allen Hicken, Anna Lührmann, Kyle L. Marquardt,
+            Kelly McMann, Pamela Paxton, Daniel Pemstein, Brigitte Seim, Rachel
+            Sigman, Svend-Erik Skaaning, Jeffrey Staton, Agnes Cornell, Lisa
+            Gastaldi, Haakon Gjerløw, Valeriya Mechkova, Johannes von Römer,
+            Aksel Sundtröm, Eitan Tzelgov, Luca Uberti, Yi-ting Wang, Tore Wig,
+            and Daniel Ziblatt. 2020. ”V-Dem Codebook v10” Varieties of
             Democracy (V-Dem) Project.
           </p>
           <p>
@@ -402,41 +510,37 @@ class About extends React.Component {
             collections
           </h2>
 
-          {
-            vdemExplanations.map(d => (
-              <div key={d.id}>
-                <h4 id={d.id}>{d.short_name}</h4>
+          {vdemExplanations.map((d) => (
+            <div key={d.id}>
+              <h4 id={d.id}>{d.short_name}</h4>
 
-                <p>
-                  <em>Description:</em> {d.description}
-                </p>
-                <p>
-                  <em>Relevance:</em> {d.relevance}
-                </p>
-                <p>
-                  <em>References:</em> {d.references}
-                </p>
-              </div>
-            ))
-          }
+              <p>
+                <em>Description:</em> {d.description}
+              </p>
+              <p>
+                <em>Relevance:</em> {d.relevance}
+              </p>
+              <p>
+                <em>References:</em> {d.references}
+              </p>
+            </div>
+          ))}
 
           <h2 id="biodiversity-indicator-variables">
             Biodiversity indicator variables
           </h2>
-          {
-            gbifExplanations.map(d => (
-              <div key={d.id}>
-                <h4 id={d.id}>{d.short_name}</h4>
+          {gbifExplanations.map((d) => (
+            <div key={d.id}>
+              <h4 id={d.id}>{d.short_name}</h4>
 
-                <p>
-                  <em>Description:</em> {d.description}
-                </p>
-                <p>
-                  <em>Relevance:</em> {d.relevance}
-                </p>
-              </div>
-            ))
-          }
+              <p>
+                <em>Description:</em> {d.description}
+              </p>
+              <p>
+                <em>Relevance:</em> {d.relevance}
+              </p>
+            </div>
+          ))}
         </Grid>
       </Grid>
     );
