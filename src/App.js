@@ -66,12 +66,28 @@ AGO,1244654,4
 const countryDataUrl = `${process.env.PUBLIC_URL}/data/country_data.csv`;
 
 /**
+ * Country data on colonial ties
+iso2,iso3,cow_state,Name,indep_year,timesince,independence_from,cont_ent,cont_suppr
+CA,CAN,20,Canada,1867,154,GB,Americas,Europe
+BS,BHS,31,Bahamas,1973,48,GB,Americas,Europe
+ */
+const colonialTiesUrl = `${process.env.PUBLIC_URL}/data/colonial_ties.csv`;
+
+/**
  * Gbif pre-downloaded data from api
 country,year,records
 AFG,1960,857
 AFG,1961,445
  */
 const gbifDataUrl = `${process.env.PUBLIC_URL}/data/gbif_data.csv`;
+
+/**
+ * Country data gbif participation status
+iso3,iso2,name,status,member_since
+AND,AD,Andorra,Voting participant,2010
+AGO,AO,"Angola, Republic of",Associate country participant,2019
+ */
+const gbifParticipatingCountriesUrl = `${process.env.PUBLIC_URL}/data/gbif_participating_countries.csv`;
 
 // The strings for the v-dem variables used to get the static data
 const v2x_polyarchy = "v2x_polyarchy";
@@ -169,6 +185,10 @@ const colorByOptions = [
     value: "region",
     label: "Region",
   },
+  {
+    value: "gbifParticipationStatus",
+    label: "GBIF participation",
+  },
 ];
 
 const regimeColor = d3.scaleSequential(d3.interpolateViridis).domain([0, 3]);
@@ -179,6 +199,38 @@ const regionColor = (regionCode) => {
   }
   return "#000000";
 };
+
+const GBIF_PARTICIPATION_VALUES = [
+  "Voting participant",
+  "Associate country participant",
+  "Not a participant",
+];
+
+const gbifParticipationColor = (status) => {
+  switch (status) {
+    case "Voting participant":
+      // return "#e41a1c";
+      // return "#1b9e77";
+      // return "#399B92";
+      return regimeColor(2);
+    case "Associate country participant":
+      // return "#377eb8";
+      // return "#d95f02";
+      // return "#486293";
+      return regimeColor(1);
+    default:
+      return "#888888";
+  }
+};
+const countryLabelSuffixByGbifParticipationStatus = {
+  "Voting participant": "ᵛ",
+  "Associate country participant": "ᵃ",
+  "Not a participant": "",
+};
+const countryLabelWithGbifParticipation = (d) =>
+  `${d.label} ${
+    countryLabelSuffixByGbifParticipationStatus[d.gbifParticipationStatus]
+  }`;
 
 // Some external variables lack data for all countries before or after a certain year
 const customStartYear = {};
@@ -281,11 +333,40 @@ const RegionLegend = ({ fillOpacity = 0.5 }) => (
   </Grid>
 );
 
-const ColorLegend = ({ type }) =>
-  type === "regime" ? <RegimeLegend /> : <RegionLegend />;
+const GbifParticipationLegend = ({ fillOpacity = 0.5 }) => (
+  <Grid container className="gbifParticipationLegend" justify="center">
+    {GBIF_PARTICIPATION_VALUES.map((v) => (
+      <div key={v} style={{ padding: 5, fontSize: "0.75em" }}>
+        <span
+          style={{
+            border: `1px solid ${gbifParticipationColor(v)}`,
+            backgroundColor: hexToRGBA(gbifParticipationColor(v), fillOpacity),
+            marginRight: 2,
+          }}
+        >
+          &nbsp;&nbsp;&nbsp;
+        </span>
+        {v}
+      </div>
+    ))}
+  </Grid>
+);
+
+const ColorLegend = ({ type }) => {
+  switch (type) {
+    case "regime":
+      return <RegimeLegend />;
+    case "region":
+      return <RegionLegend />;
+    case "gbifParticipationStatus":
+      return <GbifParticipationLegend />;
+    default:
+      return null;
+  }
+};
 
 ColorLegend.propTypes = {
-  type: PropTypes.oneOf(["regime", "region"]),
+  type: PropTypes.oneOf(["regime", "region", "gbifParticipationStatus"]),
 };
 
 const HighlightsPanel = (props) => (
@@ -558,8 +639,8 @@ class App extends Component {
   };
 
   async fetchData() {
-    if (this.data) {
-      return this.data;
+    if (this.state.data) {
+      return this.state.data;
     }
     this.setState({
       fetching: true,
@@ -607,6 +688,20 @@ class App extends Component {
         regionName: regions[row.e_regionpol],
       };
     });
+    const colonialTiesPromise = csv(colonialTiesUrl, (row) => {
+      /**
+       * iso2,iso3,cow_state,Name,indep_year,timesince,independence_from,cont_ent,cont_suppr
+CA,CAN,20,Canada,1867,154,GB,Americas,Europe
+BS,BHS,31,Bahamas,1973,48,GB,Americas,Europe
+       */
+      return {
+        colonizedCountry: row.iso3,
+        colonizedContinent: row.cont_ent,
+        colonizerCountry: countryCodes.alpha2ToAlpha3(row.independence_from),
+        colonizerContinent: row.cont_suppr,
+        yearOfIndependence: +row.indep_year,
+      };
+    });
     const gbifDataPromise = csv(gbifDataUrl, (row) => {
       return {
         country: row.country,
@@ -614,47 +709,86 @@ class App extends Component {
         records: row.records,
       };
     });
+    const gbifParticipatingCountriesPromise = csv(
+      gbifParticipatingCountriesUrl,
+      (row) => {
+        /**
+       * iso3,iso2,name,status,member_since
+AND,AD,Andorra,Voting participant,2010
+AGO,AO,"Angola, Republic of",Associate country participant,2019
+       */
+        return {
+          country: row.iso3,
+          status: row.status,
+          since: +row.member_since,
+        };
+      },
+    );
     const [
       vdemData,
       vdemExplanations,
       countryData,
+      colonialTies,
       gbifYearlyCountryData,
+      gbifParticipatingCountries,
     ] = await Promise.all([
       vdemDataPromise,
       vdemExplanationsPromise,
       countryDataPromise,
+      colonialTiesPromise,
       gbifDataPromise,
+      gbifParticipatingCountriesPromise,
       this.makeYearFacetQuery(countryCodes.alpha3ToAlpha2(this.state.country)),
       // this.makeCountryFacetQuery(),
     ]);
+    const gbifParticipationMap = new Map(
+      gbifParticipatingCountries.map((d) => [d.country, d]),
+    );
     const countryMap = {};
     countryData.forEach((d) => {
+      const gbifParticipation = gbifParticipationMap.get(d.value);
+      if (gbifParticipation !== undefined) {
+        d["gbifParticipationStatus"] = gbifParticipation.status;
+        d["gbifParticipationSince"] = gbifParticipation.since;
+        d[
+          "gbifParticipationText"
+        ] = `${gbifParticipation.status} (since ${gbifParticipation.since})`;
+      } else {
+        d["gbifParticipationStatus"] = "Not a participant";
+        d["gbifParticipationText"] = "Not a participant";
+      }
       countryMap[d.value] = d;
     });
+    console.log("gbifParticipationMap", gbifParticipationMap);
+    console.log("countryData", countryData);
+    console.log("countryMap", countryMap);
     this.countryMap = countryMap;
 
-    const data = [
+    const data = {
       vdemData,
       vdemExplanations,
       countryData,
+      colonialTies,
       gbifYearlyCountryData,
-    ];
-    this.data = data;
+      gbifParticipatingCountries,
+    };
     this.setState({
       loaded: true,
       fetching: false,
+      data,
     });
     return data;
   }
 
   async initData() {
     const data = await this.fetchData();
-    const [
+    const {
       vdemData,
       vdemExplanations,
       countryData,
       gbifYearlyCountryData,
-    ] = data;
+      gbifParticipatingCountries,
+    } = data;
     const variableExplanations = {};
     vdemExplanations.forEach((d) => {
       variableExplanations[d.id] = d;
@@ -1054,14 +1188,8 @@ class App extends Component {
   }
 
   generateScatterPlotData() {
-    const {
-      vdemData,
-      vdemX,
-      vdemY,
-      xyYearMin,
-      xyYearMax,
-      regionFilter,
-    } = this.state;
+    const { vdemData, vdemX, vdemY, xyYearMin, xyYearMax, regionFilter } =
+      this.state;
     if (vdemData.length === 0) {
       return;
     }
@@ -1144,6 +1272,10 @@ class App extends Component {
             return regimeColor(d.value.z);
           case "region":
             return regionColor(this.countryMap[d.key].regionCode);
+          case "gbifParticipationStatus":
+            return gbifParticipationColor(
+              this.countryMap[d.key].gbifParticipationStatus,
+            );
           default:
             return "#000000";
         }
@@ -1162,6 +1294,9 @@ class App extends Component {
           <div><strong>Records:</strong> ${d.value.records.toLocaleString(
             "en",
           )}</div>
+          <div><strong>GBIF membership:</strong> ${
+            this.countryMap[d.key].gbifParticipationText
+          }</div>
         </div>
       `,
       xLabel: vdemXLabel,
@@ -1245,13 +1380,8 @@ class App extends Component {
   }
 
   renderDualChart() {
-    const {
-      vdemData,
-      yearMin,
-      fetching,
-      vdemVariable,
-      variableExplanations,
-    } = this.state;
+    const { vdemData, yearMin, fetching, vdemVariable, variableExplanations } =
+      this.state;
     if (vdemData.length === 0) {
       return;
     }
@@ -1299,14 +1429,8 @@ class App extends Component {
   }
 
   render() {
-    const {
-      vdemX,
-      vdemY,
-      vdemZ,
-      xyYearMin,
-      gbifError,
-      variableExplanations,
-    } = this.state;
+    const { vdemX, vdemY, vdemZ, xyYearMin, gbifError, variableExplanations } =
+      this.state;
     const xyValidYears = this.getValidYears([vdemX, vdemY], 1960, 2018);
     const xyYearIntervalLimited =
       xyYearMin < xyValidYears[0] || xyValidYears[1] < 2016;
@@ -1634,6 +1758,8 @@ class App extends Component {
                       value={this.state.country}
                       onChange={this.handleCountryChange}
                       options={this.state.countries}
+                      const
+                      label={countryLabelWithGbifParticipation}
                     />
                   </FormControl>
                   <FormControl
@@ -1719,6 +1845,16 @@ class App extends Component {
                       }
                     />
                   </Zoom>
+                  <div>
+                    <small>
+                      Country suffix denoting{" "}
+                      <a href="https://www.gbif.org/the-gbif-network">
+                        GBIF membership
+                      </a>
+                      : ᵛ&nbsp;=&nbsp;voting participant,
+                      ᵃ&nbsp;=&nbsp;associate country participant
+                    </small>
+                  </div>
                   <div style={{ marginTop: 10 }}>
                     <h3>
                       Selected variables:

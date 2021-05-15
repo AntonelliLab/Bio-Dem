@@ -35,13 +35,8 @@ renderInput.propTypes = {
 };
 
 function renderOption(optionProps) {
-  const {
-    option,
-    index,
-    itemProps,
-    highlightedIndex,
-    selectedItem,
-  } = optionProps;
+  const { option, index, itemProps, highlightedIndex, selectedItem } =
+    optionProps;
   const isHighlighted = highlightedIndex === index;
   const isSelected = selectedItem && selectedItem.value === option.value;
 
@@ -275,7 +270,13 @@ AutoSelect.defaultProps = {
   isClearable: false,
 };
 
-export const MuiSelect = ({ options, value, onChange, input }) => (
+export const MuiSelect = ({
+  options,
+  value,
+  onChange,
+  input,
+  label = (d) => d.label,
+}) => (
   <Select
     value={options.length === 0 ? "" : value}
     onChange={onChange}
@@ -283,7 +284,7 @@ export const MuiSelect = ({ options, value, onChange, input }) => (
   >
     {options.map((o) => (
       <MenuItem key={o.value} value={o.value}>
-        {o.label}
+        {label(o)}
       </MenuItem>
     ))}
   </Select>
