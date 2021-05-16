@@ -189,6 +189,10 @@ const colorByOptions = [
     value: "gbifParticipationStatus",
     label: "GBIF participation",
   },
+  {
+    value: "colonialHistory",
+    label: "Colonial history",
+  },
 ];
 
 const regimeColor = d3.scaleSequential(d3.interpolateViridis).domain([0, 3]);
@@ -206,6 +210,8 @@ const GBIF_PARTICIPATION_VALUES = [
   "Not a participant",
 ];
 
+const COLONIAL_HISTORY_VALUES = ["Colonised", "Coloniser", "None"];
+
 const gbifParticipationColor = (status) => {
   switch (status) {
     case "Voting participant":
@@ -217,6 +223,17 @@ const gbifParticipationColor = (status) => {
       // return "#377eb8";
       // return "#d95f02";
       // return "#486293";
+      return regimeColor(1);
+    default:
+      return "#888888";
+  }
+};
+
+const colonialHistoryColor = (status) => {
+  switch (status) {
+    case "Colonised":
+      return regimeColor(2);
+    case "Coloniser":
       return regimeColor(1);
     default:
       return "#888888";
@@ -352,6 +369,25 @@ const GbifParticipationLegend = ({ fillOpacity = 0.5 }) => (
   </Grid>
 );
 
+const ColonialHistoryLegend = ({ fillOpacity = 0.5 }) => (
+  <Grid container className="colonialHistoryLegend" justify="center">
+    {COLONIAL_HISTORY_VALUES.map((v) => (
+      <div key={v} style={{ padding: 5, fontSize: "0.75em" }}>
+        <span
+          style={{
+            border: `1px solid ${colonialHistoryColor(v)}`,
+            backgroundColor: hexToRGBA(colonialHistoryColor(v), fillOpacity),
+            marginRight: 2,
+          }}
+        >
+          &nbsp;&nbsp;&nbsp;
+        </span>
+        {v}
+      </div>
+    ))}
+  </Grid>
+);
+
 const ColorLegend = ({ type }) => {
   switch (type) {
     case "regime":
@@ -360,13 +396,20 @@ const ColorLegend = ({ type }) => {
       return <RegionLegend />;
     case "gbifParticipationStatus":
       return <GbifParticipationLegend />;
+    case "colonialHistory":
+      return <ColonialHistoryLegend />;
     default:
       return null;
   }
 };
 
 ColorLegend.propTypes = {
-  type: PropTypes.oneOf(["regime", "region", "gbifParticipationStatus"]),
+  type: PropTypes.oneOf([
+    "regime",
+    "region",
+    "gbifParticipationStatus",
+    "colonialHistory",
+  ]),
 };
 
 const HighlightsPanel = (props) => (
@@ -695,10 +738,10 @@ CA,CAN,20,Canada,1867,154,GB,Americas,Europe
 BS,BHS,31,Bahamas,1973,48,GB,Americas,Europe
        */
       return {
-        colonizedCountry: row.iso3,
-        colonizedContinent: row.cont_ent,
-        colonizerCountry: countryCodes.alpha2ToAlpha3(row.independence_from),
-        colonizerContinent: row.cont_suppr,
+        colonisedCountry: row.iso3,
+        colonisedContinent: row.cont_ent,
+        coloniserCountry: countryCodes.alpha2ToAlpha3(row.independence_from),
+        coloniserContinent: row.cont_suppr,
         yearOfIndependence: +row.indep_year,
       };
     });
@@ -744,6 +787,12 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const gbifParticipationMap = new Map(
       gbifParticipatingCountries.map((d) => [d.country, d]),
     );
+    const colonisedCountries = new Set(
+      colonialTies.map((d) => d.colonisedCountry),
+    );
+    const coloniserCountries = new Set(
+      colonialTies.map((d) => d.coloniserCountry),
+    );
     const countryMap = {};
     countryData.forEach((d) => {
       const gbifParticipation = gbifParticipationMap.get(d.value);
@@ -757,11 +806,15 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
         d["gbifParticipationStatus"] = "Not a participant";
         d["gbifParticipationText"] = "Not a participant";
       }
+      d["colonised"] = colonisedCountries.has(d.value);
+      d["coloniser"] = coloniserCountries.has(d.value);
+      d["colonialHistory"] = d["colonised"]
+        ? "Colonised"
+        : d["coloniser"]
+        ? "Coloniser"
+        : "-";
       countryMap[d.value] = d;
     });
-    console.log("gbifParticipationMap", gbifParticipationMap);
-    console.log("countryData", countryData);
-    console.log("countryMap", countryMap);
     this.countryMap = countryMap;
 
     const data = {
@@ -1275,6 +1328,10 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
           case "gbifParticipationStatus":
             return gbifParticipationColor(
               this.countryMap[d.key].gbifParticipationStatus,
+            );
+          case "colonialHistory":
+            return colonialHistoryColor(
+              this.countryMap[d.key].colonialHistory,
             );
           default:
             return "#000000";
