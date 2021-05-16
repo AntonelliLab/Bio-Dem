@@ -12,7 +12,7 @@ export default function DualChart(el, properties) {
     {
       autoResize: true,
       width: null, // null to set it to the width of the anchor element
-      top: 40,
+      top: 60,
       right: 80,
       bottom: 60,
       left: 80,
@@ -50,6 +50,8 @@ export default function DualChart(el, properties) {
       // zLabel: d => d.z,
       title: "Title",
       fetching: false,
+      verticalLineAt: null,
+      verticalLineLabel: "Label",
     },
     properties,
   );
@@ -182,8 +184,8 @@ export default function DualChart(el, properties) {
 
   // text label for title
   g.append("text")
-    .attr("transform", `translate(${width / 2},0)`)
-    .attr("dy", "-1em")
+    .attr("transform", `translate(${width / 2},${-props.top})`)
+    .attr("dy", "1.5em")
     .style("text-anchor", "middle")
     .text(props.title);
 
@@ -283,9 +285,34 @@ export default function DualChart(el, properties) {
       auxLegend
         .append("text")
         .attr("dx", Math.max(5, x.bandwidth()) + 4)
-        .attr("dy", "1em")
+        .attr("dy", "1.2em")
+        .attr("font-size", "0.8em")
         .style("text-anchor", "left")
         .text(props.auxLabel);
+    }
+  }
+
+  const { verticalLineAt } = props;
+  if (verticalLineAt) {
+    const xMid = x(verticalLineAt) + x.bandwidth() / 2;
+    if (verticalLineAt >= props.xMin) {
+      g.append("line")
+        .attr("x1", xMid)
+        .attr("y1", -7)
+        .attr("x2", xMid)
+        .attr("y2", height)
+        .style("stroke-width", 2)
+        .style("stroke-dasharray", 4)
+        .style("stroke", "red")
+        .style("fill", "none");
+
+      // Label on top of vertical line
+      g.append("text")
+        .attr("transform", `translate(${xMid},${0})`)
+        .attr("dy", "-1em")
+        .attr("font-size", "0.8em")
+        .style("text-anchor", "middle")
+        .text(props.verticalLineLabel);
     }
   }
 }

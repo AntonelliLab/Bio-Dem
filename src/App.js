@@ -787,8 +787,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const gbifParticipationMap = new Map(
       gbifParticipatingCountries.map((d) => [d.country, d]),
     );
-    const colonisedCountries = new Set(
-      colonialTies.map((d) => d.colonisedCountry),
+    const colonisedCountries = new Map(
+      colonialTies.map((d) => [d.colonisedCountry, d.yearOfIndependence]),
     );
     const coloniserCountries = new Set(
       colonialTies.map((d) => d.coloniserCountry),
@@ -808,11 +808,14 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       }
       d["colonised"] = colonisedCountries.has(d.value);
       d["coloniser"] = coloniserCountries.has(d.value);
-      d["colonialHistory"] = d["colonised"]
-        ? "Colonised"
-        : d["coloniser"]
-        ? "Coloniser"
-        : "-";
+      (d["yearOfIndependence"] = d["colonised"]
+        ? colonisedCountries.get(d.value)
+        : null),
+        (d["colonialHistory"] = d["colonised"]
+          ? "Colonised"
+          : d["coloniser"]
+          ? "Coloniser"
+          : "-");
       countryMap[d.value] = d;
     });
     this.countryMap = countryMap;
@@ -1330,9 +1333,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
               this.countryMap[d.key].gbifParticipationStatus,
             );
           case "colonialHistory":
-            return colonialHistoryColor(
-              this.countryMap[d.key].colonialHistory,
-            );
+            return colonialHistoryColor(this.countryMap[d.key].colonialHistory);
           default:
             return "#000000";
         }
@@ -1448,6 +1449,9 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       ? variableExplanations[vdemVariable].short_name
       : vdemVariable;
 
+    const selectedCountryData = this.countryMap[this.state.country];
+    const { yearOfIndependence } = selectedCountryData;
+
     DualChart(this.refDualChart.current, {
       data: vdemFiltered,
       height: 400,
@@ -1470,6 +1474,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       xLabel: "Year",
       yLabel: "Number of records",
       y2Label: y2Label,
+      verticalLineAt: yearOfIndependence,
+      verticalLineLabel: "Independence",
       title: "Number of public species records per country and year",
       fetching,
     });
