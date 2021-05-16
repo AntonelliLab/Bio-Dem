@@ -793,6 +793,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const coloniserCountries = new Set(
       colonialTies.map((d) => d.coloniserCountry),
     );
+
     const countryMap = {};
     countryData.forEach((d) => {
       const gbifParticipation = gbifParticipationMap.get(d.value);
@@ -819,6 +820,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       countryMap[d.value] = d;
     });
     this.countryMap = countryMap;
+
+    countryData.sort((a, b) => a.label.localeCompare(b.label));
 
     const data = {
       vdemData,
