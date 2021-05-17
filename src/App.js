@@ -235,8 +235,6 @@ const GBIF_PARTICIPATION_VALUES = [
   "Not a participant",
 ];
 
-const COLONIAL_HISTORY_VALUES = ["Colonised", "Coloniser", "None"];
-
 const gbifParticipationColor = (status) => {
   switch (status) {
     case "Voting participant":
@@ -256,9 +254,9 @@ const gbifParticipationColor = (status) => {
 
 const colonialHistoryColor = (status) => {
   switch (status) {
-    case "Colonised":
+    case "colonised":
       return regimeColor(2);
-    case "Coloniser":
+    case "coloniser":
       return regimeColor(1);
     default:
       return "#888888";
@@ -394,20 +392,25 @@ const GbifParticipationLegend = ({ fillOpacity = 0.5 }) => (
   </Grid>
 );
 
+const COLONIAL_HISTORY_ITEMS = [
+  { key: "colonised", label: "Former colony" },
+  { key: "coloniser", label: "Former colonialist suppressor" },
+];
+
 const ColonialHistoryLegend = ({ fillOpacity = 0.5 }) => (
   <Grid container className="colonialHistoryLegend" justify="center">
-    {COLONIAL_HISTORY_VALUES.map((v) => (
-      <div key={v} style={{ padding: 5, fontSize: "0.75em" }}>
+    {COLONIAL_HISTORY_ITEMS.map(({ key, label }) => (
+      <div key={key} style={{ padding: 5, fontSize: "0.75em" }}>
         <span
           style={{
-            border: `1px solid ${colonialHistoryColor(v)}`,
-            backgroundColor: hexToRGBA(colonialHistoryColor(v), fillOpacity),
+            border: `1px solid ${colonialHistoryColor(key)}`,
+            backgroundColor: hexToRGBA(colonialHistoryColor(key), fillOpacity),
             marginRight: 2,
           }}
         >
           &nbsp;&nbsp;&nbsp;
         </span>
-        {v}
+        {label}
       </div>
     ))}
   </Grid>
@@ -504,6 +507,7 @@ class App extends Component {
       vdemVariable: v2x_freexp_altinf,
       onlyDomestic: false,
       onlyWithImage: false,
+      onlyPreservedSpecimen: false,
       // Taxon filter
       taxonFilter: "",
       filterTaxon: undefined,
@@ -688,7 +692,8 @@ class App extends Component {
       this.state.onlyDomestic !== prevState.onlyDomestic ||
       this.state.country !== prevState.country ||
       this.state.taxonFilter !== prevState.taxonFilter ||
-      this.state.onlyWithImage !== prevState.onlyWithImage;
+      this.state.onlyWithImage !== prevState.onlyWithImage ||
+      this.state.onlyPreservedSpecimen !== prevState.onlyPreservedSpecimen;
 
     if (fetchNewCountryCondition) {
       // Get alpha2 ISO code for this country, as this is what GBIF requires as query
@@ -842,9 +847,9 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
         ? colonisedData.yearOfIndependence
         : null;
       d["colonialHistory"] = d["colonised"]
-        ? "Colonised"
+        ? "colonised"
         : d["coloniser"]
-        ? "Coloniser"
+        ? "coloniser"
         : "";
       countryMap[d.value] = d;
     });
@@ -933,7 +938,13 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
    * prepare and handle negative or postive results.
    */
   makeYearFacetQuery = async (country) => {
-    const { onlyWithImage, taxonFilter, yearMin, yearMax } = this.state;
+    const {
+      onlyWithImage,
+      taxonFilter,
+      onlyPreservedSpecimen,
+      yearMin,
+      yearMax,
+    } = this.state;
     // Build up state for a query
     const gbifError = Object.assign({}, this.state.gbifError);
     delete gbifError[yearFacetQueryErrorCoded];
@@ -948,6 +959,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const result = await queryGBIFFacetPerYear(country, {
       onlyWithImage,
       taxonFilter,
+      onlyPreservedSpecimen,
       otherCountry,
       yearMin,
       yearMax,
@@ -1530,7 +1542,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
           if (countryData.colonised) {
             items.push({
               key: "countOther",
-              label: `Coloniser (${countryData.colonised})`,
+              label: `Former coloniser (${countryData.colonised})`,
             });
           }
           items.push({ key: "countRest", label: "Other" });
@@ -1987,7 +1999,22 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                         }
                       />
                     }
-                    label="Only show records with photo"
+                    label="Require photo"
+                  />
+                  <FormControlLabel
+                    style={{ marginLeft: 0 }}
+                    control={
+                      <Checkbox
+                        checked={this.state.onlyPreservedSpecimen}
+                        onChange={() =>
+                          this.setState({
+                            onlyPreservedSpecimen:
+                              !this.state.onlyPreservedSpecimen,
+                          })
+                        }
+                      />
+                    }
+                    label="Require preserved specimen"
                   />
                   <Zoom
                     in={gbifError[yearFacetQueryErrorCoded]}

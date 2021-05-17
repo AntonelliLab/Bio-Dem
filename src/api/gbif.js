@@ -92,7 +92,11 @@ export const queryGBIFYearFacet = async (
 const queryFacetByCountryAndYear = async (
   country,
   year,
-  { onlyWithImage = false, taxonFilter = "" } = {},
+  {
+    onlyWithImage = false,
+    taxonFilter = "",
+    onlyPreservedSpecimen = false,
+  } = {},
 ) => {
   let url = `${baseURL}${occ}?`;
   url += [
@@ -108,6 +112,9 @@ const queryFacetByCountryAndYear = async (
   if (onlyWithImage) {
     url += `&mediaType=StillImage`;
   }
+  if (onlyPreservedSpecimen) {
+    url += `&basisOfRecord=PRESERVED_SPECIMEN`;
+  }
 
   return fetch(url).then((response) => response.json());
 };
@@ -117,6 +124,7 @@ export const queryGBIFFacetPerYear = async (
   {
     onlyWithImage = false,
     taxonFilter = "",
+    onlyPreservedSpecimen = false,
     yearMin = 1960,
     yearMax = 2019,
     otherCountry = null,
@@ -125,7 +133,11 @@ export const queryGBIFFacetPerYear = async (
   // Construct the GBIF occurrences API url with facets for year counts
   const years = range(yearMin, yearMax + 1);
   const queries = years.map((year) =>
-    queryFacetByCountryAndYear(country, year, { onlyWithImage, taxonFilter }),
+    queryFacetByCountryAndYear(country, year, {
+      onlyWithImage,
+      taxonFilter,
+      onlyPreservedSpecimen,
+    }),
   );
   try {
     const result = await Promise.all(queries);
