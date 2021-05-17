@@ -29,6 +29,7 @@ import {
   queryGBIFYearFacet,
   queryGBIFCountryFacet,
   queryAutocompletesGBIF,
+  queryGBIFFacetPerYear,
 } from "./api/gbif";
 import About from "./About";
 import logo from "./logo.svg";
@@ -192,6 +193,30 @@ const colorByOptions = [
   {
     value: "colonialHistory",
     label: "Colonial history",
+  },
+];
+
+const getColonialOtherCountry = (country, countryMap) => {
+  const countryData = countryMap[country];
+  let otherCountry = countryData.colonised || countryData.coloniser;
+  if (otherCountry) {
+    otherCountry = countryCodes.alpha3ToAlpha2(otherCountry);
+  }
+  return otherCountry;
+};
+
+const dualChartColorByOptions = [
+  {
+    value: "regime",
+    label: "Regime type",
+  },
+  {
+    value: "basisOfRecord",
+    label: "Basis of record",
+  },
+  {
+    value: "publishingCountry",
+    label: "Publishing country",
   },
 ];
 
@@ -462,6 +487,8 @@ class App extends Component {
       countries: [],
       yearMin: 1960,
       yearMax: 2020,
+      // yearMin: 1990,
+      // yearMax: 1995,
       // ScatterPlot:
       vdemX: v2x_freexp_altinf,
       vdemY: v2x_frassoc_thick,
@@ -469,9 +496,11 @@ class App extends Component {
       xyYearMin: 1960,
       xyYearMax: 2019,
       colorBy: "regime",
+      dualChartColorBy: "basisOfRecord", // ["regime", "basisOfRecord", "publishingCountry"]
       regionFilter: 0,
       // DualChart
       country: "SWE",
+      // country: "AZE",
       vdemVariable: v2x_freexp_altinf,
       onlyDomestic: false,
       onlyWithImage: false,
@@ -781,17 +810,15 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       colonialTiesPromise,
       gbifDataPromise,
       gbifParticipatingCountriesPromise,
-      this.makeYearFacetQuery(countryCodes.alpha3ToAlpha2(this.state.country)),
-      // this.makeCountryFacetQuery(),
     ]);
     const gbifParticipationMap = new Map(
       gbifParticipatingCountries.map((d) => [d.country, d]),
     );
     const colonisedCountries = new Map(
-      colonialTies.map((d) => [d.colonisedCountry, d.yearOfIndependence]),
+      colonialTies.map((d) => [d.colonisedCountry, d]),
     );
-    const coloniserCountries = new Set(
-      colonialTies.map((d) => d.coloniserCountry),
+    const coloniserCountries = new Map(
+      colonialTies.map((d) => [d.coloniserCountry, d]),
     );
 
     const countryMap = {};
@@ -807,19 +834,26 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
         d["gbifParticipationStatus"] = "Not a participant";
         d["gbifParticipationText"] = "Not a participant";
       }
-      d["colonised"] = colonisedCountries.has(d.value);
-      d["coloniser"] = coloniserCountries.has(d.value);
-      (d["yearOfIndependence"] = d["colonised"]
-        ? colonisedCountries.get(d.value)
-        : null),
-        (d["colonialHistory"] = d["colonised"]
-          ? "Colonised"
-          : d["coloniser"]
-          ? "Coloniser"
-          : "-");
+      const colonisedData = colonisedCountries.get(d.value);
+      const coloniserData = coloniserCountries.get(d.value);
+      d["colonised"] = colonisedData ? colonisedData.coloniserCountry : null;
+      d["coloniser"] = coloniserData ? coloniserData.coloniserCountry : null;
+      d["yearOfIndependence"] = colonisedData
+        ? colonisedData.yearOfIndependence
+        : null;
+      d["colonialHistory"] = d["colonised"]
+        ? "Colonised"
+        : d["coloniser"]
+        ? "Coloniser"
+        : "";
       countryMap[d.value] = d;
     });
     this.countryMap = countryMap;
+
+    await this.makeYearFacetQuery(
+      countryCodes.alpha3ToAlpha2(this.state.country),
+    );
+    // this.makeCountryFacetQuery();
 
     countryData.sort((a, b) => a.label.localeCompare(b.label));
 
@@ -899,17 +933,26 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
    * prepare and handle negative or postive results.
    */
   makeYearFacetQuery = async (country) => {
-    const { onlyDomestic, onlyWithImage, taxonFilter } = this.state;
+    const { onlyWithImage, taxonFilter, yearMin, yearMax } = this.state;
     // Build up state for a query
     const gbifError = Object.assign({}, this.state.gbifError);
     delete gbifError[yearFacetQueryErrorCoded];
     this.setState({ fetching: true, gbifError });
+
+    const otherCountry = getColonialOtherCountry(
+      countryCodes.alpha2ToAlpha3(country),
+      this.countryMap,
+    );
+
     // Query the GBIF API
-    const result = await queryGBIFYearFacet(country, {
-      onlyDomestic,
+    const result = await queryGBIFFacetPerYear(country, {
       onlyWithImage,
       taxonFilter,
+      otherCountry,
+      yearMin,
+      yearMax,
     });
+
     // If the query errored out set to error state
     if (result.error) {
       const gbifError = Object.assign({}, this.state.gbifError);
@@ -917,15 +960,10 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       this.setState({ fetching: false, gbifError });
       return;
     }
-    // Transform the result as required for the DualChart
-    const gbifData = result.response.data.facets[0].counts.map((d) => ({
-      year: +d.name,
-      collections: +d.count,
-    }));
     // Fetching is complete rerender chart
     this.setState(
       {
-        gbifData,
+        gbifData: result.data,
         fetching: false,
       },
       () => {
@@ -957,7 +995,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const gbifCountryFacetData = {};
     result.response.data.facets[0].counts.map((d) => {
       gbifCountryFacetData[countryCodes.alpha2ToAlpha3(d.name)] = {
-        collections: d.count,
+        count: d.count,
       };
       return true;
     });
@@ -1429,20 +1467,39 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     );
 
     // Merge gbif data into vdem data
-    const gbifRecordsByYear = {};
+    const gbifDataByYear = {};
     gbifData.forEach((d) => {
-      gbifRecordsByYear[d.year] = d.collections;
+      gbifDataByYear[d.year] = d;
     });
     vdemFiltered.forEach((d) => {
-      d.records = gbifRecordsByYear[d.year] || 0;
       d.y2 = d[vdemVariable];
+      const {
+        count = 0,
+        countDomestic = 0,
+        countOther = 0,
+        countRest = 0,
+        countPreserved = 0,
+        countNotPreserved = 0,
+      } = gbifDataByYear[d.year] || {};
+      d.records = count;
+      d.countDomestic = countDomestic;
+      d.countOther = countOther;
+      d.countRest = countRest;
+      d.countPreserved = countPreserved;
+      d.countNotPreserved = countNotPreserved;
     });
     return vdemFiltered;
   }
 
   renderDualChart() {
-    const { vdemData, yearMin, fetching, vdemVariable, variableExplanations } =
-      this.state;
+    const {
+      vdemData,
+      yearMin,
+      fetching,
+      vdemVariable,
+      variableExplanations,
+      dualChartColorBy,
+    } = this.state;
     if (vdemData.length === 0) {
       return;
     }
@@ -1453,10 +1510,58 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       : vdemVariable;
 
     const selectedCountryData = this.countryMap[this.state.country];
-    const { yearOfIndependence } = selectedCountryData;
+    const { yearOfIndependence, otherCountry } = selectedCountryData;
+
+    const legendItems = ((by) => {
+      switch (by) {
+        case "regime":
+          return [{ key: "records", label: "Records" }];
+        case "basisOfRecord":
+          return [
+            {
+              key: "countPreserved",
+              label: "Preserved specimen",
+            },
+            { key: "countNotPreserved", label: "Other" },
+          ];
+        case "publishingCountry":
+          const items = [{ key: "countDomestic", label: "Domestic" }];
+          const countryData = this.countryMap[this.state.country];
+          if (countryData.colonised) {
+            items.push({
+              key: "countOther",
+              label: `Coloniser (${countryData.colonised})`,
+            });
+          }
+          items.push({ key: "countRest", label: "Other" });
+          return items;
+      }
+    })(dualChartColorBy);
+
+    const stackKeys = legendItems.map((item) => item.key);
+
+    const colorStackedRange = d3.range(4).map((i) => regimeColor(i));
+
+    const colorStacked = d3
+      .scaleOrdinal()
+      .domain(stackKeys)
+      .range(colorStackedRange);
+
+    const dualChartColor = (d) => {
+      switch (dualChartColorBy) {
+        case "regime":
+          return regimeColor(d.data.v2x_regime);
+        case "basisOfRecord":
+        case "publishingCountry":
+          return colorStacked(d.key);
+        default:
+          return "black";
+      }
+    };
 
     DualChart(this.refDualChart.current, {
       data: vdemFiltered,
+      stackKeys,
       height: 400,
       left: 70,
       right: yAxisLabelGap[vdemVariable] || 70,
@@ -1470,7 +1575,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       y2: (d) => d.y2,
       aux: (d) => d.confl,
       auxLabel: "Conflict",
-      color: (d) => regimeColor(d.v2x_regime),
+      color: dualChartColor,
+      legend: legendItems,
       fillOpacity: (d) => 0.75,
       y2Min: 0,
       y2Max: vdemScaleMax[vdemVariable],
@@ -1809,7 +1915,6 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
 
               <Grid item className="grid-item" xs={12} md={8}>
                 <div id="dualChart" ref={this.refDualChart} />
-                <RegimeLegend fillOpacity={0.75} />
 
                 {this.renderProgress()}
 
@@ -1856,19 +1961,20 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                       allowNoSelection
                     />
                   </FormControl>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={this.state.onlyDomestic}
-                        onChange={() =>
-                          this.setState({
-                            onlyDomestic: !this.state.onlyDomestic,
-                          })
-                        }
-                      />
-                    }
-                    label="Only show records from domestic institutions"
-                  />
+                  <FormControl
+                    className="formControl"
+                    style={{ minWidth: 150, margin: 10 }}
+                  >
+                    <InputLabel htmlFor="dualChartColorBy">Color by</InputLabel>
+                    <MuiSelect
+                      input={
+                        <Input name="dualChartColorBy" id="dualChartColorBy" />
+                      }
+                      value={this.state.dualChartColorBy}
+                      onChange={this.onDualChartChange}
+                      options={dualChartColorByOptions}
+                    />
+                  </FormControl>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -1881,6 +1987,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                       />
                     }
                     label="Only show records with photo"
+                    style={{ display: "none" }}
                   />
                   <Zoom
                     in={gbifError[yearFacetQueryErrorCoded]}

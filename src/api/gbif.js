@@ -2,6 +2,10 @@ import axios from "axios";
 import countryCodes from "../helpers/countryCodes";
 import { countries } from "./data";
 import sortyBy from "lodash/sortBy";
+import { range } from "d3";
+
+axios.defaults.headers.post["Content-Type"] = "application/json;charset=utf-8";
+axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
 
 const countriesFiltered = countries.filter((alpha3) =>
   countryCodes.alpha3ToAlpha2(alpha3),
@@ -11,7 +15,7 @@ const baseURL = "https://api.gbif.org/v1/";
 const occ = "occurrence/search";
 const autoc = "species/suggest";
 
-export const queryGBIFYearFacet = async (
+export const queryGBIFYearFacetOld = async (
   country,
   { onlyDomestic = false, onlyWithImage = false, taxonFilter = "" },
 ) => {
@@ -19,7 +23,7 @@ export const queryGBIFYearFacet = async (
   const url = `${baseURL}${occ}`;
   const params = {
     country: country || "SE",
-    limit: 1,
+    limit: 0,
     facet: "year",
     "year.facetLimit": 200,
   };
@@ -45,12 +49,126 @@ export const queryGBIFYearFacet = async (
     });
 };
 
+export const queryGBIFYearFacet = async (
+  country,
+  { onlyDomestic = false, onlyWithImage = false, taxonFilter = "" },
+) => {
+  // Construct the GBIF occurrences API url with facets for year counts
+  const url = `${baseURL}${occ}`;
+  const params = {
+    country: country || "SE",
+    limit: 0,
+    facet: "year",
+    "year.facetLimit": 200,
+  };
+  if (onlyDomestic) {
+    params.publishingCountry = country;
+  }
+  if (taxonFilter) {
+    params.taxonKey = taxonFilter;
+  }
+  if (onlyWithImage) {
+    params.mediaType = "StillImage";
+  }
+
+  // GET request to the GBIF-API
+  try {
+    const response = await axios.get(url, { params });
+
+    const data = response.data.facets[0].counts.map((d) => ({
+      year: +d.name,
+      count: +d.count,
+    }));
+    const result = {
+      data,
+    };
+    return result;
+  } catch (error) {
+    console.log("Error in fetching results from the GBIF API", error.message);
+    return { error };
+  }
+};
+
+const queryFacetByCountryAndYear = async (
+  country,
+  year,
+  { onlyWithImage = false, taxonFilter = "" } = {},
+) => {
+  let url = `${baseURL}${occ}?`;
+  url += [
+    `country=${encodeURIComponent(country)}`,
+    `year=${encodeURIComponent(year)}`,
+    `limit=0`,
+    `facet=publishingCountry`,
+    `facet=basisOfRecord`,
+  ].join("&");
+  if (taxonFilter) {
+    url += `&taxonKey=${encodeURIComponent(taxonFilter)}`;
+  }
+  if (onlyWithImage) {
+    url += `&mediaType=StillImage`;
+  }
+
+  return fetch(url).then((response) => response.json());
+};
+
+export const queryGBIFFacetPerYear = async (
+  country,
+  {
+    onlyWithImage = false,
+    taxonFilter = "",
+    yearMin = 1960,
+    yearMax = 2019,
+    otherCountry = null,
+  },
+) => {
+  // Construct the GBIF occurrences API url with facets for year counts
+  const years = range(yearMin, yearMax + 1);
+  const queries = years.map((year) =>
+    queryFacetByCountryAndYear(country, year, { onlyWithImage, taxonFilter }),
+  );
+  try {
+    const result = await Promise.all(queries);
+    const data = result.map(({ count, facets }, i) => {
+      const countPreserved =
+        facets
+          .find((d) => d.field === "BASIS_OF_RECORD")
+          .counts.find((d) => d.name === "PRESERVED_SPECIMEN")?.count || 0;
+
+      const countDomestic = facets
+        .find((d) => d.field === "PUBLISHING_COUNTRY")
+        .counts.find((d) => d.name === country);
+
+      const data = {
+        year: years[i],
+        count,
+        countPreserved,
+        countNotPreserved: count - countPreserved,
+        facets,
+        countDomestic: countDomestic ? countDomestic.count : 0,
+      };
+      if (otherCountry) {
+        const countOther = facets
+          .find((d) => d.field === "PUBLISHING_COUNTRY")
+          .counts.find((d) => d.name === otherCountry);
+        data.countOther = countOther ? countOther.count : 0;
+      }
+      data.countRest = data.count - data.countDomestic - (data.countOther || 0);
+      return data;
+    });
+    return { data };
+  } catch (error) {
+    console.log("Error in fetching results from the GBIF API", error.message);
+    return { error };
+  }
+};
+
 export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = 2019) => {
   // Construct the GBIF occurrences API url with facets for country counts
   const url = `${baseURL}${occ}`;
   const params = {
     year: yearMin === yearMax ? `${yearMin}` : `${yearMin},${yearMax}`,
-    limit: 1,
+    limit: 0,
     facet: "country",
     "country.facetLimit": 200,
   };
@@ -77,7 +195,7 @@ export const fetchRecordsPerCountryPerYear = async ({
 
   const responses = await Promise.all(
     countriesFiltered.map((country) =>
-      queryGBIFYearFacet(countryCodes.alpha3ToAlpha2(country), {
+      queryGBIFYearFacetOld(countryCodes.alpha3ToAlpha2(country), {
         taxonFilter,
         onlyDomestic,
       }),

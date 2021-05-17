@@ -14,7 +14,7 @@ export default function DualChart(el, properties) {
       width: null, // null to set it to the width of the anchor element
       top: 60,
       right: 80,
-      bottom: 60,
+      bottom: 70,
       left: 80,
       height: 400,
       xTickGap: 80,
@@ -29,6 +29,7 @@ export default function DualChart(el, properties) {
       zMax: null,
       y2LogScale: false,
       data: [],
+      stackKeys: null,
       // secondData: [],
       x: (d) => d.x,
       y: (d) => d.y,
@@ -52,6 +53,7 @@ export default function DualChart(el, properties) {
       fetching: false,
       verticalLineAt: null,
       verticalLineLabel: "Label",
+      legend: [],
     },
     properties,
   );
@@ -108,6 +110,8 @@ export default function DualChart(el, properties) {
 
   const y = d3.scaleLog().domain(yExtent).range([height, 0]);
 
+  const logSafe = (v) => Math.max(1, v);
+
   const yLogFriendlyAccessor = (d) => {
     const y = props.y(d);
     return Math.max(1, y);
@@ -158,7 +162,7 @@ export default function DualChart(el, properties) {
 
   // text label for the x axis
   g.append("text")
-    .attr("transform", `translate(${width / 2},${height + props.bottom})`)
+    .attr("transform", `translate(${width / 2},${height + 45})`)
     .attr("dy", "-0.5em")
     .style("text-anchor", "middle")
     .text(props.xLabel);
@@ -189,39 +193,61 @@ export default function DualChart(el, properties) {
     .style("text-anchor", "middle")
     .text(props.title);
 
-  // const legend = svg.selectAll(".legend")
-  //     // .data(z.ticks(6).slice(1).reverse())
-  //     .data(color.domain())
-  //   .enter().append("g")
-  //     .attr("class", "legend")
-  //     .attr("transform", (d, i) => `translate(${width/2 + i * 20},${height + props.bottom})`);
-  //     // .attr("transform", (d, i) => `translate(0,${i * 20})`);
-  //     // .attr("transform", function(d, i) { return "translate(" + (width + 20) + "," + (20 + i * 20) + ")"; });
+  const legendItems =
+    props.legend && props.legend.length > 1 ? props.legend : [];
+  const legend = g
+    .selectAll(".legend")
+    .data(legendItems, (d) => d.key)
+    .join("g")
+    .attr("class", "legend")
+    .attr(
+      "transform",
+      (d, i) => `translate(${i * 200},${height + props.bottom - 24})`,
+    );
+  // var text_element = legend.select("text");
+  // var textWidth = text_element.node().getComputedTextLength()
 
-  // legend.append("rect")
-  //     .attr("width", 20)
-  //     .attr("height", 20)
-  //     .style("fill", color);
-
-  // legend.append("text")
-  //     .attr("x", 26)
-  //     .attr("y", 10)
-  //     .attr("dy", ".35em")
-  //     .text(String);
-
-  // append the rectangles for the bar chart
-  g.selectAll(".bar")
-    .data(data)
-    .enter()
+  legend
     .append("rect")
+    .attr("width", 20)
+    .attr("height", 20)
+    .style("fill", props.color)
+    .style("stroke", props.color)
+    .style("fill-opacity", props.fillOpacity);
+
+  legend
+    .append("text")
+    .attr("x", 26)
+    .attr("y", 10)
+    .attr("dy", ".35em")
+    .text((d) => d.label);
+
+  const stackedData = d3
+    .stack()
+    .keys(props.stackKeys)(data)
+    .map((d) => (d.forEach((v) => (v.key = d.key)), d));
+
+  g.append("g")
+    .selectAll("g")
+    .data(stackedData)
+    .join("g")
+    // .attr("fill", (d) => (d.key === "countPreserved" ? "red" : "blue"))
+    .selectAll("rect")
+    .data((d) => d)
+    .join("rect")
     .attr("class", "bar")
     .style("fill-opacity", props.fillOpacity)
     .style("fill", barColor)
     .style("stroke", barColor)
-    .attr("x", (d) => x(props.x(d)))
+    .attr("x", (d) => x(props.x(d.data)))
     .attr("width", x.bandwidth())
-    .attr("y", (d) => y(yLogFriendlyAccessor(d)))
-    .attr("height", (d) => height - y(yLogFriendlyAccessor(d)));
+    // .attr("y", (d) => y(yLogFriendlyAccessor(d)))
+    // .attr("height", (d) => height - y(yLogFriendlyAccessor(d)));
+    .attr("y", (d) => y(logSafe(d[1])))
+    .attr("height", (d) => y(logSafe(d[0])) - y(logSafe(d[1])));
+  //     .append("title")
+  //       .text(d => `${d.data.name} ${d.key}
+  // ${formatValue(d.data[d.key])}`);
 
   const cleanData = data.filter((d) => !Number.isNaN(props.y2(d)));
 
@@ -260,7 +286,7 @@ export default function DualChart(el, properties) {
         .style("opacity", props.auxOpacity)
         .attr("x", (d) => x(props.x(d)))
         .attr("width", x.bandwidth())
-        .attr("y", 0)
+        .attr("y", -10)
         .attr("height", 5);
 
       // Legend
@@ -269,25 +295,25 @@ export default function DualChart(el, properties) {
       const auxLegend = g
         .append("g")
         .attr("class", "aux-legend")
-        .attr("transform", `translate(0, ${height + 20})`);
+        .attr("transform", `translate(0, ${-10})`);
 
+      const auxLegendWidth = Math.min(10, Math.max(5, x.bandwidth()));
       auxLegend
         .append("rect")
         .style("fill", props.auxFill)
-        // .style("stroke", props.auxStroke)
-        // .style("opacity", props.auxOpacity)
-        .attr("x", 0)
-        .attr("width", Math.max(5, x.bandwidth()))
-        .attr("y", 10)
+        .attr("x", -auxLegendWidth)
+        .attr("width", auxLegendWidth)
+        .attr("y", 0)
         .attr("height", 5);
 
       // text label for the x axis
       auxLegend
         .append("text")
-        .attr("dx", Math.max(5, x.bandwidth()) + 4)
-        .attr("dy", "1.2em")
+        .attr("x", -auxLegendWidth - 4)
+        .attr("dx", "0")
+        .attr("dy", "5")
         .attr("font-size", "0.8em")
-        .style("text-anchor", "left")
+        .style("text-anchor", "end")
         .text(props.auxLabel);
     }
   }
@@ -298,7 +324,7 @@ export default function DualChart(el, properties) {
     if (verticalLineAt >= props.xMin) {
       g.append("line")
         .attr("x1", xMid)
-        .attr("y1", -7)
+        .attr("y1", -12)
         .attr("x2", xMid)
         .attr("y2", height)
         .style("stroke-width", 2)
@@ -309,7 +335,7 @@ export default function DualChart(el, properties) {
       // Label on top of vertical line
       g.append("text")
         .attr("transform", `translate(${xMid},${0})`)
-        .attr("dy", "-1em")
+        .attr("dy", "-1.3em")
         .attr("font-size", "0.8em")
         .style("text-anchor", "middle")
         .text(props.verticalLineLabel);
