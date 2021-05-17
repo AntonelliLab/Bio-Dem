@@ -74,6 +74,12 @@ a, strong {
   color: rgba(0, 0, 0, 0.87);
 }
 
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
 .formControl {
   margin: 20px;
   min-width: 120px;

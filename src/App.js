@@ -1963,7 +1963,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                   </FormControl>
                   <FormControl
                     className="formControl"
-                    style={{ minWidth: 150, margin: 10 }}
+                    style={{ minWidth: 260, margin: 10 }}
                   >
                     <InputLabel htmlFor="dualChartColorBy">Color by</InputLabel>
                     <MuiSelect
@@ -1976,6 +1976,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                     />
                   </FormControl>
                   <FormControlLabel
+                    style={{ marginLeft: 0 }}
                     control={
                       <Checkbox
                         checked={this.state.onlyWithImage}
@@ -1987,7 +1988,6 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                       />
                     }
                     label="Only show records with photo"
-                    style={{ display: "none" }}
                   />
                   <Zoom
                     in={gbifError[yearFacetQueryErrorCoded]}
@@ -2020,7 +2020,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                   </Zoom>
                   <div>
                     <small>
-                      Country suffix denoting{" "}
+                      Country{" "}
                       <a href="https://www.gbif.org/the-gbif-network">
                         GBIF membership
                       </a>
