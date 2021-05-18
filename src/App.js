@@ -1542,7 +1542,12 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const legendItems = ((by) => {
       switch (by) {
         case "regime":
-          return [{ key: "records", label: "Records" }];
+          // return [{ key: "records", label: "Records" }];
+          return Object.keys(regimeTypes).map((key) => ({
+            key,
+            label: regimeTypes[key],
+            data: { v2x_regime: key },
+          }));
         case "basisOfRecord":
           return [
             {
@@ -1565,7 +1570,10 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       }
     })(dualChartColorBy);
 
-    const stackKeys = legendItems.map((item) => item.key);
+    const stackKeys =
+      dualChartColorBy === "regime"
+        ? [{ key: "records", label: "Records" }]
+        : legendItems.map((item) => item.key);
 
     const colorStackedRange = d3.range(4).map((i) => regimeColor(i));
 
@@ -1577,7 +1585,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const dualChartColor = (d) => {
       switch (dualChartColorBy) {
         case "regime":
-          return regimeColor(d.data.v2x_regime);
+          return regimeColor(d.data ? d.data.v2x_regime : d.v2x_regime);
         case "basisOfRecord":
         case "publishingCountry":
           return colorStacked(d.key);
@@ -1589,6 +1597,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     DualChart(this.refDualChart.current, {
       data: vdemFiltered,
       stackKeys,
+      grouped: true, // Better than stacked for log scale
       height: 400,
       left: 70,
       right: yAxisLabelGap[vdemVariable] || 70,

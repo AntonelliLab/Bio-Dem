@@ -68,7 +68,7 @@ export const computeLegendLayout = (
   {
     width = 300,
     fontSize = "0.8em",
-    hGap = 30,
+    hGap = 20,
     vGap = 0,
     lineHeight = null,
   } = {},

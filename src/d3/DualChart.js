@@ -30,7 +30,7 @@ export default function DualChart(el, properties) {
       y2LogScale: false,
       data: [],
       stackKeys: null,
-      grouped: true, // grouped bar chart instead of stacked (better if y scale is logarithmic)
+      grouped: false, // grouped bar chart instead of stacked (better if y scale is logarithmic)
       // secondData: [],
       x: (d) => d.x,
       y: (d) => d.y,
@@ -59,7 +59,9 @@ export default function DualChart(el, properties) {
     properties,
   );
 
-  const grouped = props.grouped && props.stackKeys.length > 1;
+  const stackKeys =
+    props.stackKeys && props.stackKeys.length ? props.stackKeys : [];
+  const grouped = props.grouped && stackKeys.length > 1;
 
   const anchorElement = d3.select(el);
   let svg = anchorElement.select("svg");
@@ -83,30 +85,13 @@ export default function DualChart(el, properties) {
 
   const legendItems =
     props.legend && props.legend.length > 1 ? props.legend : [];
-  console.log("Legend items:", legendItems);
-  // const legendItems = [
-  //   { key: "a", label: "a label" },
-  //   { key: "b", label: "a very long long label" },
-  //   { key: "c", label: "another label" },
-  //   {
-  //     key: "d",
-  //     label: "yet another label, or sentence actually that breaks to new row",
-  //   },
-  //   { key: "a2", label: "a label 2" },
-  //   { key: "b2", label: "a very long long label 2" },
-  //   { key: "c2", label: "another label 2" },
-  //   {
-  //     key: "d2",
-  //     label: "yet another label, or sentence actually that breaks to new row 2",
-  //   },
-  // ];
 
   const legendLayout = computeLegendLayout(
     legendItems.map((d) => d.label),
     {
       width: totalWidth - props.left - props.right,
       fontSize: "0.8em",
-      hGap: 30,
+      hGap: 20,
       vGap: 8,
     },
   );
@@ -147,18 +132,13 @@ export default function DualChart(el, properties) {
   // For grouped bar chart
   const xGroup = d3
     .scaleBand()
-    .domain(props.stackKeys)
+    .domain(stackKeys)
     .rangeRound([0, x.bandwidth()])
     .padding(0.05);
 
   const y = d3.scaleLog().domain(yExtent).range([height, 0]);
 
   const logSafe = (v) => Math.max(1, v);
-
-  const yLogFriendlyAccessor = (d) => {
-    const y = props.y(d);
-    return Math.max(1, y);
-  };
 
   const y2 = (props.y2LogScale ? d3.scaleLog() : d3.scaleLinear())
     .domain(y2Extent)
@@ -270,32 +250,47 @@ export default function DualChart(el, properties) {
   }
 
   if (!grouped) {
-    const stackedData = d3
-      .stack()
-      .keys(props.stackKeys)(data)
-      .map((d) => (d.forEach((v) => (v.key = d.key)), d));
+    if (stackKeys.length > 1) {
+      const stackedData = d3
+        .stack()
+        .keys(stackKeys)(data)
+        .map((d) => (d.forEach((v) => (v.key = d.key)), d));
 
-    g.append("g")
-      .selectAll("g")
-      .data(stackedData)
-      .join("g")
-      // .attr("fill", (d) => (d.key === "countPreserved" ? "red" : "blue"))
-      .selectAll("rect")
-      .data((d) => d)
-      .join("rect")
-      .attr("class", "bar")
-      .style("fill-opacity", props.fillOpacity)
-      .style("fill", barColor)
-      .style("stroke", barColor)
-      .attr("x", (d) => x(props.x(d.data)))
-      .attr("width", x.bandwidth())
-      // .attr("y", (d) => y(yLogFriendlyAccessor(d)))
-      // .attr("height", (d) => height - y(yLogFriendlyAccessor(d)));
-      .attr("y", (d) => y(logSafe(d[1])))
-      .attr("height", (d) => y(logSafe(d[0])) - y(logSafe(d[1])));
-    //     .append("title")
-    //       .text(d => `${d.data.name} ${d.key}
-    // ${formatValue(d.data[d.key])}`);
+      g.append("g")
+        .selectAll("g")
+        .data(stackedData)
+        .join("g")
+        // .attr("fill", (d) => (d.key === "countPreserved" ? "red" : "blue"))
+        .selectAll("rect")
+        .data((d) => d)
+        .join("rect")
+        .attr("class", "bar")
+        .style("fill-opacity", props.fillOpacity)
+        .style("fill", barColor)
+        .style("stroke", barColor)
+        .attr("x", (d) => x(props.x(d.data)))
+        .attr("width", x.bandwidth())
+        // .attr("y", (d) => y(yLogFriendlyAccessor(d)))
+        // .attr("height", (d) => height - y(yLogFriendlyAccessor(d)));
+        .attr("y", (d) => y(logSafe(d[1])))
+        .attr("height", (d) => y(logSafe(d[0])) - y(logSafe(d[1])));
+      //     .append("title")
+      //       .text(d => `${d.data.name} ${d.key}
+      // ${formatValue(d.data[d.key])}`);
+    } else {
+      g.append("g")
+        .selectAll(".bar")
+        .data(data)
+        .join("rect")
+        .attr("class", "bar")
+        .style("fill-opacity", props.fillOpacity)
+        .style("fill", barColor)
+        .style("stroke", barColor)
+        .attr("x", (d) => x(props.x(d)))
+        .attr("width", x.bandwidth())
+        .attr("y", (d) => y(logSafe(props.y(d))))
+        .attr("height", (d) => height - y(logSafe(props.y(d))));
+    }
   } else {
     g.append("g")
       .selectAll("g")
@@ -303,7 +298,9 @@ export default function DualChart(el, properties) {
       .join("g")
       .attr("transform", (d) => `translate(${x(props.x(d))},0)`)
       .selectAll("rect")
-      .data((d) => props.stackKeys.map((key) => ({ ...d, key, value: d[key] })))
+      .data((d) =>
+        props.stackKeys.map((key) => ({ data: d, key, value: d[key] })),
+      )
       .join("rect")
       .attr("x", (d) => xGroup(d.key))
       .attr("y", (d) => y(logSafe(d.value)))
