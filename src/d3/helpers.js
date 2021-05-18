@@ -62,3 +62,74 @@ export const getFirstContiguousRangeNotNaN = (data, accessor = (d) => d) => {
   }
   return [valueStartIndex, data.length - 1];
 };
+
+export const computeLegendLayout = (
+  labels,
+  {
+    width = 300,
+    fontSize = "0.8em",
+    hGap = 30,
+    vGap = 0,
+    lineHeight = null,
+  } = {},
+) => {
+  const svgNode = document.createElement("svg");
+  document.body.append(svgNode);
+  const svg = d3.select(svgNode).attr("id", "tmpLegendLayout");
+  const text = svg
+    .selectAll(".tmpText")
+    .data(labels)
+    .join("text")
+    .attr("class", "tmpText")
+    .attr("font-size", fontSize)
+    .text((d) => d);
+  // const getWidth = (node) => node.getComputedTextLength(); // Why not available here?!
+  const getWidth = (node) => node.getBoundingClientRect().width;
+  const textLengths = text.nodes().map(getWidth);
+  const rowHeight =
+    lineHeight || text.nodes()[0].getBoundingClientRect().height;
+  let layout = [
+    {
+      x: 0,
+      row: 0,
+      indexInRow: 0,
+      textWidth: textLengths[0],
+      label: labels[0],
+    },
+  ];
+  let currX = 0;
+  let row = 0;
+  let maxWidth = 0;
+  textLengths.forEach((size, i) => {
+    currX += size + hGap;
+    if (currX > width && i > 0 && layout[i].indexInRow > 0) {
+      currX = 0;
+      row += 1;
+      layout[i] = { ...layout[i], x: currX, row, indexInRow: 0 };
+      currX += size + hGap;
+    }
+    maxWidth = Math.max(currX, maxWidth);
+    if (i < textLengths.length - 1) {
+      layout.push({
+        x: currX,
+        row,
+        indexInRow: layout[i].indexInRow + 1,
+        label: labels[i + 1],
+        textWidth: size,
+      });
+    }
+  });
+  document.body.removeChild(tmpLegendLayout);
+  layout = layout.map((d) => ({
+    ...d,
+    y: (rowHeight + vGap) * d.row,
+    xEnd: d.x + d.textWidth + hGap,
+  }));
+  maxWidth = d3.max(layout, (d) => d.xEnd);
+  return {
+    items: layout,
+    height: row * (rowHeight + vGap) + rowHeight,
+    width: maxWidth,
+    lineHeight: rowHeight,
+  };
+};

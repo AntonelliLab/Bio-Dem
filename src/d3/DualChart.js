@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { getExtent } from "./helpers";
+import { getExtent, computeLegendLayout } from "./helpers";
 import "./DualChart.css";
 
 /**
@@ -8,13 +8,13 @@ import "./DualChart.css";
  * @param {Object} properties chart props
  */
 export default function DualChart(el, properties) {
-  const props = Object.assign(
+  let props = Object.assign(
     {
       autoResize: true,
       width: null, // null to set it to the width of the anchor element
       top: 60,
       right: 80,
-      bottom: 70,
+      bottom: 40,
       left: 80,
       height: 400,
       xTickGap: 80,
@@ -76,6 +76,38 @@ export default function DualChart(el, properties) {
   let totalWidth = props.width;
   if (!totalWidth) {
     totalWidth = anchorElement.node().getBoundingClientRect().width;
+  }
+
+  const legendItems =
+    props.legend && props.legend.length > 1 ? props.legend : [];
+  // const legendItems = [
+  //   { key: "a", label: "a label" },
+  //   { key: "b", label: "a very long long label" },
+  //   { key: "c", label: "another label" },
+  //   {
+  //     key: "d",
+  //     label: "yet another label, or sentence actually that breaks to new row",
+  //   },
+  //   { key: "a2", label: "a label 2" },
+  //   { key: "b2", label: "a very long long label 2" },
+  //   { key: "c2", label: "another label 2" },
+  //   {
+  //     key: "d2",
+  //     label: "yet another label, or sentence actually that breaks to new row 2",
+  //   },
+  // ];
+
+  const legendLayout = computeLegendLayout(
+    legendItems.map((d) => d.label),
+    {
+      width: totalWidth - props.left - props.right,
+      fontSize: "0.8em",
+      hGap: 30,
+      vGap: 8,
+    },
+  );
+  if (legendItems.length > 0) {
+    props.bottom += legendLayout.height;
   }
 
   const height = props.height - props.top - props.bottom;
@@ -193,23 +225,24 @@ export default function DualChart(el, properties) {
     .style("text-anchor", "middle")
     .text(props.title);
 
-  const legendItems =
-    props.legend && props.legend.length > 1 ? props.legend : [];
   const legend = g
-    .selectAll(".legend")
+    .append("g")
+    .attr("class", "legend")
+    .selectAll(".legend-item")
     .data(legendItems, (d) => d.key)
     .join("g")
-    .attr("class", "legend")
+    .attr("class", "legend-item")
     .attr(
       "transform",
-      (d, i) => `translate(${i * 200},${height + props.bottom - 24})`,
+      (d, i) =>
+        `translate(${legendLayout.items[i].x},${
+          height + 45 + legendLayout.items[i].y
+        })`,
     );
-  // var text_element = legend.select("text");
-  // var textWidth = text_element.node().getComputedTextLength()
 
   legend
     .append("rect")
-    .attr("width", 20)
+    .attr("width", 10)
     .attr("height", 20)
     .style("fill", props.color)
     .style("stroke", props.color)
@@ -217,9 +250,10 @@ export default function DualChart(el, properties) {
 
   legend
     .append("text")
-    .attr("x", 26)
+    .attr("x", 16)
     .attr("y", 10)
     .attr("dy", ".35em")
+    .attr("font-size", "0.8em")
     .text((d) => d.label);
 
   const stackedData = d3

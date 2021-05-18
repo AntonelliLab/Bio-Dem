@@ -49,46 +49,6 @@ export const queryGBIFYearFacetOld = async (
     });
 };
 
-export const queryGBIFYearFacet = async (
-  country,
-  { onlyDomestic = false, onlyWithImage = false, taxonFilter = "" },
-) => {
-  // Construct the GBIF occurrences API url with facets for year counts
-  const url = `${baseURL}${occ}`;
-  const params = {
-    country: country || "SE",
-    limit: 0,
-    facet: "year",
-    "year.facetLimit": 200,
-  };
-  if (onlyDomestic) {
-    params.publishingCountry = country;
-  }
-  if (taxonFilter) {
-    params.taxonKey = taxonFilter;
-  }
-  if (onlyWithImage) {
-    params.mediaType = "StillImage";
-  }
-
-  // GET request to the GBIF-API
-  try {
-    const response = await axios.get(url, { params });
-
-    const data = response.data.facets[0].counts.map((d) => ({
-      year: +d.name,
-      count: +d.count,
-    }));
-    const result = {
-      data,
-    };
-    return result;
-  } catch (error) {
-    console.log("Error in fetching results from the GBIF API", error.message);
-    return { error };
-  }
-};
-
 const queryFacetByCountryAndYear = async (
   country,
   year,

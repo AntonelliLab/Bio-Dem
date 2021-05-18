@@ -26,7 +26,6 @@ import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
 import { saveAs } from "file-saver";
 import {
-  queryGBIFYearFacet,
   queryGBIFCountryFacet,
   queryAutocompletesGBIF,
   queryGBIFFacetPerYear,
@@ -44,6 +43,8 @@ import Notice from "./components/Notice";
 import IconGithub from "./components/Github";
 import "./App.css";
 import "./d3/d3.css";
+
+const MOCK_GBIF_REQUESTS = true;
 
 /**
  * V-dem variables
@@ -955,8 +956,12 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       this.countryMap,
     );
 
+    const queryGBIFFacetPerYearMock = () => Promise.resolve({ data: [] });
+    const queryFunction = MOCK_GBIF_REQUESTS
+      ? queryGBIFFacetPerYearMock
+      : queryGBIFFacetPerYear;
     // Query the GBIF API
-    const result = await queryGBIFFacetPerYear(country, {
+    const result = await queryFunction(country, {
       onlyWithImage,
       taxonFilter,
       onlyPreservedSpecimen,

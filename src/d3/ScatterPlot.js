@@ -99,9 +99,7 @@ export default function ScatterPlot(el, properties) {
   const color = (d) => {
     return props.fetching ? "#aaa" : props.color(d);
   };
-  const strokeColor = (d) => {
-    return props.selected(d) ? "red" : props.color(d);
-  };
+  const strokeColor = props.color;
 
   const xAxis = d3
     .axisBottom(x)
@@ -160,9 +158,8 @@ export default function ScatterPlot(el, properties) {
   // scatter dots
   g.selectAll(".dot")
     .data(data)
-    .enter()
-    .append("circle")
-    .attr("class", "dot")
+    .join("circle")
+    .attr("class", (d) => `dot dot-${d.key}`)
     .attr("cx", (d) => x(props.x(d)))
     .attr("cy", (d) => y(props.y(d)))
     .attr("r", (d) => value(props.value(d)))
@@ -202,7 +199,7 @@ export default function ScatterPlot(el, properties) {
   //     .style("text-anchor", "end")
   //     .text(d => d);
 
-  // add a circle for indicating the highlighted point
+  // A circle to highlight mouse over
   const highlightCircle = g
     .append("circle")
     .attr("class", "highlight-circle")
@@ -211,9 +208,32 @@ export default function ScatterPlot(el, properties) {
     .style("stroke", "#333")
     .style("display", "none");
 
+  // A mark to highlight selected circle
+  const selectedGroup = g
+    .append("g")
+    .attr("class", "selected-group")
+    .style("fill", "none")
+    .style("stroke", "#333")
+    .style("display", "none");
+
+  selectedGroup
+    .append("clipPath")
+    .attr("id", "circle-clip")
+    .append("circle")
+    .attr("cx", 175)
+    .attr("cy", 100)
+    .attr("r", 100);
+
+  const selectedCircle = selectedGroup
+    .append("circle")
+    .attr("class", "selected-circle")
+    .attr("r", 2);
+
   // highlight a data point
   function highlight(d) {
     if (d) {
+      // console.log("highlight:", d);
+      // d3.select(`.dot-${d.key}`).raise(); TODO: Why side effects?
       highlightCircle
         .style("display", "")
         // .style("stroke", color(d))
