@@ -44,7 +44,7 @@ import IconGithub from "./components/Github";
 import "./App.css";
 import "./d3/d3.css";
 
-const MOCK_GBIF_REQUESTS = true;
+const MOCK_GBIF_REQUESTS = false;
 
 /**
  * V-dem variables
@@ -1218,13 +1218,23 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     // [{ confl, country, records, recordsPerArea, y2, year}]
     const data = this.generateDualChartData();
     const lines = [
-      `country,year,records,records_per_area,${vdemVariable},conflict`,
+      [
+        "country",
+        "year",
+        "records",
+        "records_per_area",
+        `${vdemVariable}`,
+        "conflict",
+        "records_domestic",
+        "records_coloniser",
+        "records_preserved_specimen",
+      ].join(","),
     ];
     data.forEach((d) => {
       lines.push(
         `${d.country},${d.year},${d.records},${d.recordsPerArea},${d.y2},${
           d.confl ? "1" : "0"
-        }`,
+        },${d.countDomestic},${d.countColoniser},${d.countPreserved}`,
       );
     });
     lines.push("\n");
@@ -1493,15 +1503,15 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       const {
         count = 0,
         countDomestic = 0,
-        countOther = 0,
-        countRest = 0,
+        countOther: countColoniser = 0,
+        countRest: countOther = 0,
         countPreserved = 0,
         countNotPreserved = 0,
       } = gbifDataByYear[d.year] || {};
       d.records = count;
       d.countDomestic = countDomestic;
+      d.countColoniser = countColoniser;
       d.countOther = countOther;
-      d.countRest = countRest;
       d.countPreserved = countPreserved;
       d.countNotPreserved = countNotPreserved;
     });
@@ -1546,11 +1556,11 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
           const countryData = this.countryMap[this.state.country];
           if (countryData.colonised) {
             items.push({
-              key: "countOther",
+              key: "countColoniser",
               label: `Former coloniser (${countryData.colonised})`,
             });
           }
-          items.push({ key: "countRest", label: "Other" });
+          items.push({ key: "countOther", label: "Other" });
           return items;
       }
     })(dualChartColorBy);
