@@ -157,7 +157,7 @@ export default function ScatterPlot(el, properties) {
 
   // scatter dots
   g.selectAll(".dot")
-    .data(data)
+    .data(data, (d) => d.key)
     .join("circle")
     .attr("class", (d) => `dot dot-${d.key}`)
     .attr("cx", (d) => x(props.x(d)))

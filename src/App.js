@@ -127,7 +127,15 @@ const circleSizeOptions = [
   },
 ];
 
-const scatterYOptions = circleSizeOptions.concat(vdemOptions);
+const extraYOptions = [
+  ...circleSizeOptions,
+  {
+    value: "yearsSinceIndependence",
+    label: "Years since independence",
+  },
+];
+
+const scatterYOptions = extraYOptions.concat(vdemOptions);
 
 const gbifExplanations = [
   {
@@ -296,6 +304,7 @@ const vdemScaleMax = {
   e_migdppc: 2e5,
   records: 1e8,
   recordsPerArea: 1e3,
+  yearsSinceIndependence: 240,
 };
 
 const vdemScaleMin = {
@@ -310,6 +319,7 @@ const vdemScaleMin = {
   e_migdppc: 2e2,
   records: 1e2,
   recordsPerArea: 1e-2,
+  yearsSinceIndependence: 0,
 };
 
 const aggregationMethod = {
@@ -324,6 +334,7 @@ const aggregationMethod = {
   e_migdppc: "median",
   records: "sum",
   recordsPerArea: "sum",
+  yearsSinceIndependence: "mean", // constant
 };
 
 const useLogScale = {
@@ -826,6 +837,19 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const coloniserCountries = new Map(
       colonialTies.map((d) => [d.coloniserCountry, d]),
     );
+    const currentYear = new Date().getFullYear();
+    const yearsSinceIndependenceMap = new Map(
+      colonialTies.map((d) => [
+        d.colonisedCountry,
+        currentYear - d.yearOfIndependence,
+      ]),
+    );
+    vdemData.forEach((d) => {
+      const years = yearsSinceIndependenceMap.get(d.country);
+      if (years !== undefined) {
+        d.yearsSinceIndependence = years;
+      }
+    });
 
     const countryMap = {};
     countryData.forEach((d) => {
@@ -1355,7 +1379,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
 
     // Filter countries lacking values on the x y dimensions or have zero records (log safe)
     return Array.from(vdemGrouped, ([key, value]) => ({ key, value })).filter(
-      (d) => d.value !== null && d.value.records > 0,
+      (d) => d.value !== null && d.value.records > 0 && d.value.y !== undefined,
     );
   }
 
