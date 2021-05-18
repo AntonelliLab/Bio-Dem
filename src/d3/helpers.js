@@ -73,6 +73,9 @@ export const computeLegendLayout = (
     lineHeight = null,
   } = {},
 ) => {
+  if (!labels || !labels.length) {
+    return null;
+  }
   const svgNode = document.createElement("svg");
   document.body.append(svgNode);
   const svg = d3.select(svgNode).attr("id", "tmpLegendLayout");

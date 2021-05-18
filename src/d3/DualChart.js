@@ -30,6 +30,7 @@ export default function DualChart(el, properties) {
       y2LogScale: false,
       data: [],
       stackKeys: null,
+      grouped: true, // grouped bar chart instead of stacked (better if y scale is logarithmic)
       // secondData: [],
       x: (d) => d.x,
       y: (d) => d.y,
@@ -58,6 +59,8 @@ export default function DualChart(el, properties) {
     properties,
   );
 
+  const grouped = props.grouped && props.stackKeys.length > 1;
+
   const anchorElement = d3.select(el);
   let svg = anchorElement.select("svg");
 
@@ -80,6 +83,7 @@ export default function DualChart(el, properties) {
 
   const legendItems =
     props.legend && props.legend.length > 1 ? props.legend : [];
+  console.log("Legend items:", legendItems);
   // const legendItems = [
   //   { key: "a", label: "a label" },
   //   { key: "b", label: "a very long long label" },
@@ -139,6 +143,13 @@ export default function DualChart(el, properties) {
     .domain(d3.range(xExtent[0], xExtent[1] + 1))
     .range([0, width])
     .padding(0.2);
+
+  // For grouped bar chart
+  const xGroup = d3
+    .scaleBand()
+    .domain(props.stackKeys)
+    .rangeRound([0, x.bandwidth()])
+    .padding(0.05);
 
   const y = d3.scaleLog().domain(yExtent).range([height, 0]);
 
@@ -225,63 +236,81 @@ export default function DualChart(el, properties) {
     .style("text-anchor", "middle")
     .text(props.title);
 
-  const legend = g
-    .append("g")
-    .attr("class", "legend")
-    .selectAll(".legend-item")
-    .data(legendItems, (d) => d.key)
-    .join("g")
-    .attr("class", "legend-item")
-    .attr(
-      "transform",
-      (d, i) =>
-        `translate(${legendLayout.items[i].x},${
-          height + 45 + legendLayout.items[i].y
-        })`,
-    );
+  if (legendItems.length > 0) {
+    const legend = g
+      .append("g")
+      .attr("class", "legend")
+      .selectAll(".legend-item")
+      .data(legendItems, (d) => d.key)
+      .join("g")
+      .attr("class", "legend-item")
+      .attr(
+        "transform",
+        (d, i) =>
+          `translate(${legendLayout.items[i].x},${
+            height + 45 + legendLayout.items[i].y
+          })`,
+      );
 
-  legend
-    .append("rect")
-    .attr("width", 10)
-    .attr("height", 20)
-    .style("fill", props.color)
-    .style("stroke", props.color)
-    .style("fill-opacity", props.fillOpacity);
+    legend
+      .append("rect")
+      .attr("width", 10)
+      .attr("height", 20)
+      .style("fill", props.color)
+      .style("stroke", props.color)
+      .style("fill-opacity", props.fillOpacity);
 
-  legend
-    .append("text")
-    .attr("x", 16)
-    .attr("y", 10)
-    .attr("dy", ".35em")
-    .attr("font-size", "0.8em")
-    .text((d) => d.label);
+    legend
+      .append("text")
+      .attr("x", 16)
+      .attr("y", 10)
+      .attr("dy", ".35em")
+      .attr("font-size", "0.8em")
+      .text((d) => d.label);
+  }
 
-  const stackedData = d3
-    .stack()
-    .keys(props.stackKeys)(data)
-    .map((d) => (d.forEach((v) => (v.key = d.key)), d));
+  if (!grouped) {
+    const stackedData = d3
+      .stack()
+      .keys(props.stackKeys)(data)
+      .map((d) => (d.forEach((v) => (v.key = d.key)), d));
 
-  g.append("g")
-    .selectAll("g")
-    .data(stackedData)
-    .join("g")
-    // .attr("fill", (d) => (d.key === "countPreserved" ? "red" : "blue"))
-    .selectAll("rect")
-    .data((d) => d)
-    .join("rect")
-    .attr("class", "bar")
-    .style("fill-opacity", props.fillOpacity)
-    .style("fill", barColor)
-    .style("stroke", barColor)
-    .attr("x", (d) => x(props.x(d.data)))
-    .attr("width", x.bandwidth())
-    // .attr("y", (d) => y(yLogFriendlyAccessor(d)))
-    // .attr("height", (d) => height - y(yLogFriendlyAccessor(d)));
-    .attr("y", (d) => y(logSafe(d[1])))
-    .attr("height", (d) => y(logSafe(d[0])) - y(logSafe(d[1])));
-  //     .append("title")
-  //       .text(d => `${d.data.name} ${d.key}
-  // ${formatValue(d.data[d.key])}`);
+    g.append("g")
+      .selectAll("g")
+      .data(stackedData)
+      .join("g")
+      // .attr("fill", (d) => (d.key === "countPreserved" ? "red" : "blue"))
+      .selectAll("rect")
+      .data((d) => d)
+      .join("rect")
+      .attr("class", "bar")
+      .style("fill-opacity", props.fillOpacity)
+      .style("fill", barColor)
+      .style("stroke", barColor)
+      .attr("x", (d) => x(props.x(d.data)))
+      .attr("width", x.bandwidth())
+      // .attr("y", (d) => y(yLogFriendlyAccessor(d)))
+      // .attr("height", (d) => height - y(yLogFriendlyAccessor(d)));
+      .attr("y", (d) => y(logSafe(d[1])))
+      .attr("height", (d) => y(logSafe(d[0])) - y(logSafe(d[1])));
+    //     .append("title")
+    //       .text(d => `${d.data.name} ${d.key}
+    // ${formatValue(d.data[d.key])}`);
+  } else {
+    g.append("g")
+      .selectAll("g")
+      .data(data)
+      .join("g")
+      .attr("transform", (d) => `translate(${x(props.x(d))},0)`)
+      .selectAll("rect")
+      .data((d) => props.stackKeys.map((key) => ({ ...d, key, value: d[key] })))
+      .join("rect")
+      .attr("x", (d) => xGroup(d.key))
+      .attr("y", (d) => y(logSafe(d.value)))
+      .attr("width", xGroup.bandwidth())
+      .attr("height", (d) => y(logSafe(0)) - y(logSafe(d.value)))
+      .attr("fill", (d) => barColor(d));
+  }
 
   const cleanData = data.filter((d) => !Number.isNaN(props.y2(d)));
 
