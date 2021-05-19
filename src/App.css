@@ -65,8 +65,12 @@ a, strong {
   z-index: -1;   
 }
 
-.section-1, .section-3 {
+.section-1, .section-4 {
   background-color: #f6f6f6;
+}
+
+.section-3 {
+  background-color: #f6f4f1;
 }
 
 .heading {

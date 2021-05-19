@@ -18,6 +18,7 @@ import AccordionDetails from "@material-ui/core/AccordionDetails";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import IconDownload from "@material-ui/icons/CloudDownload";
+import ParentSize from "@visx/responsive/lib/components/ParentSize";
 // import IconPlay from '@material-ui/icons/PlayCircleOutline';
 // import IconPause from '@material-ui/icons/PauseCircleOutline';
 import * as d3 from "d3";
@@ -41,6 +42,7 @@ import { hexToRGBA } from "./helpers/colors";
 import AutoSelect, { MuiSelect } from "./components/AutoSelect";
 import Notice from "./components/Notice";
 import IconGithub from "./components/Github";
+import WorldMap from "./components/WorldMap";
 import "./App.css";
 import "./d3/d3.css";
 
@@ -323,6 +325,7 @@ const vdemScaleMin = {
 };
 
 const aggregationMethod = {
+  v2x_regime: "mean",
   v2x_polyarchy: "median",
   v2x_freexp_altinf: "median",
   v2x_frassoc_thick: "median",
@@ -499,6 +502,7 @@ class App extends Component {
       variableExplanations: {}, // Combination of vdem and gbif explanations mapped by variable id
       loaded: false,
       fetching: false,
+      data: null,
       countries: [],
       yearMin: 1960,
       yearMax: 2020,
@@ -512,6 +516,7 @@ class App extends Component {
       xyYearMax: 2019,
       colorBy: "regime",
       dualChartColorBy: "basisOfRecord", // ["regime", "basisOfRecord", "publishingCountry"]
+      mapColorBy: "records",
       regionFilter: 0,
       // DualChart
       country: "SWE",
@@ -527,6 +532,7 @@ class App extends Component {
       // Active highlights
       activeScatterPlotHighlight: null,
       activeDualChartHighlight: null,
+      worldMapData: null,
     };
     this.refScatterPlot = React.createRef();
     this.refBrush = React.createRef();
@@ -905,13 +911,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
 
   async initData() {
     const data = await this.fetchData();
-    const {
-      vdemData,
-      vdemExplanations,
-      countryData,
-      gbifYearlyCountryData,
-      gbifParticipatingCountries,
-    } = data;
+    const { vdemData, vdemExplanations, countryData, gbifYearlyCountryData } =
+      data;
     const variableExplanations = {};
     vdemExplanations.forEach((d) => {
       variableExplanations[d.id] = d;
@@ -953,6 +954,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       () => {
         this.renderCharts();
         this.renderBrush();
+
+        this.generateWorldMapData();
       },
     );
   }
@@ -1056,6 +1059,13 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const { name, value } = event.target;
     this.setState({ [name]: value }, () => {
       this.renderCharts();
+    });
+  };
+
+  handleMapChange = (event) => {
+    const { name, value } = event.target;
+    this.setState({ [name]: value }, () => {
+      this.generateWorldMapData();
     });
   };
 
@@ -1383,6 +1393,46 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     );
   }
 
+  generateWorldMapData() {
+    const { vdemData, mapColorBy, xyYearMin, xyYearMax, regionFilter } =
+      this.state;
+    if (vdemData.length === 0) {
+      return;
+    }
+    const [startYear, stopYear] = this.getValidYears(
+      [mapColorBy],
+      xyYearMin,
+      xyYearMax,
+    );
+    const worldMapData = d3.rollup(
+      vdemData.filter(
+        (d) =>
+          d.year >= startYear &&
+          d.year <= stopYear &&
+          (regionFilter === 0 ||
+            this.countryMap[d.country].regionCode === regionFilter),
+      ),
+      (values) => {
+        if (
+          haveNaN([values[0][mapColorBy]]) ||
+          haveNaN(values, (d) => d[mapColorBy])
+        ) {
+          return null;
+        }
+        const z = d3[aggregationMethod[mapColorBy]](
+          values,
+          (d) => d[mapColorBy],
+        );
+        return z;
+      },
+      (d) => d.country,
+    );
+
+    // Filter countries lacking values on the x y dimensions or have zero records (log safe)
+    this.setState({ worldMapData });
+    return worldMapData;
+  }
+
   renderScatterPlot() {
     const { vdemData, vdemX, vdemY, vdemZ, variableExplanations } = this.state;
     if (vdemData.length === 0) {
@@ -1661,8 +1711,15 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
   }
 
   render() {
-    const { vdemX, vdemY, vdemZ, xyYearMin, gbifError, variableExplanations } =
-      this.state;
+    const {
+      vdemX,
+      vdemY,
+      vdemZ,
+      xyYearMin,
+      gbifError,
+      variableExplanations,
+      mapColorBy,
+    } = this.state;
     const xyValidYears = this.getValidYears([vdemX, vdemY], 1960, 2018);
     const xyYearIntervalLimited =
       xyYearMin < xyValidYears[0] || xyValidYears[1] < 2016;
@@ -2150,6 +2207,53 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
           </Grid>
 
           <Grid item className="grid-item section section-3" xs={12}>
+            <Grid container>
+              <Grid item className="grid-item" xs={12} md={4}>
+                <Typography variant="h5" gutterBottom className="heading">
+                  Data through space and time
+                </Typography>
+                <Typography variant="body2" gutterBottom>
+                  Biodiversity and democracy data mapped to space.
+                </Typography>
+                <Typography variant="body2" gutterBottom>
+                  Create a window in the time filter and drag to explore how the
+                  data evolves in time (coming soon).
+                </Typography>
+                <div className="controls">
+                  <FormControl
+                    className="formControl"
+                    style={{ minWidth: 240, margin: 10 }}
+                  >
+                    <InputLabel htmlFor="mapColorBy">Color by</InputLabel>
+                    <MuiSelect
+                      input={<Input name="mapColorBy" id="mapColorBy" />}
+                      value={this.state.mapColorBy}
+                      onChange={this.handleMapChange}
+                      options={scatterYOptions}
+                    />
+                  </FormControl>
+                </div>
+              </Grid>
+
+              <Grid item className="grid-item" xs={12} md={8}>
+                <ParentSize>
+                  {({ width }) => (
+                    <WorldMap
+                      width={width}
+                      data={this.state.worldMapData}
+                      colorBy={mapColorBy}
+                      valueMin={vdemScaleMin[mapColorBy]}
+                      valueMax={vdemScaleMax[mapColorBy]}
+                      logScale={useLogScale[mapColorBy]}
+                    />
+                  )}
+                </ParentSize>
+                <div className="controls"></div>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Grid item className="grid-item section section-4" xs={12}>
             <About
               vdemExplanations={this.state.vdemExplanations}
               gbifExplanations={gbifExplanations}

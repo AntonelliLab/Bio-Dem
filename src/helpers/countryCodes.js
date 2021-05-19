@@ -23,4 +23,8 @@ export default {
   alpha3ToAlpha2(code) {
     return countryCodes.alpha3ToAlpha2(code);
   },
+
+  numericToAlpha3(code) {
+    return countryCodes.numericToAlpha3(code);
+  },
 };

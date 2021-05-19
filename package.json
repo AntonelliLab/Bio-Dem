@@ -15,6 +15,9 @@
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/styles": "^4.11.4",
+    "@visx/geo": "^1.7.0",
+    "@visx/responsive": "^1.10.1",
+    "@visx/scale": "^1.7.0",
     "autosuggest-highlight": "^3.1.1",
     "axios": "^0.21.1",
     "classnames": "^2.3.1",
@@ -36,7 +39,8 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-player": "^2.9.0",
-    "react-scripts": "4.0.3"
+    "react-scripts": "4.0.3",
+    "topojson-client": "^3.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.14.2",
