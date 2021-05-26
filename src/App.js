@@ -160,6 +160,16 @@ const gbifExplanations = [
     relevance:
       "This variable accounts for the fact that the size of a country might affect the absolute number of records collected.",
   },
+  {
+    id: "yearsSinceIndependence",
+    label: "Years since independence",
+    short_name: "Years since independence",
+    full_name: "Years since independence",
+    description:
+      "Number of years since the country gained independence from its former colonial power. Countries with no such data are filtered out.",
+    //TODO: Write about selection criteria? After 1800, only across continents? Only from Europe?
+    relevance: "TODO",
+  },
 ];
 
 const regimeTypes = {
@@ -1878,7 +1888,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                       input={<Input name="vdemX" id="vdemX" />}
                       value={this.state.vdemX}
                       onChange={this.handleChange}
-                      options={vdemOptions}
+                      options={scatterYOptions}
                     />
                   </FormControl>
                   <FormControl
