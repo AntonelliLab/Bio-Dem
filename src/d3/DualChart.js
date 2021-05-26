@@ -249,6 +249,72 @@ export default function DualChart(el, properties) {
       .text((d) => d.label);
   }
 
+  if (props.aux) {
+    const auxData = data.filter(props.aux);
+    if (auxData.length > 0) {
+      // Dots for auxiliary boolean input
+      const gAux = g
+        .selectAll(".aux")
+        .data(auxData)
+        .join("g")
+        .attr("class", "aux");
+
+      gAux
+        .append("rect")
+        // .attr("class", "aux")
+        .style("fill", props.auxFill)
+        .style("stroke", props.auxStroke)
+        .style("opacity", props.auxOpacity)
+        .attr("x", (d) => x(props.x(d)))
+        .attr("width", x.bandwidth())
+        .attr("y", -10)
+        .attr("height", 5);
+
+      // Half-transparent bar to the x-axis to connect with bars
+      gAux
+        .append("rect")
+        .style("fill", props.auxFill)
+        .style("stroke", props.auxStroke)
+        .style("opacity", 0.1)
+        .attr(
+          "x",
+          (d) =>
+            x(props.x(d)) -
+            (0.5 * x.paddingInner() * x.bandwidth()) / (1 - x.paddingInner()),
+        )
+        .attr("width", x.bandwidth() / (1 - x.paddingInner()))
+        .attr("y", -10)
+        .attr("height", height + 10);
+
+      // Legend
+
+      // Add the second y Axis
+      const auxLegend = g
+        .append("g")
+        .attr("class", "aux-legend")
+        .attr("transform", `translate(0, ${-10})`);
+
+      const auxLegendWidth = Math.min(10, Math.max(5, x.bandwidth()));
+      auxLegend
+        .append("rect")
+        .style("fill", props.auxFill)
+        .attr("x", -auxLegendWidth)
+        .attr("width", auxLegendWidth)
+        .attr("y", 0)
+        .attr("height", 5);
+
+      // text label for the x axis
+      auxLegend
+        .append("text")
+        .attr("x", -auxLegendWidth - 4)
+        .attr("dx", "0")
+        .attr("dy", "5")
+        .attr("font-size", "0.8em")
+        .style("text-anchor", "end")
+        .text(props.auxLabel);
+    }
+  }
+
   if (!grouped) {
     if (stackKeys.length > 1) {
       const stackedData = d3
@@ -332,52 +398,6 @@ export default function DualChart(el, properties) {
     .attr("cy", (d) => y2(props.y2(d)))
     .attr("r", 3);
 
-  if (props.aux) {
-    const auxData = data.filter(props.aux);
-    if (auxData.length > 0) {
-      // Dots for auxiliary boolean input
-      g.selectAll(".aux")
-        .data(data.filter(props.aux))
-        .enter()
-        .append("rect") // Uses the enter().append() method
-        .attr("class", "aux") // Assign a class for styling
-        .style("fill", props.auxFill)
-        .style("stroke", props.auxStroke)
-        .style("opacity", props.auxOpacity)
-        .attr("x", (d) => x(props.x(d)))
-        .attr("width", x.bandwidth())
-        .attr("y", -10)
-        .attr("height", 5);
-
-      // Legend
-
-      // Add the second y Axis
-      const auxLegend = g
-        .append("g")
-        .attr("class", "aux-legend")
-        .attr("transform", `translate(0, ${-10})`);
-
-      const auxLegendWidth = Math.min(10, Math.max(5, x.bandwidth()));
-      auxLegend
-        .append("rect")
-        .style("fill", props.auxFill)
-        .attr("x", -auxLegendWidth)
-        .attr("width", auxLegendWidth)
-        .attr("y", 0)
-        .attr("height", 5);
-
-      // text label for the x axis
-      auxLegend
-        .append("text")
-        .attr("x", -auxLegendWidth - 4)
-        .attr("dx", "0")
-        .attr("dy", "5")
-        .attr("font-size", "0.8em")
-        .style("text-anchor", "end")
-        .text(props.auxLabel);
-    }
-  }
-
   const { verticalLineAt } = props;
   if (verticalLineAt) {
     const xMid = x(verticalLineAt) + x.bandwidth() / 2;
@@ -389,7 +409,7 @@ export default function DualChart(el, properties) {
         .attr("y2", height)
         .style("stroke-width", 2)
         .style("stroke-dasharray", 4)
-        .style("stroke", "red")
+        .style("stroke", "#75B176")
         .style("fill", "none");
 
       // Label on top of vertical line

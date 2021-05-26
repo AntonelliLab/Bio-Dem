@@ -164,11 +164,12 @@ const gbifExplanations = [
     id: "yearsSinceIndependence",
     label: "Years since independence",
     short_name: "Years since independence",
-    full_name: "Years since independence",
+    full_name:
+      "Number of years since independence from last imperial suppressor",
     description:
-      "Number of years since the country gained independence from its former colonial power. Countries with no such data are filtered out.",
-    //TODO: Write about selection criteria? After 1800, only across continents? Only from Europe?
-    relevance: "TODO",
+      "The time since independence from the last imperial suppressor. Only for colonial ties outside Europe and for connection of countries on different continents. Countries with no such data are filtered out.",
+    relevance:
+      "The longer a country is independent, the more time there may be for establishment of domestic scientific institutions and the lower the on-going ties of scientific dependency to the former imperialistic power may be.",
   },
 ];
 
@@ -530,7 +531,7 @@ class App extends Component {
       regionFilter: 0,
       // DualChart
       country: "SWE",
-      // country: "AZE",
+      // country: "SYR",
       vdemVariable: v2x_freexp_altinf,
       onlyDomestic: false,
       onlyWithImage: false,
