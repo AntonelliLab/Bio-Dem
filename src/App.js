@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
+import { withStyles } from "@material-ui/core/styles";
+import Tooltip from "@material-ui/core/Tooltip";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import Grid from "@material-ui/core/Grid";
@@ -138,6 +140,10 @@ const extraYOptions = [
 ];
 
 const scatterYOptions = extraYOptions.concat(vdemOptions);
+
+const scatterYOptionsLabelMap = new Map(
+  scatterYOptions.map((d) => [d.value, d.label]),
+);
 
 const gbifExplanations = [
   {
@@ -501,6 +507,16 @@ const CountryHighlight = ({ code, name, onClick }) => (
     {name}
   </strong>
 );
+
+const HtmlTooltip = withStyles((theme) => ({
+  tooltip: {
+    backgroundColor: "#f5f5f9",
+    color: "rgba(0, 0, 0, 0.87)",
+    // maxWidth: 220,
+    fontSize: theme.typography.pxToRem(12),
+    border: "1px solid #dadde9",
+  },
+}))(Tooltip);
 
 class App extends Component {
   constructor(props) {
@@ -927,9 +943,11 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const variableExplanations = {};
     vdemExplanations.forEach((d) => {
       variableExplanations[d.id] = d;
+      scatterYOptionsLabelMap.set(d.id, d.short_name);
     });
     gbifExplanations.forEach((d) => {
       variableExplanations[d.id] = d;
+      scatterYOptionsLabelMap.set(d.id, d.short_name);
     });
 
     vdemOptions.forEach((d) => {
@@ -1318,6 +1336,25 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     });
   };
 
+  onWorldMapMouseOver = (countryCode) => {
+    this.setState({
+      worldMapMouseOverCountry: countryCode,
+    });
+  };
+  onWorldMapMouseOut = () => {
+    this.setState({
+      worldMapMouseOverCountry: null,
+    });
+  };
+  onWorldMapClick = (countryCode) => {
+    const worldMapSelectedCountry =
+      countryCode === this.state.worldMapSelectedCountry ? null : countryCode;
+    this.setState({
+      worldMapSelectedCountry,
+      worldMapLoading: worldMapSelectedCountry !== null,
+    });
+  };
+
   /**
    * Get valid year range for selected data dimensions
    * This will adjust for data limits where certain dimensions lack values for all countries.
@@ -1517,6 +1554,51 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       onClick: this.onScatterPlotClickCountry,
     });
   }
+
+  renderWorldMapTooltip = () => {
+    const {
+      worldMapMouseOverCountry: country,
+      mapColorBy,
+      worldMapData,
+    } = this.state;
+    if (!country || !worldMapData) {
+      return "";
+    }
+    const countryData = this.countryMap[country];
+    if (!countryData) {
+      return (
+        <React.Fragment>
+          <Typography color="inherit">{country}</Typography>
+          <div>
+            <div>The country is not part of our dataset</div>
+          </div>
+        </React.Fragment>
+      );
+    }
+    return (
+      <React.Fragment>
+        <Typography color="inherit">
+          {countryData.label} ({country})
+        </Typography>
+        <div>
+          <div>
+            <strong>Region:</strong> {countryData.regionName}
+          </div>
+          <div>
+            <strong>Area:</strong> {countryData.area.toLocaleString("en")} km²
+          </div>
+          <div>
+            <strong>GBIF membership:</strong>{" "}
+            {countryData.gbifParticipationText}
+          </div>
+          <div>
+            <strong>{scatterYOptionsLabelMap.get(mapColorBy)}:</strong>{" "}
+            {worldMapData.get(country)}
+          </div>
+        </div>
+      </React.Fragment>
+    );
+  };
 
   renderBrush() {
     const { vdemData, regionFilter } = this.state;
@@ -2249,14 +2331,24 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
               <Grid item className="grid-item" xs={12} md={8}>
                 <ParentSize>
                   {({ width }) => (
-                    <WorldMap
-                      width={width}
-                      data={this.state.worldMapData}
-                      colorBy={mapColorBy}
-                      valueMin={vdemScaleMin[mapColorBy]}
-                      valueMax={vdemScaleMax[mapColorBy]}
-                      logScale={useLogScale[mapColorBy]}
-                    />
+                    <HtmlTooltip
+                      title={this.renderWorldMapTooltip()}
+                      open={!!this.state.worldMapMouseOverCountry}
+                    >
+                      <div>
+                        <WorldMap
+                          width={width}
+                          data={this.state.worldMapData}
+                          colorBy={mapColorBy}
+                          valueMin={vdemScaleMin[mapColorBy]}
+                          valueMax={vdemScaleMax[mapColorBy]}
+                          logScale={useLogScale[mapColorBy]}
+                          onMouseOver={this.onWorldMapMouseOver}
+                          onMouseOut={this.onWorldMapMouseOut}
+                          onClick={this.onWorldMapClick}
+                        />
+                      </div>
+                    </HtmlTooltip>
                   )}
                 </ParentSize>
                 <div className="controls"></div>

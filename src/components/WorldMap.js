@@ -57,7 +57,9 @@ export default ({
   valueMin = null,
   valueMax = null,
   logScale = false,
-  events = true,
+  onMouseOver = () => {},
+  onMouseOut = () => {},
+  onClick = () => {},
 }) => {
   const [world, setWorld] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -106,7 +108,7 @@ export default ({
   };
 
   return width < 10 ? null : (
-    <svg width={width} height={height}>
+    <svg width={width} height={height} onClick={() => onClick(null)}>
       <NaturalEarth
         data={world.features}
         scale={scale}
@@ -125,12 +127,15 @@ export default ({
                 fill={color(feature)}
                 stroke={background}
                 strokeWidth={0.5}
-                onClick={() => {
-                  if (events)
-                    console.log(
-                      `Clicked: ${feature.properties.name} (${feature.id})`,
-                      feature,
-                    );
+                onMouseOver={() => {
+                  onMouseOver(feature.id, feature);
+                }}
+                onMouseOut={() => {
+                  onMouseOut(feature.id, feature);
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClick(feature.id, feature);
                 }}
               />
             ))}
