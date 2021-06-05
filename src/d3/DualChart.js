@@ -184,9 +184,9 @@ export default function DualChart(el, properties) {
     .tickSizeOuter(0)
     .tickValues(d3.ticks(xExtent[0], xExtent[1], totalWidth / props.xTickGap));
 
-  const yAxis = d3.axisLeft(y).ticks(height / props.yTickGap);
+  const yAxis = d3.axisLeft(y).ticks(height / props.yTickGap, "~s");
 
-  const y2Axis = d3.axisRight(y2).ticks(height / props.yTickGap);
+  const y2Axis = d3.axisRight(y2).ticks(height / props.yTickGap, "~s");
 
   // Second y data
   const y2line = d3
