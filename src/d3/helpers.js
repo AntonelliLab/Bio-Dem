@@ -74,7 +74,12 @@ export const computeLegendLayout = (
   } = {},
 ) => {
   if (!labels || !labels.length) {
-    return null;
+    return {
+      items: [],
+      height: 0,
+      width: 0,
+      lineHeight,
+    };
   }
   const svgNode = document.createElement("svg");
   document.body.append(svgNode);

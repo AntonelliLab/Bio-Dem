@@ -32,13 +32,14 @@ export default function DualChart(el, properties) {
       stackKeys: null,
       grouped: false, // grouped bar chart instead of stacked (better if y scale is logarithmic)
       // secondData: [],
+      extraCurves: [],
       x: (d) => d.x,
       y: (d) => d.y,
       y2: (d) => d.y,
       color: (d) => "steelblue",
       fillOpacity: (d) => 1.0,
-      y2Stroke: (d) => "#D75C1F",
-      y2Fill: (d) => "#8C330F",
+      y2Stroke: "#fdd471",
+      y2Fill: "#b88918",
       y2Opacity: (d) => 1,
       aux: null, // () => b:Boolean, auxiliary boolean input based on the same x axis
       auxFill: (d) => "#CA1229",
@@ -99,6 +100,38 @@ export default function DualChart(el, properties) {
     props.bottom += legendLayout.height;
   }
 
+  const useCurveLegends = props.extraCurves.length > 0;
+
+  const curveLegendItems = useCurveLegends
+    ? [
+        {
+          key: "y2",
+          label: props.y2Label,
+          fill: props.y2Fill,
+          stroke: props.y2Stroke,
+        },
+        ...props.extraCurves.map(({ label, fill, stroke }) => ({
+          key: label,
+          label,
+          fill,
+          stroke,
+        })),
+      ]
+    : [];
+
+  const curveLegendLayout = computeLegendLayout(
+    curveLegendItems.map((d) => d.label),
+    {
+      width: totalWidth - props.left - props.right,
+      fontSize: "0.8em",
+      hGap: 8,
+      vGap: 0,
+    },
+  );
+  if (curveLegendItems.length > 0) {
+    props.bottom += curveLegendLayout.height;
+  }
+
   const height = props.height - props.top - props.bottom;
   const width = totalWidth - props.left - props.right;
 
@@ -144,6 +177,8 @@ export default function DualChart(el, properties) {
     .domain(y2Extent)
     .range([height, 0]);
 
+  const yCurve = d3.scaleLinear().domain([0, 1]).range([height, 0]);
+
   const xAxis = d3
     .axisBottom(x)
     .tickSizeOuter(0)
@@ -179,7 +214,7 @@ export default function DualChart(el, properties) {
   // Add the second y Axis
   g.append("g")
     .attr("class", "y2 axis")
-    .style("fill", props.y2Stroke)
+    .style("fill", useCurveLegends ? "none" : props.y2Stroke)
     .attr("transform", `translate(${width}, 0)`)
     .call(y2Axis);
 
@@ -200,14 +235,15 @@ export default function DualChart(el, properties) {
     .text(props.yLabel);
 
   // text label for the second y axis
-  g.append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("y", width + props.right)
-    .attr("x", 0 - height / 2)
-    .attr("dy", "-0.5em")
-    .style("text-anchor", "middle")
-    // .style("stroke", props.y2Fill)
-    .text(props.y2Label);
+  if (!useCurveLegends) {
+    g.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", width + props.right)
+      .attr("x", 0 - height / 2)
+      .attr("dy", "-0.5em")
+      .style("text-anchor", "middle")
+      .text(props.y2Label);
+  }
 
   // text label for title
   g.append("text")
@@ -239,6 +275,48 @@ export default function DualChart(el, properties) {
       .style("fill", props.color)
       .style("stroke", props.color)
       .style("fill-opacity", props.fillOpacity);
+
+    legend
+      .append("text")
+      .attr("x", 16)
+      .attr("y", 10)
+      .attr("dy", ".35em")
+      .attr("font-size", "0.8em")
+      .text((d) => d.label);
+  }
+
+  if (curveLegendItems.length > 0) {
+    const legend = g
+      .append("g")
+      .attr("class", "legend")
+      .selectAll(".extra-legend-item")
+      .data(curveLegendItems, (d) => d.key)
+      .join("g")
+      .attr("class", "extra-legend-item")
+      .attr(
+        "transform",
+        (d, i) =>
+          `translate(${curveLegendLayout.items[i].x},${
+            height + 45 + curveLegendLayout.items[i].y + legendLayout.height
+          })`,
+      );
+
+    legend
+      .append("rect")
+      .attr("height", 2)
+      .attr("width", 14)
+      .attr("x", -2)
+      .attr("y", 9)
+      .style("fill", (d) => d.fill)
+      .style("stroke", "none");
+
+    legend
+      .append("circle")
+      .attr("r", 3)
+      .attr("cx", 5)
+      .attr("cy", 10)
+      .style("fill", (d) => d.stroke)
+      .style("stroke", "none");
 
     legend
       .append("text")
@@ -287,8 +365,6 @@ export default function DualChart(el, properties) {
         .attr("height", height + 10);
 
       // Legend
-
-      // Add the second y Axis
       const auxLegend = g
         .append("g")
         .attr("class", "aux-legend")
@@ -373,6 +449,37 @@ export default function DualChart(el, properties) {
       .attr("width", xGroup.bandwidth())
       .attr("height", (d) => y(logSafe(0)) - y(logSafe(d.value)))
       .attr("fill", (d) => barColor(d));
+  }
+
+  const { extraCurves } = props;
+  if (extraCurves.length > 0) {
+    const extraLines = extraCurves.map((curve) =>
+      d3
+        .line()
+        .x((d) => x(props.x(d)))
+        .y((d) => yCurve(curve.y(d))),
+    );
+
+    extraCurves.forEach((curve, i) => {
+      // line
+      g.append("path")
+        .datum(data)
+        .style("fill", "none")
+        .style("stroke", curve.stroke)
+        .style("stroke-width", 2)
+        .attr("d", extraLines[i]);
+
+      // dots
+      g.append("g")
+        .selectAll(`.dot-extra-${i}`)
+        .data(data)
+        .join("circle")
+        .attr("class", `.dot-extra-${i}`)
+        .style("fill", curve.fill)
+        .attr("cx", (d) => x(props.x(d)))
+        .attr("cy", (d) => yCurve(curve.y(d)))
+        .attr("r", 3);
+    });
   }
 
   const cleanData = data.filter((d) => !Number.isNaN(props.y2(d)));

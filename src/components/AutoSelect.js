@@ -7,7 +7,7 @@ import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-
+import Chip from "@material-ui/core/Chip";
 function renderInput(inputProps) {
   const { InputProps, classes, ref, ...other } = inputProps;
 
@@ -84,9 +84,6 @@ const useStyles = makeStyles((theme) => ({
     left: 0,
     right: 0,
   },
-  chip: {
-    margin: theme.spacing(0.5, 0.25),
-  },
   inputRoot: {
     flexWrap: "wrap",
   },
@@ -96,6 +93,17 @@ const useStyles = makeStyles((theme) => ({
   },
   divider: {
     height: theme.spacing(2),
+  },
+  chips: {
+    display: "flex",
+    flexWrap: "wrap",
+  },
+  chip: {
+    // margin: theme.spacing(0.5, 0.25),
+    margin: 2,
+  },
+  noLabel: {
+    marginTop: theme.spacing(3),
   },
 }));
 
@@ -285,6 +293,57 @@ export const MuiSelect = ({
     {options.map((o) => (
       <MenuItem key={o.value} value={o.value}>
         {label(o)}
+      </MenuItem>
+    ))}
+  </Select>
+);
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 350,
+      minWidth: 350,
+    },
+  },
+};
+
+function getMultiSelectStyles(value, selectedValues) {
+  return {
+    fontWeight: selectedValues.indexOf(value) === -1 ? "normal" : "bold",
+  };
+}
+
+export const MuiMultiSelect = ({
+  options,
+  value,
+  onChange,
+  input,
+  label = (d) => d.label,
+}) => (
+  <Select
+    multiple
+    value={value}
+    onChange={onChange}
+    input={input}
+    renderValue={(selected) => (
+      <div style={{ display: "flex", flexWrap: "wrap" }}>
+        {selected.map((value) => (
+          <Chip key={value} label={label(value)} style={{ margin: 2 }} />
+        ))}
+      </div>
+    )}
+    MenuProps={MenuProps}
+  >
+    {options.map((o) => (
+      <MenuItem
+        key={o.value}
+        value={o.value}
+        style={getMultiSelectStyles(o.value, value)}
+      >
+        {o.label}
       </MenuItem>
     ))}
   </Select>

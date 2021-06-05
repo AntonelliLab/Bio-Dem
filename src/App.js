@@ -41,7 +41,7 @@ import Brush from "./d3/Brush";
 import { haveNaN } from "./d3/helpers";
 import countryCodes from "./helpers/countryCodes";
 import { hexToRGBA } from "./helpers/colors";
-import AutoSelect, { MuiSelect } from "./components/AutoSelect";
+import AutoSelect, { MuiSelect, MuiMultiSelect } from "./components/AutoSelect";
 import Notice from "./components/Notice";
 import IconGithub from "./components/Github";
 import WorldMap from "./components/WorldMap";
@@ -235,6 +235,10 @@ const getColonialOtherCountry = (country, countryMap) => {
 
 const dualChartColorByOptions = [
   {
+    value: "none",
+    label: "None",
+  },
+  {
     value: "regime",
     label: "Regime type",
   },
@@ -247,6 +251,28 @@ const dualChartColorByOptions = [
     label: "Publishing country",
   },
 ];
+
+const dualChartShowProportionsOptions = [
+  {
+    value: "publishedByDomestic",
+    label: "Published by domestic",
+  },
+  {
+    value: "publishedByFormerColoniser",
+    label: "Published by former coloniser",
+  },
+  {
+    value: "preservedSpecimen",
+    label: "Preserved specimen",
+  },
+];
+
+const showProportionsLabelMap = new Map(
+  dualChartShowProportionsOptions.map(({ value, label }) => [value, label]),
+);
+const getShowProportionsLabel = (value) => {
+  return showProportionsLabelMap.get(value);
+};
 
 const regimeColor = d3.scaleSequential(d3.interpolateViridis).domain([0, 3]);
 
@@ -542,12 +568,15 @@ class App extends Component {
       xyYearMin: 1960,
       xyYearMax: 2019,
       colorBy: "regime",
-      dualChartColorBy: "basisOfRecord", // ["regime", "basisOfRecord", "publishingCountry"]
+      dualChartColorBy: "regime", // ["none", "regime", "basisOfRecord", "publishingCountry"]
       mapColorBy: "records",
+      dualChartShowProportions: ["publishedByDomestic", "preservedSpecimen"], // ["publishedByDomestic", "publishedByFormerColoniser", "preservedSpecimen"]
+      // dualChartShowProportions: dualChartShowProportionsOptions.slice(0, 1), // ["publishedByDomestic", "preservedSpecimen"], // ["publishedByDomestic", "publishedByFormerColoniser", "preservedSpecimen"]
       regionFilter: 0,
       // DualChart
-      country: "SWE",
+      // country: "SWE",
       // country: "SYR",
+      country: "MDG",
       vdemVariable: v2x_freexp_altinf,
       onlyDomestic: false,
       onlyWithImage: false,
@@ -747,6 +776,21 @@ class App extends Component {
       );
     }
   }
+
+  getEnabledExtraCurves = () => {
+    const { country, dualChartColorBy } = this.state;
+    const enabledCurves = [];
+    if (dualChartColorBy !== "basisOfRecord") {
+      enabledCurves.push("preservedSpecimen");
+    }
+    if (dualChartColorBy !== "publishingCountry") {
+      enabledCurves.push("publishedByDomestic");
+      if (this.countryMap && this.countryMap[country].colonised) {
+        enabledCurves.push("publishedByFormerColoniser");
+      }
+    }
+    return enabledCurves;
+  };
 
   onResize = () => {
     if (this.rqf) {
@@ -1107,6 +1151,17 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
    * then trigger rerender.
    */
   onDualChartChange = (event) => {
+    this.setState(
+      {
+        [event.target.name]: event.target.value,
+      },
+      () => {
+        this.renderDualChart();
+      },
+    );
+  };
+
+  onDualChartChangeShowProportions = (event) => {
     this.setState(
       {
         [event.target.name]: event.target.value,
@@ -1708,6 +1763,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
 
     const legendItems = ((by) => {
       switch (by) {
+        case "none":
+          return [];
         case "regime":
           // return [{ key: "records", label: "Records" }];
           return Object.keys(regimeTypes).map((key) => ({
@@ -1738,11 +1795,33 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     })(dualChartColorBy);
 
     const stackKeys =
-      dualChartColorBy === "regime"
+      dualChartColorBy === "regime" || dualChartColorBy === "none"
         ? [{ key: "records", label: "Records" }]
         : legendItems.map((item) => item.key);
 
-    const colorStackedRange = d3.range(4).map((i) => regimeColor(i));
+    // const colorStackedRange = d3.range(4).map((i) => regimeColor(i));
+    // const colorStackedRange = ["#7fc97f", "#beaed4", "#fdc086", "#ffff99"];
+    // const colorStackedRange = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a'];
+    const colorStackedRange = [
+      // "#C5DE39",
+      // "#78B078",
+      "#7fc97f",
+      // "#93D64D",
+      // "#2E868D",
+      "#482470",
+      // "#fda066",
+      "#FBA250",
+      // "#fdc086",
+      "#1b9e77",
+      // "#d95f02",
+      // "#7570b3",
+      // "#e7298a",
+      // "#66a61e",
+      // "#e6ab02",
+      // "#a6761d",
+      "#aaaaaa",
+      // "#beaed4",
+    ];
 
     const colorStacked = d3
       .scaleOrdinal()
@@ -1751,6 +1830,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
 
     const dualChartColor = (d) => {
       switch (dualChartColorBy) {
+        case "none":
+          return "#430753";
         case "regime":
           return regimeColor(d.data ? d.data.v2x_regime : d.v2x_regime);
         case "basisOfRecord":
@@ -1761,10 +1842,57 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       }
     };
 
+    const { dualChartShowProportions } = this.state;
+
+    const countryData = this.countryMap[this.state.country];
+
+    const extraCurvesSelected = dualChartShowProportions.map((value) => {
+      switch (value) {
+        case "publishedByDomestic":
+          return {
+            key: value,
+            label: `${getShowProportionsLabel(value)}`,
+            title: "Proportion from domestic publisher",
+            y: (d) => d.countDomestic / d.records,
+            // stroke: "#6ad8ff",
+            // fill: "#0d86b2",
+            stroke: "#a6cee3",
+            fill: "#1f78b4",
+          };
+        case "publishedByFormerColoniser":
+          return {
+            key: value,
+            label: `${getShowProportionsLabel(value)} (${
+              countryData.colonised
+            })`,
+            y: (d) => d.countColoniser / d.records,
+            // stroke: "#d2b3ff",
+            // fill: "#5e339c",
+            stroke: "#cab2d6",
+            fill: "#6a3d9a",
+          };
+        case "preservedSpecimen":
+          return {
+            key: value,
+            label: `${getShowProportionsLabel(value)}`,
+            y: (d) => d.countPreserved / d.records,
+            // stroke: "#F8435E",
+            // fill: "#AF0735",
+            stroke: "#b2df8a",
+            fill: "#33a02c",
+          };
+      }
+    });
+    const enabledExtraCurves = this.getEnabledExtraCurves();
+    const extraCurves = extraCurvesSelected.filter(
+      ({ key }) => enabledExtraCurves.indexOf(key) !== -1,
+    );
+
     DualChart(this.refDualChart.current, {
       data: vdemFiltered,
       stackKeys,
       grouped: true, // Better than stacked for log scale
+      extraCurves,
       height: 400,
       left: 70,
       right: yAxisLabelGap[vdemVariable] || 70,
@@ -1779,6 +1907,12 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       aux: (d) => d.confl,
       auxLabel: "Conflict",
       color: dualChartColor,
+      // y2Stroke: "#fdd471",
+      // y2Fill: "#b88918",
+      // y2Stroke: "#a6cee3",
+      // y2Fill: "#1f78b4",
+      y2Stroke: "#FBA250",
+      y2Fill: "#A60729",
       legend: legendItems,
       fillOpacity: (d) => 0.75,
       y2Min: 0,
@@ -1788,7 +1922,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       y2Label: y2Label,
       verticalLineAt: yearOfIndependence,
       verticalLineLabel: "Independence",
-      title: "Number of public species records per country and year",
+      title: `Number of public species records per year in ${countryData.label}`,
       fetching,
     });
   }
@@ -1816,6 +1950,17 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const xyValidYears = this.getValidYears([vdemX, vdemY], 1960, 2018);
     const xyYearIntervalLimited =
       xyYearMin < xyValidYears[0] || xyValidYears[1] < 2016;
+
+    const enabledCurves = this.getEnabledExtraCurves();
+    const dualChartShowProportionsFiltered =
+      this.state.dualChartShowProportions.filter(
+        (value) => enabledCurves.indexOf(value) !== -1,
+      );
+    const dualChartShowProportionsOptionsFiltered =
+      dualChartShowProportionsOptions.filter(
+        ({ value }) => enabledCurves.indexOf(value) !== -1,
+      );
+
     return (
       <div className="App">
         <AppBar color="primary" position="fixed" className="appbar">
@@ -2214,6 +2359,21 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                     }
                     label="Require preserved specimen"
                   />
+                  <FormControl
+                    className="formControl"
+                    style={{ minWidth: 240, margin: 10 }}
+                  >
+                    <InputLabel htmlFor="dualChartShowProportions">
+                      Show proportions
+                    </InputLabel>
+                    <MuiMultiSelect
+                      value={dualChartShowProportionsFiltered}
+                      onChange={this.onDualChartChangeShowProportions}
+                      input={<Input name="dualChartShowProportions" />}
+                      options={dualChartShowProportionsOptionsFiltered}
+                      label={getShowProportionsLabel}
+                    />
+                  </FormControl>
                   <Zoom
                     in={gbifError[yearFacetQueryErrorCoded]}
                     mountOnEnter
@@ -2243,57 +2403,55 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                       }
                     />
                   </Zoom>
-                  <div>
-                    <small>
-                      Country{" "}
-                      <a href="https://www.gbif.org/the-gbif-network">
-                        GBIF membership
-                      </a>
-                      : ᵛ&nbsp;=&nbsp;voting participant,
-                      ᵃ&nbsp;=&nbsp;associate country participant
-                    </small>
-                  </div>
-                  <div style={{ marginTop: 10 }}>
-                    <h3>
-                      Selected variables:
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        style={{ marginLeft: 8 }}
-                        download="bio-dem_dualchart.csv"
-                        onClick={this.onClickSaveDualChartData}
-                      >
-                        <IconDownload
-                          fontSize="small"
-                          style={{ marginRight: 5 }}
-                        />
-                        CSV
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        style={{ marginLeft: 8 }}
-                        download="bio-dem_dualchart.svg"
-                        onClick={this.onClickSaveDualChartSVG}
-                      >
-                        <IconDownload
-                          fontSize="small"
-                          style={{ marginRight: 5 }}
-                        />
-                        SVG
-                      </Button>
-                    </h3>
-                    <h4>
-                      {variableExplanations[this.state.vdemVariable]
-                        ? variableExplanations[this.state.vdemVariable]
-                            .short_name
-                        : ""}
-                    </h4>
+                </div>
+                <div>
+                  <small>
+                    Country{" "}
+                    <a href="https://www.gbif.org/the-gbif-network">
+                      GBIF membership
+                    </a>
+                    : ᵛ&nbsp;=&nbsp;voting participant, ᵃ&nbsp;=&nbsp;associate
+                    country participant
+                  </small>
+                </div>
+                <div style={{ marginTop: 10 }}>
+                  <h3>
+                    Selected variables:
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      style={{ marginLeft: 8 }}
+                      download="bio-dem_dualchart.csv"
+                      onClick={this.onClickSaveDualChartData}
+                    >
+                      <IconDownload
+                        fontSize="small"
+                        style={{ marginRight: 5 }}
+                      />
+                      CSV
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      style={{ marginLeft: 8 }}
+                      download="bio-dem_dualchart.svg"
+                      onClick={this.onClickSaveDualChartSVG}
+                    >
+                      <IconDownload
+                        fontSize="small"
+                        style={{ marginRight: 5 }}
+                      />
+                      SVG
+                    </Button>
+                  </h3>
+                  <h4>
                     {variableExplanations[this.state.vdemVariable]
-                      ? variableExplanations[this.state.vdemVariable]
-                          .description
+                      ? variableExplanations[this.state.vdemVariable].short_name
                       : ""}
-                  </div>
+                  </h4>
+                  {variableExplanations[this.state.vdemVariable]
+                    ? variableExplanations[this.state.vdemVariable].description
+                    : ""}
                 </div>
               </Grid>
             </Grid>
