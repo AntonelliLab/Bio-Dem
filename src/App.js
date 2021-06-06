@@ -52,8 +52,8 @@ const MOCK_GBIF_REQUESTS = false;
 
 /**
  * V-dem variables
- * country,year,v2x_regime,v2x_polyarchy,v2x_freexp_altinf,v2x_frassoc_thick,v2xcl_dmove,v2xcs_ccsi,v2x_corr,v2x_clphy,e_regiongeo,e_peaveduc,e_migdppc,confl
-AFG,1960,0,0.0878861649162364,0.190868685410209,0.125512007338669,0.266093357150313,0.242432454719204,0.48274120527295,0.37271631597475,14,0.31028929,2744,NA,0
+country,year,v2x_regime,v2x_polyarchy,v2x_freexp_altinf,v2x_frassoc_thick,v2xcl_dmove,v2xcs_ccsi,v2x_corr,v2x_clphy,e_peaveduc,e_migdppc,conflict_hi,conflict_li
+AFG,1960,0,0.093,0.179,0.12,0.218,0.254,0.482,0.369,0.31,2744,0,0
  */
 const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
 
@@ -829,7 +829,8 @@ class App extends Component {
         v2x_clphy: +row.v2x_clphy,
         e_peaveduc: +row.e_peaveduc,
         e_migdppc: +row.e_migdppc,
-        confl: +row.confl,
+        conflict_major: +row.conflict_hi,
+        conflict_minor: +row.conflict_li,
       };
     });
     const vdemExplanationsPromise = csv(vdemExplanationsUrl, (row) => {
@@ -1333,7 +1334,6 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
   onClickSaveDualChartData = () => {
     const { vdemVariable } = this.state;
 
-    // [{ confl, country, records, recordsPerArea, y2, year}]
     const data = this.generateDualChartData();
     const lines = [
       [
@@ -1342,7 +1342,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
         "records",
         "records_per_area",
         `${vdemVariable}`,
-        "conflict",
+        "conflict_major",
+        "conflict_minor",
         "records_domestic",
         "records_coloniser",
         "records_preserved_specimen",
@@ -1351,8 +1352,10 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     data.forEach((d) => {
       lines.push(
         `${d.country},${d.year},${d.records},${d.recordsPerArea},${d.y2},${
-          d.confl ? "1" : "0"
-        },${d.countDomestic},${d.countColoniser},${d.countPreserved}`,
+          d.conflict_major ? "1" : "0"
+        }${d.conflict_minor ? "1" : "0"},${d.countDomestic},${
+          d.countColoniser
+        },${d.countPreserved}`,
       );
     });
     lines.push("\n");
@@ -1904,8 +1907,10 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       x: (d) => d.year,
       y: (d) => d.records,
       y2: (d) => d.y2,
-      aux: (d) => d.confl,
-      auxLabel: "Conflict",
+      aux: (d) => d.conflict_major,
+      auxLabel: "Major conflict",
+      aux2: (d) => d.conflict_minor,
+      aux2Label: "Minor conflict",
       color: dualChartColor,
       // y2Stroke: "#fdd471",
       // y2Fill: "#b88918",
@@ -2277,6 +2282,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                   <FormControl
                     className="formControl"
                     style={{ minWidth: 260, margin: 10 }}
+                    title={this.state.country}
                   >
                     <InputLabel htmlFor="country">Country</InputLabel>
                     <MuiSelect

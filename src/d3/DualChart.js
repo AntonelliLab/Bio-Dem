@@ -42,11 +42,16 @@ export default function DualChart(el, properties) {
       y2Fill: "#b88918",
       y2Opacity: (d) => 1,
       aux: null, // () => b:Boolean, auxiliary boolean input based on the same x axis
-      auxFill: (d) => "#CA1229",
-      // auxStroke: (d) => '#fbc2c4',
-      auxStroke: (d) => "none",
-      auxOpacity: (d) => 1,
+      auxFill: "#CA1229",
+      auxStroke: "none",
+      auxOpacity: 0.1,
       auxLabel: "Aux",
+      aux2: null, // () => b:Boolean, auxiliary boolean input based on the same x axis
+      // aux2Fill: "#FB6347",
+      aux2Fill: "#FC7E45",
+      aux2Stroke: "none",
+      aux2Opacity: 0.1,
+      aux2Label: "Aux 2",
       xLabel: "Year",
       yLabel: "Value",
       y2Label: "Value #2",
@@ -84,8 +89,31 @@ export default function DualChart(el, properties) {
     totalWidth = anchorElement.node().getBoundingClientRect().width;
   }
 
+  const { data } = props;
+  const auxData = data.filter(props.aux);
+  const aux2Data = data.filter(props.aux2);
+
   const legendItems =
     props.legend && props.legend.length > 1 ? props.legend : [];
+
+  if (auxData.length > 0) {
+    legendItems.push({
+      key: "aux",
+      label: props.auxLabel,
+      fill: props.auxFill,
+      opacity: props.auxOpacity,
+      aux: true,
+    });
+  }
+  if (aux2Data.length > 0) {
+    legendItems.push({
+      key: "aux2",
+      label: props.aux2Label,
+      fill: props.aux2Fill,
+      opacity: props.aux2Opacity,
+      aux: true,
+    });
+  }
 
   const legendLayout = computeLegendLayout(
     legendItems.map((d) => d.label),
@@ -138,8 +166,6 @@ export default function DualChart(el, properties) {
   svg.attr("width", totalWidth).attr("height", props.height);
 
   g.attr("transform", `translate(${props.left}, ${props.top})`);
-
-  const { data } = props;
 
   // Scale the range of the data in the domains
   const xExtent = getExtent(data, props.x, props.xMin, props.xMax);
@@ -272,9 +298,19 @@ export default function DualChart(el, properties) {
       .append("rect")
       .attr("width", 10)
       .attr("height", 20)
-      .style("fill", props.color)
-      .style("stroke", props.color)
-      .style("fill-opacity", props.fillOpacity);
+      .style("fill", (d) => (d.aux ? d.fill : props.color(d)))
+      .style("stroke", (d) => (d.aux ? d.fill : props.color(d)))
+      .style("stroke-opacity", (d) => (d.aux ? 0.2 : 1))
+      .style("fill-opacity", (d) => (d.aux ? d.opacity : props.fillOpacity(d)));
+
+    // Bottom border of aux bar
+    legend
+      .append("rect")
+      .attr("y", 17)
+      .attr("width", 10)
+      .attr("height", 3)
+      .style("fill", (d) => (d.aux ? d.fill : "none"))
+      .style("stroke", "none");
 
     legend
       .append("text")
@@ -307,7 +343,7 @@ export default function DualChart(el, properties) {
       .attr("width", 14)
       .attr("x", -2)
       .attr("y", 9)
-      .style("fill", (d) => d.fill)
+      .style("fill", (d) => d.stroke)
       .style("stroke", "none");
 
     legend
@@ -315,7 +351,7 @@ export default function DualChart(el, properties) {
       .attr("r", 3)
       .attr("cx", 5)
       .attr("cy", 10)
-      .style("fill", (d) => d.stroke)
+      .style("fill", (d) => d.fill)
       .style("stroke", "none");
 
     legend
@@ -327,68 +363,76 @@ export default function DualChart(el, properties) {
       .text((d) => d.label);
   }
 
-  if (props.aux) {
-    const auxData = data.filter(props.aux);
-    if (auxData.length > 0) {
-      // Dots for auxiliary boolean input
-      const gAux = g
-        .selectAll(".aux")
-        .data(auxData)
-        .join("g")
-        .attr("class", "aux");
+  if (auxData.length > 0) {
+    // Dots for auxiliary boolean input
+    const gAux = g
+      .selectAll(".aux")
+      .data(auxData)
+      .join("g")
+      .attr("class", "aux");
 
-      gAux
-        .append("rect")
-        // .attr("class", "aux")
-        .style("fill", props.auxFill)
-        .style("stroke", props.auxStroke)
-        .style("opacity", props.auxOpacity)
-        .attr("x", (d) => x(props.x(d)))
-        .attr("width", x.bandwidth())
-        .attr("y", -10)
-        .attr("height", 5);
+    // stroke below the bar
+    gAux
+      .append("rect")
+      // .attr("class", "aux")
+      .style("fill", props.auxFill)
+      .style("stroke", props.auxStroke)
+      .attr("x", (d) => x(props.x(d)))
+      .attr("width", x.bandwidth())
+      .attr("y", height)
+      .attr("height", 5);
 
-      // Half-transparent bar to the x-axis to connect with bars
-      gAux
-        .append("rect")
-        .style("fill", props.auxFill)
-        .style("stroke", props.auxStroke)
-        .style("opacity", 0.1)
-        .attr(
-          "x",
-          (d) =>
-            x(props.x(d)) -
-            (0.5 * x.paddingInner() * x.bandwidth()) / (1 - x.paddingInner()),
-        )
-        .attr("width", x.bandwidth() / (1 - x.paddingInner()))
-        .attr("y", -10)
-        .attr("height", height + 10);
+    // Half-transparent bar to the x-axis to connect with bars
+    gAux
+      .append("rect")
+      .style("fill", props.auxFill)
+      .style("stroke", props.auxStroke)
+      .style("opacity", props.auxOpacity)
+      .attr(
+        "x",
+        (d) =>
+          x(props.x(d)) -
+          (0.5 * x.paddingInner() * x.bandwidth()) / (1 - x.paddingInner()),
+      )
+      .attr("width", x.bandwidth() / (1 - x.paddingInner()))
+      .attr("y", -10)
+      .attr("height", height + 10);
+  }
 
-      // Legend
-      const auxLegend = g
-        .append("g")
-        .attr("class", "aux-legend")
-        .attr("transform", `translate(0, ${-10})`);
+  if (aux2Data.length > 0) {
+    // Dots for auxiliary boolean input
+    const gAux = g
+      .selectAll(".aux2")
+      .data(aux2Data)
+      .join("g")
+      .attr("class", "aux2");
 
-      const auxLegendWidth = Math.min(10, Math.max(5, x.bandwidth()));
-      auxLegend
-        .append("rect")
-        .style("fill", props.auxFill)
-        .attr("x", -auxLegendWidth)
-        .attr("width", auxLegendWidth)
-        .attr("y", 0)
-        .attr("height", 5);
+    // stroke below the bar
+    gAux
+      .append("rect")
+      // .attr("class", "aux")
+      .style("fill", props.aux2Fill)
+      .style("stroke", props.aux2Stroke)
+      .attr("x", (d) => x(props.x(d)))
+      .attr("width", x.bandwidth())
+      .attr("y", height)
+      .attr("height", 5);
 
-      // text label for the x axis
-      auxLegend
-        .append("text")
-        .attr("x", -auxLegendWidth - 4)
-        .attr("dx", "0")
-        .attr("dy", "5")
-        .attr("font-size", "0.8em")
-        .style("text-anchor", "end")
-        .text(props.auxLabel);
-    }
+    // Half-transparent bar to the x-axis to connect with bars
+    gAux
+      .append("rect")
+      .style("fill", props.aux2Fill)
+      .style("stroke", props.aux2Stroke)
+      .style("opacity", props.aux2Opacity)
+      .attr(
+        "x",
+        (d) =>
+          x(props.x(d)) -
+          (0.5 * x.paddingInner() * x.bandwidth()) / (1 - x.paddingInner()),
+      )
+      .attr("width", x.bandwidth() / (1 - x.paddingInner()))
+      .attr("y", -10)
+      .attr("height", height + 10);
   }
 
   if (!grouped) {
