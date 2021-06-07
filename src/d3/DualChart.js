@@ -14,7 +14,7 @@ export default function DualChart(el, properties) {
       width: null, // null to set it to the width of the anchor element
       top: 60,
       right: 80,
-      bottom: 40,
+      bottom: 45,
       left: 80,
       height: 400,
       xTickGap: 80,
@@ -122,6 +122,7 @@ export default function DualChart(el, properties) {
       fontSize: "0.8em",
       hGap: 20,
       vGap: 8,
+      // lineHeight: 20,
     },
   );
   if (legendItems.length > 0) {

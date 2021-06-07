@@ -141,8 +141,23 @@ const extraYOptions = [
 
 const scatterYOptions = extraYOptions.concat(vdemOptions);
 
+const worldMapColorByOptions = [
+  {
+    value: "publishingCountry",
+    label: "Publishing country",
+  },
+  ...scatterYOptions,
+];
+
 const scatterYOptionsLabelMap = new Map(
   scatterYOptions.map((d) => [d.value, d.label]),
+);
+
+const worldMapColorByOptionsLabelMap = new Map(
+  worldMapColorByOptions.map((d) => [
+    d.value,
+    d.value === "publishingCountry" ? "Number of records" : d.label,
+  ]),
 );
 
 const gbifExplanations = [
@@ -350,6 +365,7 @@ const vdemScaleMax = {
   records: 1e8,
   recordsPerArea: 1e3,
   yearsSinceIndependence: 240,
+  publishingCountry: null,
 };
 
 const vdemScaleMin = {
@@ -365,6 +381,7 @@ const vdemScaleMin = {
   records: 1e2,
   recordsPerArea: 1e-2,
   yearsSinceIndependence: 0,
+  publishingCountry: null,
 };
 
 const aggregationMethod = {
@@ -387,6 +404,7 @@ const useLogScale = {
   records: true,
   recordsPerArea: true,
   e_migdppc: true,
+  publishingCountry: true,
 };
 
 const BioDemLogo = ({ className = "logo", alt = "logo" }) => (
@@ -569,7 +587,7 @@ class App extends Component {
       xyYearMax: 2019,
       colorBy: "regime",
       dualChartColorBy: "regime", // ["none", "regime", "basisOfRecord", "publishingCountry"]
-      mapColorBy: "records",
+      mapColorBy: "publishingCountry", // "records",
       dualChartShowProportions: ["publishedByDomestic", "preservedSpecimen"], // ["publishedByDomestic", "publishedByFormerColoniser", "preservedSpecimen"]
       // dualChartShowProportions: dualChartShowProportionsOptions.slice(0, 1), // ["publishedByDomestic", "preservedSpecimen"], // ["publishedByDomestic", "publishedByFormerColoniser", "preservedSpecimen"]
       regionFilter: 0,
@@ -588,7 +606,7 @@ class App extends Component {
       // Active highlights
       activeScatterPlotHighlight: null,
       activeDualChartHighlight: null,
-      worldMapData: null,
+      worldMapData: new Map(), // country => value (alpha3 to value of mapColorBy)
     };
     this.refScatterPlot = React.createRef();
     this.refBrush = React.createRef();
@@ -774,20 +792,23 @@ class App extends Component {
       await this.makeYearFacetQuery(
         countryCodes.alpha3ToAlpha2(this.state.country),
       );
+      this.setState({
+        worldMapLoading: false,
+      });
     }
   }
 
   getEnabledExtraCurves = () => {
     const { country, dualChartColorBy } = this.state;
     const enabledCurves = [];
-    if (dualChartColorBy !== "basisOfRecord") {
-      enabledCurves.push("preservedSpecimen");
-    }
-    if (dualChartColorBy !== "publishingCountry") {
-      enabledCurves.push("publishedByDomestic");
-      if (this.countryMap && this.countryMap[country].colonised) {
-        enabledCurves.push("publishedByFormerColoniser");
-      }
+    // if (dualChartColorBy !== "basisOfRecord") {
+    enabledCurves.push("preservedSpecimen");
+    // }
+    // if (dualChartColorBy !== "publishingCountry") {
+    enabledCurves.push("publishedByDomestic");
+    if (this.countryMap && this.countryMap[country].colonised) {
+      enabledCurves.push("publishedByFormerColoniser");
+      // }
     }
     return enabledCurves;
   };
@@ -1405,11 +1426,11 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     });
   };
   onWorldMapClick = (countryCode) => {
-    const worldMapSelectedCountry =
-      countryCode === this.state.worldMapSelectedCountry ? null : countryCode;
+    if (countryCode === null || countryCode === this.state.country) {
+      return;
+    }
     this.setState({
-      worldMapSelectedCountry,
-      worldMapLoading: worldMapSelectedCountry !== null,
+      country: countryCode,
     });
   };
 
@@ -1449,6 +1470,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
   renderCharts() {
     this.renderScatterPlot();
     this.renderDualChart();
+    this.generateWorldMapData();
   }
 
   generateScatterPlotData() {
@@ -1500,8 +1522,14 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
   }
 
   generateWorldMapData() {
-    const { vdemData, mapColorBy, xyYearMin, xyYearMax, regionFilter } =
-      this.state;
+    const {
+      vdemData,
+      gbifData,
+      mapColorBy,
+      xyYearMin,
+      xyYearMax,
+      regionFilter,
+    } = this.state;
     if (vdemData.length === 0) {
       return;
     }
@@ -1510,6 +1538,20 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       xyYearMin,
       xyYearMax,
     );
+    if (mapColorBy === "publishingCountry") {
+      const worldMapData = new Map();
+      (gbifData || []).forEach((yearData) => {
+        yearData.facets
+          .find((d) => d.field === "PUBLISHING_COUNTRY")
+          .counts.forEach(({ name, count }) => {
+            const country = countryCodes.alpha2ToAlpha3(name);
+            const countryCount = (worldMapData.get(country) || 0) + count;
+            worldMapData.set(country, countryCount);
+          });
+      });
+      this.setState({ worldMapData });
+      return worldMapData;
+    }
     const worldMapData = d3.rollup(
       vdemData.filter(
         (d) =>
@@ -1650,7 +1692,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
             {countryData.gbifParticipationText}
           </div>
           <div>
-            <strong>{scatterYOptionsLabelMap.get(mapColorBy)}:</strong>{" "}
+            <strong>{worldMapColorByOptionsLabelMap.get(mapColorBy)}:</strong>{" "}
             {worldMapData.get(country)}
           </div>
         </div>
@@ -1834,7 +1876,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const dualChartColor = (d) => {
       switch (dualChartColorBy) {
         case "none":
-          return "#430753";
+          return "#6588A3";
         case "regime":
           return regimeColor(d.data ? d.data.v2x_regime : d.v2x_regime);
         case "basisOfRecord":
@@ -1965,6 +2007,10 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       dualChartShowProportionsOptions.filter(
         ({ value }) => enabledCurves.indexOf(value) !== -1,
       );
+
+    const country = this.countryMap
+      ? this.countryMap[this.state.country].label
+      : "";
 
     return (
       <div className="App">
@@ -2326,7 +2372,9 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                     className="formControl"
                     style={{ minWidth: 260, margin: 10 }}
                   >
-                    <InputLabel htmlFor="dualChartColorBy">Color by</InputLabel>
+                    <InputLabel htmlFor="dualChartColorBy">
+                      Color bars by
+                    </InputLabel>
                     <MuiSelect
                       input={
                         <Input name="dualChartColorBy" id="dualChartColorBy" />
@@ -2380,6 +2428,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                       label={getShowProportionsLabel}
                     />
                   </FormControl>
+                </div>
+                <div>
                   <Zoom
                     in={gbifError[yearFacetQueryErrorCoded]}
                     mountOnEnter
@@ -2481,12 +2531,14 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                     className="formControl"
                     style={{ minWidth: 240, margin: 10 }}
                   >
-                    <InputLabel htmlFor="mapColorBy">Color by</InputLabel>
+                    <InputLabel htmlFor="mapColorBy">
+                      Color countries by
+                    </InputLabel>
                     <MuiSelect
                       input={<Input name="mapColorBy" id="mapColorBy" />}
                       value={this.state.mapColorBy}
                       onChange={this.handleMapChange}
-                      options={scatterYOptions}
+                      options={worldMapColorByOptions}
                     />
                   </FormControl>
                 </div>
@@ -2500,13 +2552,23 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                       open={!!this.state.worldMapMouseOverCountry}
                     >
                       <div>
+                        {this.renderProgress()}
+                        <div style={{ textAlign: "center" }}>
+                          {mapColorBy === "publishingCountry"
+                            ? `Publisher origin for records in ${country}`
+                            : " "}
+                        </div>
+
                         <WorldMap
                           width={width}
                           data={this.state.worldMapData}
                           colorBy={mapColorBy}
                           valueMin={vdemScaleMin[mapColorBy]}
                           valueMax={vdemScaleMax[mapColorBy]}
-                          logScale={useLogScale[mapColorBy]}
+                          logScale={
+                            mapColorBy === "publishingCountry" ||
+                            useLogScale[mapColorBy]
+                          }
                           onMouseOver={this.onWorldMapMouseOver}
                           onMouseOut={this.onWorldMapMouseOut}
                           onClick={this.onWorldMapClick}

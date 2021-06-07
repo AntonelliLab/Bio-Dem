@@ -53,7 +53,6 @@ const fetchWorld = async (callback) => {
 export default ({
   width,
   data,
-  colorBy,
   valueMin = null,
   valueMax = null,
   logScale = false,
@@ -89,11 +88,11 @@ export default ({
   const scale = (width / 630) * 100;
 
   if (valueMin === null && valueMax === null) {
-    [valueMin, valueMax] = d3.extent(data, (d) => d[colorBy]);
+    [valueMin, valueMax] = d3.extent(data, (d) => d[1]);
   } else if (valueMin === null) {
-    valueMin = d3.min(data, (d) => d[colorBy]);
+    valueMin = d3.min(data, (d) => d[1]);
   } else if (valueMax === null) {
-    valueMax = d3.max(data, (d) => d[colorBy]);
+    valueMax = d3.max(data, (d) => d[1]);
   }
   const domain = [valueMin, valueMax];
 
