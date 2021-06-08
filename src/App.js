@@ -616,6 +616,7 @@ class App extends Component {
     this.refBrush = React.createRef();
     this.refBrushWorld = React.createRef();
     this.refDualChart = React.createRef();
+    this.refWorldMap = React.createRef();
 
     const Country = ({ code, name }) => (
       <CountryHighlight
@@ -1336,7 +1337,6 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     // Safari inserts NS1/NS2 namespaces as xlink is not defined within the svg html
     svgContent = svgContent.replace("NS1", "xlink");
     svgContent = svgContent.replace("NS2", "xlink");
-
     return new Blob([svgContent], { type: "image/svg+xml" });
   };
 
@@ -1394,6 +1394,19 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     saveAs(blob, "bio-dem_dualchart.csv");
   };
 
+  onClickSaveWorldMapData = () => {
+    const { worldMapData, mapColorBy } = this.state;
+    const lines = [`country,${mapColorBy}`];
+    worldMapData.forEach((value, country) => {
+      lines.push(`${country},${value}`);
+    });
+    lines.push("\n");
+    const blob = new Blob([lines.join("\n")], {
+      type: "text/plain;charset=utf-8",
+    });
+    saveAs(blob, "bio-dem_worldmap.csv");
+  };
+
   onClickSaveScatterPlotSVG = () => {
     const blob = this.generateSVGContent(this.refScatterPlot.current);
     saveAs(blob, "bio-dem_scatterplot.svg");
@@ -1402,6 +1415,11 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
   onClickSaveDualChartSVG = () => {
     const blob = this.generateSVGContent(this.refDualChart.current);
     saveAs(blob, "bio-dem_dualchart.svg");
+  };
+
+  onClickSaveWorldMapSVG = () => {
+    const blob = this.generateSVGContent(this.refWorldMap.current);
+    saveAs(blob, "bio-dem_worldmap.svg");
   };
 
   onClickPlay = () => {
@@ -2610,6 +2628,38 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                   </div>
                   <div style={{ marginLeft: 5 }}></div>
                 </div>
+
+                <div style={{ marginTop: 30 }}>
+                  <h3>
+                    Download map:
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      style={{ marginLeft: 8 }}
+                      download="bio-dem_worldmap.csv"
+                      onClick={this.onClickSaveWorldMapData}
+                    >
+                      <IconDownload
+                        fontSize="small"
+                        style={{ marginRight: 5 }}
+                      />
+                      CSV
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      style={{ marginLeft: 8 }}
+                      download="bio-dem_worldmap.svg"
+                      onClick={this.onClickSaveWorldMapSVG}
+                    >
+                      <IconDownload
+                        fontSize="small"
+                        style={{ marginRight: 5 }}
+                      />
+                      SVG
+                    </Button>
+                  </h3>
+                </div>
               </Grid>
 
               <Grid item className="grid-item" xs={12} md={8}>
@@ -2627,20 +2677,22 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                             : " "}
                         </div>
 
-                        <WorldMap
-                          width={width}
-                          data={this.state.worldMapData}
-                          colorBy={mapColorBy}
-                          valueMin={this.state.worldMapDataScaleMin}
-                          valueMax={this.state.worldMapDataScaleMax}
-                          logScale={
-                            mapColorBy === "publishingCountry" ||
-                            useLogScale[mapColorBy]
-                          }
-                          onMouseOver={this.onWorldMapMouseOver}
-                          onMouseOut={this.onWorldMapMouseOut}
-                          onClick={this.onWorldMapClick}
-                        />
+                        <div ref={this.refWorldMap}>
+                          <WorldMap
+                            width={width}
+                            data={this.state.worldMapData}
+                            colorBy={mapColorBy}
+                            valueMin={this.state.worldMapDataScaleMin}
+                            valueMax={this.state.worldMapDataScaleMax}
+                            logScale={
+                              mapColorBy === "publishingCountry" ||
+                              useLogScale[mapColorBy]
+                            }
+                            onMouseOver={this.onWorldMapMouseOver}
+                            onMouseOut={this.onWorldMapMouseOut}
+                            onClick={this.onWorldMapClick}
+                          />
+                        </div>
                       </div>
                     </HtmlTooltip>
                   )}

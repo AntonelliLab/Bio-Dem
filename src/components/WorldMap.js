@@ -109,49 +109,47 @@ export default ({
   };
 
   return width < 10 ? null : (
-    <div>
-      <svg width={width} height={height} onClick={() => onClick(null)}>
-        <NaturalEarth
-          data={world.features}
-          scale={scale}
-          translate={[centerX, centerY]}
-        >
-          {(projection) => (
-            <g>
-              <Graticule
-                graticule={(g) => projection.path(g) || ""}
-                stroke="rgba(33,33,33,0.05)"
+    <svg width={width} height={height} onClick={() => onClick(null)}>
+      <NaturalEarth
+        data={world.features}
+        scale={scale}
+        translate={[centerX, centerY]}
+      >
+        {(projection) => (
+          <g>
+            <Graticule
+              graticule={(g) => projection.path(g) || ""}
+              stroke="rgba(33,33,33,0.05)"
+            />
+            {projection.features.map(({ feature, path }, i) => (
+              <path
+                key={`map-feature-${i}`}
+                d={path || ""}
+                fill={color(feature)}
+                stroke={background}
+                strokeWidth={0.5}
+                onMouseOver={() => {
+                  onMouseOver(feature.id, feature);
+                }}
+                onMouseOut={() => {
+                  onMouseOut(feature.id, feature);
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClick(feature.id, feature);
+                }}
               />
-              {projection.features.map(({ feature, path }, i) => (
-                <path
-                  key={`map-feature-${i}`}
-                  d={path || ""}
-                  fill={color(feature)}
-                  stroke={background}
-                  strokeWidth={0.5}
-                  onMouseOver={() => {
-                    onMouseOver(feature.id, feature);
-                  }}
-                  onMouseOut={() => {
-                    onMouseOut(feature.id, feature);
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onClick(feature.id, feature);
-                  }}
-                />
-              ))}
-            </g>
-          )}
-        </NaturalEarth>
-        <g transform={`translate(0,${mapHeight})`}>
-          <ColorAxisBottom
-            width={width}
-            colorScale={colorScale}
-            logScale={logScale}
-          />
-        </g>
-      </svg>
-    </div>
+            ))}
+          </g>
+        )}
+      </NaturalEarth>
+      <g transform={`translate(0,${mapHeight})`}>
+        <ColorAxisBottom
+          width={width}
+          colorScale={colorScale}
+          logScale={logScale}
+        />
+      </g>
+    </svg>
   );
 };
