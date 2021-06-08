@@ -585,6 +585,8 @@ class App extends Component {
       vdemZ: "records",
       xyYearMin: 1960,
       xyYearMax: 2019,
+      worldYearMin: 1960,
+      worldYearMax: 2019,
       colorBy: "regime",
       dualChartColorBy: "regime", // ["none", "regime", "basisOfRecord", "publishingCountry"]
       mapColorBy: "publishingCountry", // "records",
@@ -610,6 +612,7 @@ class App extends Component {
     };
     this.refScatterPlot = React.createRef();
     this.refBrush = React.createRef();
+    this.refBrushWorld = React.createRef();
     this.refDualChart = React.createRef();
 
     const Country = ({ code, name }) => (
@@ -644,6 +647,7 @@ class App extends Component {
           vdemY: e_migdppc,
           vdemX: v2x_polyarchy,
           xyYearMin: 1960,
+          worldYearMin: 1960,
           colorBy: "regime",
         },
       },
@@ -665,6 +669,7 @@ class App extends Component {
           vdemY: e_peaveduc,
           vdemX: e_migdppc,
           xyYearMin: 1960,
+          worldYearMin: 1960,
           colorBy: "regime",
         },
       },
@@ -1467,6 +1472,24 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     }
   }, 50);
 
+  onBrushWorld = throttle((domain) => {
+    const [worldYearMin, worldYearMax] = domain.map((d) => d.getFullYear());
+    if (
+      worldYearMin !== this.state.worldYearMin ||
+      worldYearMax !== this.state.worldYearMax
+    ) {
+      this.setState(
+        {
+          worldYearMin,
+          worldYearMax,
+        },
+        () => {
+          this.generateWorldMapData();
+        },
+      );
+    }
+  }, 50);
+
   renderCharts() {
     this.renderScatterPlot();
     this.renderDualChart();
@@ -1526,8 +1549,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       vdemData,
       gbifData,
       mapColorBy,
-      xyYearMin,
-      xyYearMax,
+      worldYearMin,
+      worldYearMax,
       regionFilter,
     } = this.state;
     if (vdemData.length === 0) {
@@ -1535,12 +1558,15 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     }
     const [startYear, stopYear] = this.getValidYears(
       [mapColorBy],
-      xyYearMin,
-      xyYearMax,
+      worldYearMin,
+      worldYearMax,
     );
     if (mapColorBy === "publishingCountry") {
       const worldMapData = new Map();
       (gbifData || []).forEach((yearData) => {
+        if (yearData.year < worldYearMin || yearData.year > worldYearMax) {
+          return;
+        }
         yearData.facets
           .find((d) => d.field === "PUBLISHING_COUNTRY")
           .counts.forEach(({ name, count }) => {
@@ -1743,6 +1769,24 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       barColor: (d) => regimeColor(d.value.regime),
       xLabel: "",
       onBrush: this.onBrush,
+      selectedYears: [startYear, stopYear].map((year) => new Date(year, 0)),
+    });
+
+    Brush(this.refBrushWorld.current, {
+      data: recordsPerYear,
+      height: 70,
+      top: 10,
+      left: 20,
+      right: 20,
+      bottom: 25,
+      xTickGap: 140,
+      xMin: startYear,
+      xMax: stopYear,
+      x: (d) => d.key,
+      y: (d) => d.value.records,
+      barColor: (d) => regimeColor(d.value.regime),
+      xLabel: "",
+      onBrush: this.onBrushWorld,
       selectedYears: [startYear, stopYear].map((year) => new Date(year, 0)),
     });
   }
@@ -2522,10 +2566,6 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                 <Typography variant="body2" gutterBottom>
                   Biodiversity and democracy data mapped to space.
                 </Typography>
-                <Typography variant="body2" gutterBottom>
-                  Create a window in the time filter and drag to explore how the
-                  data evolves in time (coming soon).
-                </Typography>
                 <div className="controls">
                   <FormControl
                     className="formControl"
@@ -2541,6 +2581,22 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                       options={worldMapColorByOptions}
                     />
                   </FormControl>
+                </div>
+                <Typography
+                  variant="body2"
+                  gutterBottom
+                  style={{ marginTop: "1em" }}
+                >
+                  Select a time window and drag to explore how the data evolves
+                  in time.
+                </Typography>
+                <div id="brushWorld" ref={this.refBrushWorld} />
+                <div className="play-container">
+                  <div>
+                    Selected years: {this.state.worldYearMin} -{" "}
+                    {this.state.worldYearMax}
+                  </div>
+                  <div style={{ marginLeft: 5 }}></div>
                 </div>
               </Grid>
 
