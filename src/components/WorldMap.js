@@ -4,7 +4,7 @@ import { NaturalEarth, Graticule } from "@visx/geo";
 import * as topojson from "topojson-client";
 import * as d3 from "d3";
 import countryCodes from "../helpers/countryCodes";
-// import topology from "../..public/world-topo.json";
+import ColorAxisBottom from "./ColorAxisBottom";
 
 export const background = "#f9f7e8";
 
@@ -75,7 +75,9 @@ export default ({
     });
   }, []);
 
-  const height = width * 0.5;
+  const mapHeight = width * 0.52;
+  const legendHeight = 50;
+  const height = mapHeight + legendHeight;
   if (loading) {
     return <div style={{ height }}>Loading world map...</div>;
   }
@@ -84,7 +86,7 @@ export default ({
   }
 
   const centerX = width / 2;
-  const centerY = height / 2;
+  const centerY = mapHeight / 2;
   const scale = (width / 630) * 100;
 
   if (valueMin === null && valueMax === null) {
@@ -107,40 +109,49 @@ export default ({
   };
 
   return width < 10 ? null : (
-    <svg width={width} height={height} onClick={() => onClick(null)}>
-      <NaturalEarth
-        data={world.features}
-        scale={scale}
-        translate={[centerX, centerY]}
-      >
-        {(projection) => (
-          <g>
-            <Graticule
-              graticule={(g) => projection.path(g) || ""}
-              stroke="rgba(33,33,33,0.05)"
-            />
-            {projection.features.map(({ feature, path }, i) => (
-              <path
-                key={`map-feature-${i}`}
-                d={path || ""}
-                fill={color(feature)}
-                stroke={background}
-                strokeWidth={0.5}
-                onMouseOver={() => {
-                  onMouseOver(feature.id, feature);
-                }}
-                onMouseOut={() => {
-                  onMouseOut(feature.id, feature);
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClick(feature.id, feature);
-                }}
+    <div>
+      <svg width={width} height={height} onClick={() => onClick(null)}>
+        <NaturalEarth
+          data={world.features}
+          scale={scale}
+          translate={[centerX, centerY]}
+        >
+          {(projection) => (
+            <g>
+              <Graticule
+                graticule={(g) => projection.path(g) || ""}
+                stroke="rgba(33,33,33,0.05)"
               />
-            ))}
-          </g>
-        )}
-      </NaturalEarth>
-    </svg>
+              {projection.features.map(({ feature, path }, i) => (
+                <path
+                  key={`map-feature-${i}`}
+                  d={path || ""}
+                  fill={color(feature)}
+                  stroke={background}
+                  strokeWidth={0.5}
+                  onMouseOver={() => {
+                    onMouseOver(feature.id, feature);
+                  }}
+                  onMouseOut={() => {
+                    onMouseOut(feature.id, feature);
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClick(feature.id, feature);
+                  }}
+                />
+              ))}
+            </g>
+          )}
+        </NaturalEarth>
+        <g transform={`translate(0,${mapHeight})`}>
+          <ColorAxisBottom
+            width={width}
+            colorScale={colorScale}
+            logScale={logScale}
+          />
+        </g>
+      </svg>
+    </div>
   );
 };
