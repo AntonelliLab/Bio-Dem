@@ -587,6 +587,8 @@ class App extends Component {
       xyYearMax: 2019,
       worldYearMin: 1960,
       worldYearMax: 2019,
+      worldMapDataScaleMin: 0,
+      worldMapDataScaleMax: 1,
       colorBy: "regime",
       dualChartColorBy: "regime", // ["none", "regime", "basisOfRecord", "publishingCountry"]
       mapColorBy: "publishingCountry", // "records",
@@ -1556,6 +1558,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     if (vdemData.length === 0) {
       return;
     }
+    let worldMapDataScaleMin = vdemScaleMin[mapColorBy] || 0;
+    let worldMapDataScaleMax = vdemScaleMax[mapColorBy];
     const [startYear, stopYear] = this.getValidYears(
       [mapColorBy],
       worldYearMin,
@@ -1563,7 +1567,9 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     );
     if (mapColorBy === "publishingCountry") {
       const worldMapData = new Map();
+      let totalCount = 0;
       (gbifData || []).forEach((yearData) => {
+        totalCount += yearData.count;
         if (yearData.year < worldYearMin || yearData.year > worldYearMax) {
           return;
         }
@@ -1575,7 +1581,13 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
             worldMapData.set(country, countryCount);
           });
       });
-      this.setState({ worldMapData });
+      worldMapDataScaleMin = 1e2;
+      worldMapDataScaleMax = totalCount;
+      this.setState({
+        worldMapData,
+        worldMapDataScaleMax,
+        worldMapDataScaleMin,
+      });
       return worldMapData;
     }
     const worldMapData = d3.rollup(
@@ -1603,7 +1615,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     );
 
     // Filter countries lacking values on the x y dimensions or have zero records (log safe)
-    this.setState({ worldMapData });
+    this.setState({ worldMapData, worldMapDataScaleMax, worldMapDataScaleMin });
     return worldMapData;
   }
 
@@ -2619,8 +2631,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                           width={width}
                           data={this.state.worldMapData}
                           colorBy={mapColorBy}
-                          valueMin={vdemScaleMin[mapColorBy]}
-                          valueMax={vdemScaleMax[mapColorBy]}
+                          valueMin={this.state.worldMapDataScaleMin}
+                          valueMax={this.state.worldMapDataScaleMax}
                           logScale={
                             mapColorBy === "publishingCountry" ||
                             useLogScale[mapColorBy]
