@@ -33,6 +33,7 @@ export default ({
   logScale,
   style,
   tickCount = 10,
+  tickFormat = "~s",
   colorBarWidth = 20,
   margin = 30,
 }) => {
@@ -44,7 +45,7 @@ export default ({
 
   const range = scale.range();
   const values = scale.ticks(tickCount);
-  const format = scale.tickFormat(tickCount, "~s");
+  const format = scale.tickFormat(tickCount, tickFormat);
   const position = scale.copy();
 
   const axisStyle = Object.assign({}, defaultAxisStyle, style);

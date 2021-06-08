@@ -56,9 +56,12 @@ export default ({
   valueMin = null,
   valueMax = null,
   logScale = false,
+  tickCount = 10,
+  tickFormat = "~s",
   onMouseOver = () => {},
   onMouseOut = () => {},
   onClick = () => {},
+  valueAccessor = (value) => value,
 }) => {
   const [world, setWorld] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -105,7 +108,7 @@ export default ({
     if (!data) {
       return "#999999";
     }
-    return colorScale(data.get(feature.id)) ?? "#cccccc";
+    return colorScale(valueAccessor(data.get(feature.id))) ?? "#cccccc";
   };
 
   return width < 10 ? null : (
@@ -148,6 +151,8 @@ export default ({
           width={width}
           colorScale={colorScale}
           logScale={logScale}
+          tickCount={tickCount}
+          tickFormat={tickFormat}
         />
       </g>
     </svg>

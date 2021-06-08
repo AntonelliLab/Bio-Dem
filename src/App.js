@@ -405,6 +405,28 @@ const useLogScale = {
   recordsPerArea: true,
   e_migdppc: true,
   publishingCountry: true,
+  publishingCountry: true,
+  // publishingCountry: false,
+};
+
+const getTickFormat = (colorBy) => {
+  switch (colorBy) {
+    case "records":
+    case "recordsPerArea":
+    case "yearsSinceIndependence":
+      return "~s";
+    default:
+      return "~%";
+  }
+};
+
+const getTickCount = (colorBy) => {
+  switch (colorBy) {
+    case "publishingCountry":
+      return 5;
+    default:
+      return 10;
+  }
 };
 
 const BioDemLogo = ({ className = "logo", alt = "logo" }) => (
@@ -1396,9 +1418,19 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
 
   onClickSaveWorldMapData = () => {
     const { worldMapData, mapColorBy } = this.state;
-    const lines = [`country,${mapColorBy}`];
+    const getValue =
+      mapColorBy === "publishingCountry"
+        ? (d) => `${d.count},${d.proportion}`
+        : (d) => d;
+    const lines = [
+      `country,${
+        mapColorBy === "publishingCountry"
+          ? "publishingCountry_count,publishingCountry_proportion"
+          : mapColorBy
+      }`,
+    ];
     worldMapData.forEach((value, country) => {
-      lines.push(`${country},${value}`);
+      lines.push(`${country},${getValue(value)}`);
     });
     lines.push("\n");
     const blob = new Blob([lines.join("\n")], {
@@ -1585,9 +1617,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     );
     if (mapColorBy === "publishingCountry") {
       const worldMapData = new Map();
-      let totalCount = 0;
+      const numYears = worldYearMax - worldYearMin + 1;
       (gbifData || []).forEach((yearData) => {
-        totalCount += yearData.count;
         if (yearData.year < worldYearMin || yearData.year > worldYearMax) {
           return;
         }
@@ -1595,12 +1626,17 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
           .find((d) => d.field === "PUBLISHING_COUNTRY")
           .counts.forEach(({ name, count }) => {
             const country = countryCodes.alpha2ToAlpha3(name);
-            const countryCount = (worldMapData.get(country) || 0) + count;
+            const countryCount = worldMapData.get(country) || {
+              count: 0,
+              proportion: 0,
+            };
+            countryCount.count += count;
+            countryCount.proportion += count / yearData.count / numYears;
             worldMapData.set(country, countryCount);
           });
       });
-      worldMapDataScaleMin = 1e2;
-      worldMapDataScaleMax = totalCount;
+      worldMapDataScaleMin = 1e-4;
+      worldMapDataScaleMax = 1;
       this.setState({
         worldMapData,
         worldMapDataScaleMax,
@@ -1731,6 +1767,11 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
         </React.Fragment>
       );
     }
+    const value = worldMapData.get(country);
+    const valueStr =
+      typeof value === "object"
+        ? `${value.count} (${d3.format(".2p")(value.proportion)})`
+        : `${value}`;
     return (
       <React.Fragment>
         <Typography color="inherit">
@@ -1749,7 +1790,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
           </div>
           <div>
             <strong>{worldMapColorByOptionsLabelMap.get(mapColorBy)}:</strong>{" "}
-            {worldMapData.get(country)}
+            {valueStr}
           </div>
         </div>
       </React.Fragment>
@@ -2058,6 +2099,15 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     );
   }
 
+  worldMapDataAccessorPublishingCountry = (d) => d?.proportion;
+
+  worldMapDataAccessorOther = (d) => d;
+
+  getWorldMapDataAccessor = () =>
+    this.state.mapColorBy === "publishingCountry"
+      ? this.worldMapDataAccessorPublishingCountry
+      : this.worldMapDataAccessorOther;
+
   render() {
     const {
       vdemX,
@@ -2085,6 +2135,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     const country = this.countryMap
       ? this.countryMap[this.state.country].label
       : "";
+    const worldMapDataAccessor = this.getWorldMapDataAccessor();
 
     return (
       <div className="App">
@@ -2681,16 +2732,16 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                           <WorldMap
                             width={width}
                             data={this.state.worldMapData}
+                            valueAccessor={worldMapDataAccessor}
                             colorBy={mapColorBy}
                             valueMin={this.state.worldMapDataScaleMin}
                             valueMax={this.state.worldMapDataScaleMax}
-                            logScale={
-                              mapColorBy === "publishingCountry" ||
-                              useLogScale[mapColorBy]
-                            }
+                            logScale={useLogScale[mapColorBy]}
                             onMouseOver={this.onWorldMapMouseOver}
                             onMouseOut={this.onWorldMapMouseOut}
                             onClick={this.onWorldMapClick}
+                            tickCount={getTickCount(mapColorBy)}
+                            tickFormat={getTickFormat(mapColorBy)}
                           />
                         </div>
                       </div>
