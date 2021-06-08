@@ -496,6 +496,11 @@ export default function DualChart(el, properties) {
       .attr("fill", (d) => barColor(d));
   }
 
+  const gCurves = g
+    .append("g")
+    .attr("class", "curves")
+    .attr("transform", `translate(${x.bandwidth() / 2}, 0)`);
+
   const { extraCurves } = props;
   if (extraCurves.length > 0) {
     const extraLines = extraCurves.map((curve) =>
@@ -507,7 +512,8 @@ export default function DualChart(el, properties) {
 
     extraCurves.forEach((curve, i) => {
       // line
-      g.append("path")
+      gCurves
+        .append("path")
         .datum(data)
         .style("fill", "none")
         .style("stroke", curve.stroke)
@@ -515,7 +521,8 @@ export default function DualChart(el, properties) {
         .attr("d", extraLines[i]);
 
       // dots
-      g.append("g")
+      gCurves
+        .append("g")
         .selectAll(`.dot-extra-${i}`)
         .data(data)
         .join("circle")
@@ -530,7 +537,8 @@ export default function DualChart(el, properties) {
   const cleanData = data.filter((d) => !Number.isNaN(props.y2(d)));
 
   // Add second line
-  g.append("path")
+  gCurves
+    .append("path")
     .datum(cleanData)
     .attr("class", "y2line")
     .style("fill", "none")
@@ -540,7 +548,8 @@ export default function DualChart(el, properties) {
     .attr("d", y2line);
 
   // Dots for second line
-  g.selectAll(".dot")
+  gCurves
+    .selectAll(".dot")
     .data(cleanData)
     .enter()
     .append("circle") // Uses the enter().append() method
