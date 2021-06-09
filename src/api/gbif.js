@@ -56,6 +56,7 @@ const queryFacetByCountryAndYear = async (
     onlyWithImage = false,
     taxonFilter = "",
     onlyPreservedSpecimen = false,
+    onlyDomestic = false,
   } = {},
 ) => {
   let url = `${baseURL}${occ}?`;
@@ -75,6 +76,9 @@ const queryFacetByCountryAndYear = async (
   if (onlyPreservedSpecimen) {
     url += `&basisOfRecord=PRESERVED_SPECIMEN`;
   }
+  if (onlyDomestic) {
+    url += `&publishingCountry=${country}`;
+  }
 
   return fetch(url).then((response) => response.json());
 };
@@ -85,6 +89,7 @@ export const queryGBIFFacetPerYear = async (
     onlyWithImage = false,
     taxonFilter = "",
     onlyPreservedSpecimen = false,
+    onlyDomestic = false,
     yearMin = 1960,
     yearMax = 2019,
     otherCountry = null,
@@ -97,6 +102,7 @@ export const queryGBIFFacetPerYear = async (
       onlyWithImage,
       taxonFilter,
       onlyPreservedSpecimen,
+      onlyDomestic,
     }),
   );
   try {

@@ -1095,6 +1095,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       onlyWithImage,
       taxonFilter,
       onlyPreservedSpecimen,
+      onlyDomestic,
       yearMin,
       yearMax,
     } = this.state;
@@ -1117,6 +1118,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       onlyWithImage,
       taxonFilter,
       onlyPreservedSpecimen,
+      onlyDomestic,
       otherCountry,
       yearMin,
       yearMax,
@@ -2537,6 +2539,20 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                       />
                     }
                     label="Require preserved specimen"
+                  />
+                  <FormControlLabel
+                    style={{ marginLeft: 0 }}
+                    control={
+                      <Checkbox
+                        checked={this.state.onlyDomestic}
+                        onChange={() =>
+                          this.setState({
+                            onlyDomestic: !this.state.onlyDomestic,
+                          })
+                        }
+                      />
+                    }
+                    label="Require domestic publisher"
                   />
                   <FormControl
                     className="formControl"
