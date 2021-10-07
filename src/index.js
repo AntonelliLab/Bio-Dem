@@ -4,10 +4,10 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/styles";
-import { createMuiTheme, responsiveFontSizes } from "@material-ui/core/styles";
+import { createTheme, responsiveFontSizes } from "@material-ui/core/styles";
 import muiTheme from "./theme";
 
-const theme = responsiveFontSizes(createMuiTheme(muiTheme));
+const theme = responsiveFontSizes(createTheme(muiTheme));
 
 const Index = () => (
   <ThemeProvider theme={theme}>

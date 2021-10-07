@@ -428,7 +428,7 @@ const getTickCount = (colorBy) => {
 };
 
 const RegimeLegend = ({ fillOpacity = 0.5 }) => (
-  <Grid container className="regimeLegend" justify="center">
+  <Grid container className="regimeLegend" justifyContent="center">
     {Object.keys(regimeTypes).map((v) => (
       <div key={v} style={{ padding: 5, fontSize: "0.75em" }}>
         <span
@@ -447,7 +447,7 @@ const RegimeLegend = ({ fillOpacity = 0.5 }) => (
 );
 
 const RegionLegend = ({ fillOpacity = 0.5 }) => (
-  <Grid container className="regionLegend" justify="center">
+  <Grid container className="regionLegend" justifyContent="center">
     {Object.keys(regions).map((v) => (
       <div key={v} style={{ padding: 5, fontSize: "0.75em" }}>
         <span
@@ -466,7 +466,7 @@ const RegionLegend = ({ fillOpacity = 0.5 }) => (
 );
 
 const GbifParticipationLegend = ({ fillOpacity = 0.5 }) => (
-  <Grid container className="gbifParticipationLegend" justify="center">
+  <Grid container className="gbifParticipationLegend" justifyContent="center">
     {GBIF_PARTICIPATION_VALUES.map((v) => (
       <div key={v} style={{ padding: 5, fontSize: "0.75em" }}>
         <span
@@ -490,7 +490,7 @@ const COLONIAL_HISTORY_ITEMS = [
 ];
 
 const ColonialHistoryLegend = ({ fillOpacity = 0.5 }) => (
-  <Grid container className="colonialHistoryLegend" justify="center">
+  <Grid container className="colonialHistoryLegend" justifyContent="center">
     {COLONIAL_HISTORY_ITEMS.map(({ key, label }) => (
       <div key={key} style={{ padding: 5, fontSize: "0.75em" }}>
         <span
@@ -1468,16 +1468,6 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     });
   };
 
-  onWorldMapMouseOver = (countryCode) => {
-    this.setState({
-      worldMapMouseOverCountry: countryCode,
-    });
-  };
-  onWorldMapMouseOut = () => {
-    this.setState({
-      worldMapMouseOverCountry: null,
-    });
-  };
   onWorldMapClick = (countryCode) => {
     if (countryCode === null || countryCode === this.state.country) {
       return;
@@ -1743,12 +1733,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     });
   }
 
-  renderWorldMapTooltip = () => {
-    const {
-      worldMapMouseOverCountry: country,
-      mapColorBy,
-      worldMapData,
-    } = this.state;
+  renderWorldMapTooltip = (country) => {
+    const { mapColorBy, worldMapData } = this.state;
     if (!country || !worldMapData) {
       return "";
     }
@@ -2664,36 +2650,33 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
               <Grid item className="grid-item" xs={12} md={8}>
                 <ParentSize>
                   {({ width }) => (
-                    <HtmlTooltip
-                      title={this.renderWorldMapTooltip()}
-                      open={!!this.state.worldMapMouseOverCountry}
-                    >
-                      <div>
-                        {this.renderProgress()}
-                        <div style={{ textAlign: "center" }}>
-                          {mapColorBy === "publishingCountry"
-                            ? `Publisher origin for records in ${country}`
-                            : " "}
-                        </div>
-
-                        <div ref={this.refWorldMap}>
-                          <WorldMap
-                            width={width}
-                            data={this.state.worldMapData}
-                            valueAccessor={worldMapDataAccessor}
-                            colorBy={mapColorBy}
-                            valueMin={this.state.worldMapDataScaleMin}
-                            valueMax={this.state.worldMapDataScaleMax}
-                            logScale={useLogScale[mapColorBy]}
-                            onMouseOver={this.onWorldMapMouseOver}
-                            onMouseOut={this.onWorldMapMouseOut}
-                            onClick={this.onWorldMapClick}
-                            tickCount={getTickCount(mapColorBy)}
-                            tickFormat={getTickFormat(mapColorBy)}
-                          />
-                        </div>
+                    <div>
+                      {this.renderProgress()}
+                      <div style={{ textAlign: "center" }}>
+                        {mapColorBy === "publishingCountry"
+                          ? `Publisher origin for records in ${country}`
+                          : " "}
                       </div>
-                    </HtmlTooltip>
+
+                      <div
+                        ref={this.refWorldMap}
+                        style={{ position: "relative" }}
+                      >
+                        <WorldMap
+                          width={width}
+                          data={this.state.worldMapData}
+                          valueAccessor={worldMapDataAccessor}
+                          colorBy={mapColorBy}
+                          valueMin={this.state.worldMapDataScaleMin}
+                          valueMax={this.state.worldMapDataScaleMax}
+                          logScale={useLogScale[mapColorBy]}
+                          renderTooltip={this.renderWorldMapTooltip}
+                          onClick={this.onWorldMapClick}
+                          tickCount={getTickCount(mapColorBy)}
+                          tickFormat={getTickFormat(mapColorBy)}
+                        />
+                      </div>
+                    </div>
                   )}
                 </ParentSize>
                 <div className="controls"></div>

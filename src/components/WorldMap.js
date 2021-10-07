@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { scaleQuantize } from "@visx/scale";
 import { NaturalEarth, Graticule } from "@visx/geo";
 import * as topojson from "topojson-client";
 import * as d3 from "d3";
 import countryCodes from "../helpers/countryCodes";
 import ColorAxisBottom from "./ColorAxisBottom";
+import { useTooltip, TooltipWithBounds as Tooltip } from "@visx/tooltip";
+import { localPoint } from "@visx/event";
 
 export const background = "#f9f7e8";
 
@@ -56,6 +58,7 @@ export default ({
   logScale = false,
   tickCount = 10,
   tickFormat = "~s",
+  renderTooltip = (country) => country,
   onMouseOver = () => {},
   onMouseOut = () => {},
   onClick = () => {},
@@ -64,6 +67,15 @@ export default ({
   const [world, setWorld] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const {
+    tooltipData,
+    tooltipLeft,
+    tooltipTop,
+    tooltipOpen,
+    showTooltip,
+    hideTooltip,
+  } = useTooltip();
 
   useEffect(() => {
     fetchWorld((world, err) => {
@@ -75,6 +87,36 @@ export default ({
       }
     });
   }, []);
+
+  const _onMouseOver = useCallback(
+    (event, feature) => {
+      const coords = localPoint(event.target.ownerSVGElement, event);
+      showTooltip({
+        tooltipLeft: coords.x,
+        tooltipTop: coords.y,
+        tooltipData: feature.id,
+      });
+      onMouseOver(feature.id, { feature, coords });
+    },
+    [onMouseOver],
+  );
+
+  const _onMouseOut = useCallback(
+    (event, feature) => {
+      const coords = localPoint(event.target.ownerSVGElement, event);
+      hideTooltip();
+      onMouseOut(feature.id, { feature, coords });
+    },
+    [onMouseOut],
+  );
+
+  const _onClick = useCallback(
+    (event, feature) => {
+      event.stopPropagation();
+      onClick(feature.id, { feature });
+    },
+    [onClick],
+  );
 
   const mapHeight = width * 0.52;
   const legendHeight = 50;
@@ -109,50 +151,59 @@ export default ({
     return colorScale(valueAccessor(data.get(feature.id))) ?? "#cccccc";
   };
 
-  return width < 10 ? null : (
-    <svg width={width} height={height} onClick={() => onClick(null)}>
-      <NaturalEarth
-        data={world.features}
-        scale={scale}
-        translate={[centerX, centerY]}
-      >
-        {(projection) => (
-          <g>
-            <Graticule
-              graticule={(g) => projection.path(g) || ""}
-              stroke="rgba(33,33,33,0.05)"
-            />
-            {projection.features.map(({ feature, path }, i) => (
-              <path
-                key={`map-feature-${i}`}
-                d={path || ""}
-                fill={color(feature)}
-                stroke={background}
-                strokeWidth={0.5}
-                onMouseOver={() => {
-                  onMouseOver(feature.id, feature);
-                }}
-                onMouseOut={() => {
-                  onMouseOut(feature.id, feature);
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClick(feature.id, feature);
-                }}
+  if (width < 10) {
+    return null;
+  }
+
+  return (
+    <React.Fragment>
+      <svg width={width} height={height} onClick={() => onClick(null)}>
+        <NaturalEarth
+          data={world.features}
+          scale={scale}
+          translate={[centerX, centerY]}
+        >
+          {(projection) => (
+            <g>
+              <Graticule
+                graticule={(g) => projection.path(g) || ""}
+                stroke="rgba(33,33,33,0.05)"
               />
-            ))}
-          </g>
-        )}
-      </NaturalEarth>
-      <g transform={`translate(0,${mapHeight})`}>
-        <ColorAxisBottom
-          width={width}
-          colorScale={colorScale}
-          logScale={logScale}
-          tickCount={tickCount}
-          tickFormat={tickFormat}
-        />
-      </g>
-    </svg>
+              {projection.features.map(({ feature, path }, i) => (
+                <path
+                  key={`map-feature-${i}`}
+                  d={path || ""}
+                  fill={color(feature)}
+                  stroke={background}
+                  strokeWidth={0.5}
+                  onMouseOver={(e) => _onMouseOver(e, feature)}
+                  onMouseOut={(e) => _onMouseOut(e, feature)}
+                  onClick={(e) => _onClick(e, feature)}
+                />
+              ))}
+            </g>
+          )}
+        </NaturalEarth>
+        <g transform={`translate(0,${mapHeight})`}>
+          <ColorAxisBottom
+            width={width}
+            colorScale={colorScale}
+            logScale={logScale}
+            tickCount={tickCount}
+            tickFormat={tickFormat}
+          />
+        </g>
+      </svg>
+      {tooltipOpen && (
+        <Tooltip
+          // set this to random so it correctly updates with parent bounds
+          key={Math.random()}
+          top={tooltipTop}
+          left={tooltipLeft}
+        >
+          {renderTooltip(tooltipData)}
+        </Tooltip>
+      )}
+    </React.Fragment>
   );
 };
