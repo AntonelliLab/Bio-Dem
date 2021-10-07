@@ -5,6 +5,7 @@ import Box from "@material-ui/core/Box";
 import ReactPlayer from "react-player/youtube";
 import "./About.css";
 import { Typography } from "@material-ui/core";
+import BioDemText from "./components/BioDemText";
 
 const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
 
@@ -84,12 +85,15 @@ class About extends React.Component {
           </p>
 
           <p>
-            <strong>Bio-Dem addresses this gap</strong>, and provides a web-app
-            to visually explore the availability of geographic occurrence
-            records of biological species available from the Global Biodiversity
-            Information Facility (as proxy for scientific biodiversity
-            knowledge) in relation to political systems around the world Some
-            specific questions that motivated the development of Bio-Dem are:{" "}
+            <strong>
+              <BioDemText /> addresses this gap
+            </strong>
+            , and provides a web-app to visually explore the availability of
+            geographic occurrence records of biological species available from
+            the Global Biodiversity Information Facility (as proxy for
+            scientific biodiversity knowledge) in relation to political systems
+            around the world Some specific questions that motivated the
+            development of <BioDemText /> are:{" "}
           </p>
 
           <ul>
@@ -144,8 +148,8 @@ class About extends React.Component {
             >
               GBIF
             </a>
-            . Bio-Dem fetches the number of occurrence records live from the
-            latest version of GBIF via the{" "}
+            . <BioDemText /> fetches the number of occurrence records live from
+            the latest version of GBIF via the{" "}
             <a
               target="_blank"
               rel="noopener noreferrer"
@@ -202,7 +206,7 @@ class About extends React.Component {
             >
               download the data and browse the codebook
             </a>
-            . Bio-Dem currently{" "}
+            . <BioDemText /> currently{" "}
             <a
               target="_blank"
               rel="noopener noreferrer"
@@ -225,7 +229,7 @@ class About extends React.Component {
 
           <h3 id="inthegreatercontext">In the greater context</h3>
           <p>
-            Bio-Dem visualizes the relation between biological collection
+            <BioDemText /> visualizes the relation between biological collection
             records from any given country and the political situation in this
             country. It must be noted that, in general, correlation is not
             causation (see{" "}
@@ -237,29 +241,31 @@ class About extends React.Component {
               here
             </a>{" "}
             for illustrative examples) and that, in particular, there are some
-            caveats related to the data used by Bio-Dem. For instance, the
-            amount of occurrence information available from GBIF is only a crude
-            and certainly biased proxy of national knowledge of biodiversity
-            (and not all countries have institutions contributing to GBIF); and
-            the connection between political systems and biodiversity collection
-            and knowledge are certainly complicated. However, scientific
-            collection and laymen naturalist activity--two major sources of
-            species occurrence information--are clearly influenced by political
-            structure and society of a country, such as the freedom of movement
-            and physical violence. We only included those indicators in Bio-Dem
+            caveats related to the data used by <BioDemText />. For instance,
+            the amount of occurrence information available from GBIF is only a
+            crude and certainly biased proxy of national knowledge of
+            biodiversity (and not all countries have institutions contributing
+            to GBIF); and the connection between political systems and
+            biodiversity collection and knowledge are certainly complicated.
+            However, scientific collection and laymen naturalist activity--two
+            major sources of species occurrence information--are clearly
+            influenced by political structure and society of a country, such as
+            the freedom of movement and physical violence. We only included
+            those indicators in <BioDemText />
             which have a
             <a href="#political-indicator-variables">mechanistic link</a> to
             biodiversity collections. Indeed, interesting patterns emerge
             globally and for individual countries through time as shown by the
-            example plots. We consider Bio-Dem primarily as an exploration tool
-            to reveal interesting patterns and inspire new thoughts on research,
-            collection activity, data sharing and, ideally, policy.
+            example plots. We consider <BioDemText /> primarily as an
+            exploration tool to reveal interesting patterns and inspire new
+            thoughts on research, collection activity, data sharing and,
+            ideally, policy.
           </p>
 
           <h2 id="tutorials">Tutorials</h2>
           <p>
-            Learn more about the features of Bio-Dem to explore the relation
-            between biodiversity data and political regime in our video
+            Learn more about the features of <BioDemText /> to explore the
+            relation between biodiversity data and political regime in our video
             tutorials:
           </p>
 
@@ -391,6 +397,40 @@ class About extends React.Component {
             </a>
             .
           </p>
+
+          <h2 id="awards">Awards</h2>
+          <div>
+            <BioDemText /> won the first prize in the{" "}
+            <a href="https://www.gbif.org/news/QWLleXqOFkDOGR4Oxaj94/bio-dem-wins-2021-gbif-ebbe-nielsen-challenge">
+              2021 GBIF Ebbe Nielsen Challenge
+            </a>
+            .
+          </div>
+
+          <h2 id="cite">How to cite</h2>
+          <div>
+            <BioDemText /> is published in
+            <div
+              style={{
+                borderLeft: "5px solid #dddddd",
+                marginTop: 10,
+                paddingLeft: 10,
+              }}
+            >
+              Zizka, A., Rydén, O., Edler, D., Klein, J., Perrigo, A.,
+              Silvestro, D., Jagers, S. C., Lindberg, S. I., & Antonelli, A.
+              (2021). <BioDemText />, a tool to explore the relationship between
+              biodiversity data availability and socio-political conditions in
+              time and space.{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Journal of Biogeography
+              </span>
+              , 00, 1– 12.{" "}
+              <a href="https://doi.org/10.1111/jbi.14256">
+                https://doi.org/10.1111/jbi.14256
+              </a>
+            </div>
+          </div>
 
           <h2 id="references">References</h2>
           <p>

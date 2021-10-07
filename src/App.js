@@ -1,12 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { withStyles } from "@material-ui/core/styles";
 import Tooltip from "@material-ui/core/Tooltip";
 import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
 import Grid from "@material-ui/core/Grid";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -34,7 +31,6 @@ import {
   queryGBIFFacetPerYear,
 } from "./api/gbif";
 import About from "./About";
-import logo from "./logo.svg";
 import DualChart from "./d3/DualChart";
 import ScatterPlot from "./d3/ScatterPlot";
 import Brush from "./d3/Brush";
@@ -43,8 +39,9 @@ import countryCodes from "./helpers/countryCodes";
 import { hexToRGBA } from "./helpers/colors";
 import AutoSelect, { MuiSelect, MuiMultiSelect } from "./components/AutoSelect";
 import Notice from "./components/Notice";
-import IconGithub from "./components/Github";
 import WorldMap from "./components/WorldMap";
+import Header from "./components/Header";
+import BioDemText from "./components/BioDemText";
 import "./App.css";
 import "./d3/d3.css";
 
@@ -428,10 +425,6 @@ const getTickCount = (colorBy) => {
       return 10;
   }
 };
-
-const BioDemLogo = ({ className = "logo", alt = "logo" }) => (
-  <img src={logo} className={className} alt={alt} />
-);
 
 const RegimeLegend = ({ fillOpacity = 0.5 }) => (
   <Grid container className="regimeLegend" justify="center">
@@ -2141,37 +2134,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
 
     return (
       <div className="App">
-        <AppBar color="primary" position="fixed" className="appbar">
-          <Toolbar variant="dense">
-            <IconButton
-              href="#top"
-              color="inherit"
-              aria-label="Home"
-              style={{ padding: 0 }}
-            >
-              <BioDemLogo className="appbar-logo" alt="appbar-logo" />
-            </IconButton>
-            <Button href="#about" color="inherit">
-              About
-            </Button>
-            <Button href="#tutorials" color="inherit">
-              Tutorials
-            </Button>
-            <Button href="#team" color="inherit">
-              Team
-            </Button>
-            <span style={{ flexGrow: 1 }} />
-            <span>{`${process.env.REACT_APP_VERSION}`}</span>
-            <IconButton
-              href="https://github.com/AntonelliLab/Bio-Dem"
-              color="inherit"
-              aria-label="Github"
-              style={{ padding: 8 }}
-            >
-              <IconGithub />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
+        <Header />
 
         <Grid container>
           <Grid item className="grid-item intro section section-0" xs={12}>
@@ -2184,7 +2147,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                     className="heading"
                     style={{ color: "rgba(0, 0, 0, 0.54)" }}
                   >
-                    Bio-Dem
+                    <BioDemText />
                   </Typography>
                   <div
                     style={{
