@@ -55,7 +55,7 @@ export default function Brush(el, properties) {
 
   let totalWidth = props.width;
   if (!totalWidth) {
-    totalWidth = anchorElement.node().getBoundingClientRect().width;
+    totalWidth = anchorElement?.node()?.getBoundingClientRect()?.width ?? 400;
   }
 
   const height = props.height - props.top - props.bottom;

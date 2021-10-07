@@ -65,6 +65,11 @@ export default function DualChart(el, properties) {
     properties,
   );
 
+  if (!el) {
+    console.warn("DualChart: Anchor element not defined");
+    return;
+  }
+
   const stackKeys =
     props.stackKeys && props.stackKeys.length ? props.stackKeys : [];
   const grouped = props.grouped && stackKeys.length > 1;
@@ -86,7 +91,7 @@ export default function DualChart(el, properties) {
 
   let totalWidth = props.width;
   if (!totalWidth) {
-    totalWidth = anchorElement.node().getBoundingClientRect().width;
+    totalWidth = anchorElement?.node()?.getBoundingClientRect()?.width ?? 400;
   }
 
   const { data } = props;

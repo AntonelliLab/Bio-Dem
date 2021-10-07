@@ -43,6 +43,11 @@ export default function ScatterPlot(el, properties) {
     properties,
   );
 
+  if (!el) {
+    console.warn("ScatterPlot: Anchor element not defined");
+    return;
+  }
+
   const anchorElement = d3.select(el);
   let svg = anchorElement.select("svg");
 
@@ -60,7 +65,7 @@ export default function ScatterPlot(el, properties) {
 
   let totalWidth = props.width;
   if (!totalWidth) {
-    totalWidth = anchorElement.node().getBoundingClientRect().width;
+    totalWidth = anchorElement?.node()?.getBoundingClientRect()?.width ?? 400;
   }
 
   const height = props.height - props.top - props.bottom;

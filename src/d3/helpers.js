@@ -92,10 +92,10 @@ export const computeLegendLayout = (
     .attr("font-size", fontSize)
     .text((d) => d);
   // const getWidth = (node) => node.getComputedTextLength(); // Why not available here?!
-  const getWidth = (node) => node.getBoundingClientRect().width;
+  const getWidth = (node) => node.getBoundingClientRect()?.width ?? 0;
   const textLengths = text.nodes().map(getWidth);
   const rowHeight =
-    lineHeight || text.nodes()[0].getBoundingClientRect().height;
+    lineHeight ?? text.nodes()[0].getBoundingClientRect()?.height ?? 0;
   let layout = [
     {
       x: 0,
