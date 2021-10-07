@@ -47,7 +47,7 @@ class About extends React.Component {
     const { vdemExplanations, gbifExplanations } = this.props;
 
     return (
-      <Grid container>
+      <Grid container className="sub-section">
         {/* First main column */}
         <Grid item className="column" xs={12} sm={6}>
           <h2 id="about">About</h2>

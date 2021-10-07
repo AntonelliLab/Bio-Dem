@@ -17,7 +17,6 @@ const fetchWorld = async (callback) => {
     const worldTopo = await fetch(worldTopoURL).then((response) =>
       response.json(),
     );
-    console.log("worldTopo", worldTopo);
     // topojson.merge(us, us.objects.states.geometries.filter(d => d.id in [...]))
     const world = topojson.feature(worldTopo, worldTopo.objects.countries);
     world.features = world.features.filter((feature) => {
@@ -30,7 +29,7 @@ const fetchWorld = async (callback) => {
           return true;
         }
         console.log(
-          `!!!! numeric id ${feature.id} missing TODO: Merge with other!`,
+          `Warning: numeric country id ${feature.id} missing. TODO: Merge with other?`,
           feature,
         );
         return false;
@@ -38,7 +37,6 @@ const fetchWorld = async (callback) => {
       feature.id = id;
       return true;
     });
-    console.log("world:", world);
     callback(world);
   } catch (error) {
     callback(null, error);

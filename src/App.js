@@ -2140,7 +2140,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
         <Grid container>
           <MainTitle />
           <Grid item className="grid-item section section-1" xs={12}>
-            <Grid container>
+            <Grid container className="sub-section">
               <Grid
                 item
                 className="grid-item"
@@ -2349,7 +2349,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
           </Grid>
 
           <Grid item className="grid-item section section-2" xs={12}>
-            <Grid container>
+            <Grid container className="sub-section">
               <Grid item className="grid-item" xs={12} md={4}>
                 <Typography variant="h5" gutterBottom className="heading">
                   Biodiversity knowledge through time
@@ -2587,7 +2587,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
           </Grid>
 
           <Grid item className="grid-item section section-3" xs={12}>
-            <Grid container>
+            <Grid container className="sub-section">
               <Grid item className="grid-item" xs={12} md={4}>
                 <Typography variant="h5" gutterBottom className="heading">
                   Data through space and time
