@@ -81,7 +81,7 @@ const Header = () => {
             <BioDemText />
             <Drawer anchor="left" open={isOpen} onClose={toggleDrawer}>
               <List>
-                <ListItem component="a" href="#top">
+                <ListItem component="a" href="#top" onClick={toggleDrawer}>
                   <ListItemIcon>
                     <BioDemLogo className="appbar-logo" alt="appbar-logo" />
                   </ListItemIcon>
@@ -101,7 +101,12 @@ const Header = () => {
               <Divider />
               <List>
                 {menuItems.map(({ label, href, icon }) => (
-                  <ListItem component="a" key={href} href={href}>
+                  <ListItem
+                    component="a"
+                    key={href}
+                    href={href}
+                    onClick={toggleDrawer}
+                  >
                     <ListItemIcon>{icon}</ListItemIcon>
                     <ListItemText primary={label} />
                   </ListItem>
