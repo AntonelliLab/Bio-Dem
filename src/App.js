@@ -42,6 +42,7 @@ import Notice from "./components/Notice";
 import WorldMap from "./components/WorldMap";
 import Header from "./components/Header";
 import BioDemText from "./components/BioDemText";
+import MainTitle from "./components/MainTitle";
 import "./App.css";
 import "./d3/d3.css";
 
@@ -2137,39 +2138,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
         <Header />
 
         <Grid container>
-          <Grid item className="grid-item intro section section-0" xs={12}>
-            <Grid container direction="column" alignItems="center">
-              <Grid item style={{ marginTop: 0, padding: "40px 0" }}>
-                <Grid container direction="column" alignItems="center">
-                  <Typography
-                    variant="h3"
-                    gutterBottom
-                    className="heading"
-                    style={{ color: "rgba(0, 0, 0, 0.54)" }}
-                  >
-                    <BioDemText />
-                  </Typography>
-                  <div
-                    style={{
-                      borderTop: "1px solid #ccc",
-                      marginTop: -10,
-                      paddingTop: 10,
-                    }}
-                  >
-                    <Typography
-                      variant="h5"
-                      gutterBottom
-                      className="heading"
-                      style={{ color: "#666" }}
-                    >
-                      <strong>Biodiversity</strong> knowledge &amp;{" "}
-                      <strong>democracy</strong>
-                    </Typography>
-                  </div>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
+          <MainTitle />
           <Grid item className="grid-item section section-1" xs={12}>
             <Grid container>
               <Grid

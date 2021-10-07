@@ -1,4 +1,5 @@
 import React from "react";
+import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -24,9 +25,17 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import BioDemText from "./BioDemText";
 import BioDemLogo from "./BioDemLogo";
 
+const useStyles = makeStyles({
+  button: {
+    textTransform: "none",
+  },
+});
+
 const Header = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+
+  const classes = useStyles();
 
   /* Creating a function to handle manu: */
   const toggleDrawer = () => {
@@ -69,6 +78,7 @@ const Header = () => {
             <IconButton onClick={toggleDrawer}>
               <MenuIcon style={{ color: "white" }} />
             </IconButton>
+            <BioDemText />
             <Drawer anchor="left" open={isOpen} onClose={toggleDrawer}>
               <List>
                 <ListItem component="a" href="#top">
@@ -116,6 +126,7 @@ const Header = () => {
             <Button
               href="#top"
               color="inherit"
+              classes={{ root: classes.button }}
               aria-label="Home"
               style={{ paddingTop: 0, paddingBottom: 0 }}
               startIcon={
