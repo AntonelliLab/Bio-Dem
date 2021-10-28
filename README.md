@@ -43,4 +43,5 @@ https://github.com/AntonelliLab/Bio-Dem/issues.
 If you want to contribute to the project, send a pull request or contact [us](mailto:bio-dem@googlegroups.com).
 
 # Citation
-Edler D, Klein J, Ryden O and Zizka A. (2018) Bio-Dem - Biodiversity knowledge & democracy. Available at http://bio-dem.surge.sh/.
+Bio-Dem is published in
+Zizka, A., Rydén, O., Edler, D., Klein, J., Perrigo, A., Silvestro, D., Jagers, S. C., Lindberg, S. I., & Antonelli, A. (2021). Bio-Dem, a tool to explore the relationship between biodiversity data availability and socio-political conditions in time and space. Journal of Biogeography, 48, 2715–2726. https://doi.org/10.1111/jbi.14256
