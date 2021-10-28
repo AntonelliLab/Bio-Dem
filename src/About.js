@@ -425,7 +425,7 @@ class About extends React.Component {
               <span style={{ fontStyle: "italic" }}>
                 Journal of Biogeography
               </span>
-              , 00, 1– 12.{" "}
+              , 48, 2715–2726.{" "}
               <a href="https://doi.org/10.1111/jbi.14256">
                 https://doi.org/10.1111/jbi.14256
               </a>
