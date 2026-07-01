@@ -1,7 +1,7 @@
 import React from "react";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import BioDemText from "./BioDemText";
 
 export function SubTitle() {
@@ -40,10 +40,10 @@ export function SubTitle() {
 
 export default function MainTitle() {
   return (
-    <Grid item className="grid-item intro section section-0" xs={12}>
-      <Grid container direction="column" alignItems="center">
-        <Grid item style={{ marginTop: 0, padding: "40px 0" }}>
-          <Grid container direction="column" alignItems="center">
+    <Grid className="grid-item intro section section-0" size={12}>
+      <Grid container direction="column" sx={{ alignItems: "center" }}>
+        <Grid style={{ marginTop: 0, padding: "40px 0" }}>
+          <Grid container direction="column" sx={{ alignItems: "center" }}>
             <Typography
               variant="h3"
               gutterBottom

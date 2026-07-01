@@ -1,4 +1,5 @@
-require("@babel/register");
-const download = require("./bin/downloadGbifData").default;
+// Run with tsx (resolves the TypeScript app imports in ./bin and ../src):
+//   pnpm exec tsx downloadGbifData.js [taxonFilters...] [--add-domestic]
+import run from "./bin/downloadGbifData.js";
 
-download(process.argv.slice(2));
+run(process.argv.slice(2));

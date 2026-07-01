@@ -1,25 +1,24 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
-import Typography from "@material-ui/core/Typography";
-import { withStyles } from "@material-ui/core/styles";
-import Tooltip from "@material-ui/core/Tooltip";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
-import Zoom from "@material-ui/core/Zoom";
-import Accordion from "@material-ui/core/Accordion";
-import AccordionDetails from "@material-ui/core/AccordionDetails";
-import AccordionSummary from "@material-ui/core/AccordionSummary";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import IconDownload from "@material-ui/icons/CloudDownload";
-import ParentSize from "@visx/responsive/lib/components/ParentSize";
-// import IconPlay from '@material-ui/icons/PlayCircleOutline';
-// import IconPause from '@material-ui/icons/PauseCircleOutline';
+import Typography from "@mui/material/Typography";
+import { styled } from "@mui/material/styles";
+import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import Input from "@mui/material/Input";
+import InputLabel from "@mui/material/InputLabel";
+import LinearProgress from "@mui/material/LinearProgress";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Zoom from "@mui/material/Zoom";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import IconDownload from "@mui/icons-material/CloudDownload";
+import { ParentSize } from "@visx/responsive";
+// import IconPlay from '@mui/icons-material/PlayCircleOutline';
+// import IconPause from '@mui/icons-material/PauseCircleOutline';
 import * as d3 from "d3";
 import { csv } from "d3-fetch";
 import debounce from "lodash/debounce";
@@ -53,13 +52,13 @@ const MOCK_GBIF_REQUESTS = false;
 country,year,v2x_regime,v2x_polyarchy,v2x_freexp_altinf,v2x_frassoc_thick,v2xcl_dmove,v2xcs_ccsi,v2x_corr,v2x_clphy,e_peaveduc,e_migdppc,conflict_hi,conflict_li
 AFG,1960,0,0.093,0.179,0.12,0.218,0.254,0.482,0.369,0.31,2744,0,0
  */
-const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
+const vdemDataUrl = `${import.meta.env.BASE_URL}data/vdem_variables.csv`;
 
 /**
  * V-dem variables explanations
  * id, full_name, short_name, description, relevance, references, comment
  */
-const vdemExplanationsUrl = `${process.env.PUBLIC_URL}/data/vdem_variables_explanations.csv`;
+const vdemExplanationsUrl = `${import.meta.env.BASE_URL}data/vdem_variables_explanations.csv`;
 
 /**
  * Country data
@@ -67,7 +66,7 @@ const vdemExplanationsUrl = `${process.env.PUBLIC_URL}/data/vdem_variables_expla
 AFG,642182,8
 AGO,1244654,4
  */
-const countryDataUrl = `${process.env.PUBLIC_URL}/data/country_data.csv`;
+const countryDataUrl = `${import.meta.env.BASE_URL}data/country_data.csv`;
 
 /**
  * Country data on colonial ties
@@ -75,7 +74,7 @@ iso2,iso3,cow_state,Name,indep_year,timesince,independence_from,cont_ent,cont_su
 CA,CAN,20,Canada,1867,154,GB,Americas,Europe
 BS,BHS,31,Bahamas,1973,48,GB,Americas,Europe
  */
-const colonialTiesUrl = `${process.env.PUBLIC_URL}/data/colonial_ties.csv`;
+const colonialTiesUrl = `${import.meta.env.BASE_URL}data/colonial_ties.csv`;
 
 /**
  * Gbif pre-downloaded data from api
@@ -83,7 +82,7 @@ country,year,records
 AFG,1960,857
 AFG,1961,445
  */
-const gbifDataUrl = `${process.env.PUBLIC_URL}/data/gbif_data.csv`;
+const gbifDataUrl = `${import.meta.env.BASE_URL}data/gbif_data.csv`;
 
 /**
  * Country data gbif participation status
@@ -91,7 +90,7 @@ iso3,iso2,name,status,member_since
 AND,AD,Andorra,Voting participant,2010
 AGO,AO,"Angola, Republic of",Associate country participant,2019
  */
-const gbifParticipatingCountriesUrl = `${process.env.PUBLIC_URL}/data/gbif_participating_countries.csv`;
+const gbifParticipatingCountriesUrl = `${import.meta.env.BASE_URL}data/gbif_participating_countries.csv`;
 
 // The strings for the v-dem variables used to get the static data
 const v2x_polyarchy = "v2x_polyarchy";
@@ -428,7 +427,7 @@ const getTickCount = (colorBy) => {
 };
 
 const RegimeLegend = ({ fillOpacity = 0.5 }) => (
-  <Grid container className="regimeLegend" justifyContent="center">
+  <Grid container className="regimeLegend" sx={{ justifyContent: "center" }}>
     {Object.keys(regimeTypes).map((v) => (
       <div key={v} style={{ padding: 5, fontSize: "0.75em" }}>
         <span
@@ -447,7 +446,7 @@ const RegimeLegend = ({ fillOpacity = 0.5 }) => (
 );
 
 const RegionLegend = ({ fillOpacity = 0.5 }) => (
-  <Grid container className="regionLegend" justifyContent="center">
+  <Grid container className="regionLegend" sx={{ justifyContent: "center" }}>
     {Object.keys(regions).map((v) => (
       <div key={v} style={{ padding: 5, fontSize: "0.75em" }}>
         <span
@@ -466,7 +465,7 @@ const RegionLegend = ({ fillOpacity = 0.5 }) => (
 );
 
 const GbifParticipationLegend = ({ fillOpacity = 0.5 }) => (
-  <Grid container className="gbifParticipationLegend" justifyContent="center">
+  <Grid container className="gbifParticipationLegend" sx={{ justifyContent: "center" }}>
     {GBIF_PARTICIPATION_VALUES.map((v) => (
       <div key={v} style={{ padding: 5, fontSize: "0.75em" }}>
         <span
@@ -490,7 +489,7 @@ const COLONIAL_HISTORY_ITEMS = [
 ];
 
 const ColonialHistoryLegend = ({ fillOpacity = 0.5 }) => (
-  <Grid container className="colonialHistoryLegend" justifyContent="center">
+  <Grid container className="colonialHistoryLegend" sx={{ justifyContent: "center" }}>
     {COLONIAL_HISTORY_ITEMS.map(({ key, label }) => (
       <div key={key} style={{ padding: 5, fontSize: "0.75em" }}>
         <span
@@ -521,15 +520,6 @@ const ColorLegend = ({ type }) => {
     default:
       return null;
   }
-};
-
-ColorLegend.propTypes = {
-  type: PropTypes.oneOf([
-    "regime",
-    "region",
-    "gbifParticipationStatus",
-    "colonialHistory",
-  ]),
 };
 
 const HighlightsPanel = (props) => (
@@ -568,15 +558,17 @@ const CountryHighlight = ({ code, name, onClick }) => (
   </strong>
 );
 
-const HtmlTooltip = withStyles((theme) => ({
-  tooltip: {
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: "#f5f5f9",
     color: "rgba(0, 0, 0, 0.87)",
     // maxWidth: 220,
     fontSize: theme.typography.pxToRem(12),
     border: "1px solid #dadde9",
   },
-}))(Tooltip);
+}));
 
 class App extends Component {
   constructor(props) {
@@ -1059,7 +1051,10 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       const numRecords =
         gbifDataPerCountryAndYear[`${d.country}-${d.year}`] || 0;
       d.records = numRecords;
-      d.recordsPerArea = numRecords / this.countryMap[d.country].area;
+      // Some vdem countries (e.g. historical states like DDR, YMD) have no
+      // reference entry in country_data.csv and therefore no area.
+      const countryInfo = this.countryMap[d.country];
+      d.recordsPerArea = countryInfo ? numRecords / countryInfo.area : 0;
     });
 
     this.setState(
@@ -2125,12 +2120,11 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
 
         <Grid container>
           <MainTitle />
-          <Grid item className="grid-item section section-1" xs={12}>
+          <Grid className="grid-item section section-1" size={12}>
             <Grid container className="sub-section">
               <Grid
-                item
                 className="grid-item"
-                xs={12}
+                size={12}
                 style={{ paddingTop: 10 }}
               >
                 <Typography variant="subtitle1" gutterBottom>
@@ -2148,7 +2142,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                   started!
                 </Typography>
               </Grid>
-              <Grid item className="grid-item" xs={12} md={4}>
+              <Grid className="grid-item" size={{ xs: 12, md: 4 }}>
                 <Typography variant="h5" gutterBottom className="heading">
                   Biodiversity knowledge &amp; political regimes
                 </Typography>
@@ -2172,7 +2166,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                   value={this.state.activeScatterPlotHighlight}
                 />
               </Grid>
-              <Grid item className="grid-item" xs={12} md={8}>
+              <Grid className="grid-item" size={{ xs: 12, md: 8 }}>
                 <div id="scatterPlot" ref={this.refScatterPlot} />
                 <ColorLegend type={this.state.colorBy} />
                 {this.renderProgress()}
@@ -2334,9 +2328,9 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
             </Grid>
           </Grid>
 
-          <Grid item className="grid-item section section-2" xs={12}>
+          <Grid className="grid-item section section-2" size={12}>
             <Grid container className="sub-section">
-              <Grid item className="grid-item" xs={12} md={4}>
+              <Grid className="grid-item" size={{ xs: 12, md: 4 }}>
                 <Typography variant="h5" gutterBottom className="heading">
                   Biodiversity knowledge through time
                 </Typography>
@@ -2364,7 +2358,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                 />
               </Grid>
 
-              <Grid item className="grid-item" xs={12} md={8}>
+              <Grid className="grid-item" size={{ xs: 12, md: 8 }}>
                 <div id="dualChart" ref={this.refDualChart} />
 
                 {this.renderProgress()}
@@ -2572,9 +2566,9 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
             </Grid>
           </Grid>
 
-          <Grid item className="grid-item section section-3" xs={12}>
+          <Grid className="grid-item section section-3" size={12}>
             <Grid container className="sub-section">
-              <Grid item className="grid-item" xs={12} md={4}>
+              <Grid className="grid-item" size={{ xs: 12, md: 4 }}>
                 <Typography variant="h5" gutterBottom className="heading">
                   Data through space and time
                 </Typography>
@@ -2647,7 +2641,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                 </div>
               </Grid>
 
-              <Grid item className="grid-item" xs={12} md={8}>
+              <Grid className="grid-item" size={{ xs: 12, md: 8 }}>
                 <ParentSize>
                   {({ width }) => (
                     <div>
@@ -2684,7 +2678,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
             </Grid>
           </Grid>
 
-          <Grid item className="grid-item section section-4" xs={12}>
+          <Grid className="grid-item section section-4" size={12}>
             <About
               vdemExplanations={this.state.vdemExplanations}
               gbifExplanations={gbifExplanations}

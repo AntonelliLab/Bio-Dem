@@ -162,6 +162,39 @@ export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = 2019) => {
     });
 };
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Run async tasks over `items` with at most `limit` running concurrently,
+// preserving input order in the results.
+async function mapWithConcurrency(items, limit, task) {
+  const results = new Array(items.length);
+  let cursor = 0;
+  const workers = Array.from(
+    { length: Math.min(limit, items.length) },
+    async () => {
+      while (cursor < items.length) {
+        const i = cursor++;
+        results[i] = await task(items[i], i);
+      }
+    },
+  );
+  await Promise.all(workers);
+  return results;
+}
+
+// GBIF returns HTTP 429 when too many requests arrive at once. Retry the
+// rate-limited ones with exponential backoff.
+const queryGBIFYearFacetWithRetry = async (country, options, retries = 4) => {
+  for (let attempt = 0; ; attempt++) {
+    const res = await queryGBIFYearFacetOld(country, options);
+    if (res.error?.response?.status === 429 && attempt < retries) {
+      await sleep(500 * 2 ** attempt);
+      continue;
+    }
+    return res;
+  }
+};
+
 export const fetchRecordsPerCountryPerYear = async ({
   yearMin = 1960,
   yearMax = 2019,
@@ -171,13 +204,13 @@ export const fetchRecordsPerCountryPerYear = async ({
   // Construct the GBIF occurrences API url with facets for country counts
   let result = [];
 
-  const responses = await Promise.all(
-    countriesFiltered.map((country) =>
-      queryGBIFYearFacetOld(countryCodes.alpha3ToAlpha2(country), {
-        taxonFilter,
-        onlyDomestic,
-      }),
-    ),
+  // Limit concurrency (and retry 429s) so the bulk download isn't rejected by
+  // the GBIF API rate limiter.
+  const responses = await mapWithConcurrency(countriesFiltered, 6, (country) =>
+    queryGBIFYearFacetWithRetry(countryCodes.alpha3ToAlpha2(country), {
+      taxonFilter,
+      onlyDomestic,
+    }),
   );
   responses.forEach((res, i) => {
     if (res.error) {

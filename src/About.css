@@ -19,7 +19,9 @@
 	height: 0;
 	overflow: hidden;
 }
-.youtube-wrapper iframe {
+.youtube-wrapper iframe,
+.youtube-wrapper > *,
+.youtube-wrapper video {
 	position: absolute;
 	top: 0;
 	left: 0;

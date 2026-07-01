@@ -1,41 +1,32 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import Button from "@material-ui/core/Button";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import MenuIcon from "@material-ui/icons/Menu";
-import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import InfoIcon from "@material-ui/icons/InfoOutlined";
-import TutorialsIcon from "@material-ui/icons/VideoLibraryOutlined";
-import TeamIcon from "@material-ui/icons/PeopleOutlined";
-import AwardsIcon from "@material-ui/icons/EmojiEventsOutlined";
-import CiteIcon from "@material-ui/icons/DescriptionOutlined";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MenuIcon from "@mui/icons-material/Menu";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import InfoIcon from "@mui/icons-material/InfoOutlined";
+import TutorialsIcon from "@mui/icons-material/VideoLibraryOutlined";
+import TeamIcon from "@mui/icons-material/PeopleOutlined";
+import AwardsIcon from "@mui/icons-material/EmojiEventsOutlined";
+import CiteIcon from "@mui/icons-material/DescriptionOutlined";
 import IconGithub from "./Github";
 
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import BioDemText from "./BioDemText";
 import BioDemLogo from "./BioDemLogo";
-
-const useStyles = makeStyles({
-  button: {
-    textTransform: "none",
-  },
-});
 
 const Header = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
-
-  const classes = useStyles();
 
   /* Creating a function to handle manu: */
   const toggleDrawer = () => {
@@ -93,7 +84,7 @@ const Header = () => {
                   <ListItemText>
                     <span style={{ fontSize: 12, color: "#999999" }}>
                       <span>Version: </span>
-                      <span>{`${process.env.REACT_APP_VERSION}`}</span>
+                      <span>{`${__APP_VERSION__}`}</span>
                     </span>
                   </ListItemText>
                 </ListItem>
@@ -131,7 +122,7 @@ const Header = () => {
             <Button
               href="#top"
               color="inherit"
-              classes={{ root: classes.button }}
+              sx={{ textTransform: "none" }}
               aria-label="Home"
               style={{ paddingTop: 0, paddingBottom: 0 }}
               startIcon={
@@ -152,7 +143,7 @@ const Header = () => {
               </Button>
             ))}
             <span style={{ flexGrow: 1 }} />
-            <span>{`${process.env.REACT_APP_VERSION}`}</span>
+            <span>{`${__APP_VERSION__}`}</span>
             <IconButton
               href="https://github.com/AntonelliLab/Bio-Dem"
               color="inherit"

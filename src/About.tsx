@@ -1,43 +1,42 @@
 import React from "react";
-import PropTypes from "prop-types";
-import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
-import ReactPlayer from "react-player/youtube";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import ReactPlayer from "react-player";
 import "./About.css";
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import BioDemText from "./components/BioDemText";
 
-const vdemDataUrl = `${process.env.PUBLIC_URL}/data/vdem_variables.csv`;
+const vdemDataUrl = `${import.meta.env.BASE_URL}data/vdem_variables.csv`;
 
 const partners = [
   {
     short: "GGBC",
     long: "Gothenburg Global Biodiversity Centre",
-    logo: `${process.env.PUBLIC_URL}/logos/ggbc.png`,
+    logo: `${import.meta.env.BASE_URL}logos/ggbc.png`,
     url: "https://ggbc.gu.se",
   },
   {
     short: "Kew",
     long: "Royal Botanic Gardens, Kew",
-    logo: `${process.env.PUBLIC_URL}/logos/kew.svg`,
+    logo: `${import.meta.env.BASE_URL}logos/kew.svg`,
     url: "https://www.kew.org",
   },
   {
     short: "V-Dem",
     long: "Varieties of Democracy",
-    logo: `${process.env.PUBLIC_URL}/logos/v-dem.png`,
+    logo: `${import.meta.env.BASE_URL}logos/v-dem.png`,
     url: "https://www.v-dem.net",
   },
   {
     short: "iDiv",
     long: "German Centre for Integrative Biodiversity Research",
-    logo: `${process.env.PUBLIC_URL}/logos/idiv.png`,
+    logo: `${import.meta.env.BASE_URL}logos/idiv.png`,
     url: "https://www.idiv.de/",
   },
   {
     short: "BECC",
     long: "Biodiversity and Ecosystem services in a Changing Climate",
-    logo: `${process.env.PUBLIC_URL}/logos/becc.png`,
+    logo: `${import.meta.env.BASE_URL}logos/becc.png`,
     url: "https://www.becc.lu.se",
   },
 ];
@@ -49,7 +48,7 @@ class About extends React.Component {
     return (
       <Grid container className="sub-section">
         {/* First main column */}
-        <Grid item className="column" xs={12} sm={6}>
+        <Grid className="column" size={{ xs: 12, sm: 6 }}>
           <h2 id="about">About</h2>
           <p>
             The distribution of biological diversity, or biodiversity, has
@@ -274,10 +273,11 @@ class About extends React.Component {
           </h3>
           <div className="youtube-wrapper">
             <ReactPlayer
-              url="https://www.youtube.com/watch?v=dkUHRdBRUj0"
-              config={{
-                youtube: { playerVars: { origin: window.location.origin } },
-              }}
+              src="https://www.youtube.com/watch?v=dkUHRdBRUj0"
+              controls
+              width="100%"
+              height="100%"
+              style={{ position: "absolute", top: 0, left: 0 }}
             />
           </div>
 
@@ -286,10 +286,11 @@ class About extends React.Component {
           </h3>
           <div className="youtube-wrapper">
             <ReactPlayer
-              url="https://www.youtube.com/watch?v=9c4-qgBXYw4"
-              config={{
-                youtube: { playerVars: { origin: window.location.origin } },
-              }}
+              src="https://www.youtube.com/watch?v=9c4-qgBXYw4"
+              controls
+              width="100%"
+              height="100%"
+              style={{ position: "absolute", top: 0, left: 0 }}
             />
           </div>
 
@@ -356,18 +357,20 @@ class About extends React.Component {
             </div>
           ))}
 
-          <Box id="partners" display="flex" flexWrap="wrap">
+          <Box id="partners" sx={{ display: "flex", flexWrap: "wrap" }}>
             {partners.map((partner) => (
               <Box
                 key={partner.short}
                 className="partner"
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
                 component="a"
                 href={partner.url}
-                p={1}
                 title={partner.long}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  p: 1,
+                }}
               >
                 {partner.logo ? (
                   <img alt={partner.short} src={partner.logo} height={80} />
@@ -544,7 +547,7 @@ class About extends React.Component {
         </Grid>
 
         {/* Second main column */}
-        <Grid item className="column" xs={12} sm={6}>
+        <Grid className="column" size={{ xs: 12, sm: 6 }}>
           <h2 id="political-indicator-variables">
             Political indicator variables and their connection to biodiversity
             collections
@@ -587,9 +590,5 @@ class About extends React.Component {
   }
 }
 
-About.propTypes = {
-  vdemExplanations: PropTypes.array.isRequired,
-  gbifExplanations: PropTypes.array.isRequired,
-};
 
 export default About;

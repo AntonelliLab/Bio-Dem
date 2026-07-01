@@ -1,38 +1,31 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
+import { useState } from "react";
 // import deburr from 'lodash/deburr';
 import Downshift from "downshift";
-import { makeStyles } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
-import Paper from "@material-ui/core/Paper";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
-import Chip from "@material-ui/core/Chip";
+import TextField from "@mui/material/TextField";
+import Paper from "@mui/material/Paper";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Chip from "@mui/material/Chip";
 function renderInput(inputProps) {
-  const { InputProps, classes, ref, ...other } = inputProps;
+  const { InputProps, InputLabelProps, ref, ...other } = inputProps;
 
   return (
     <TextField
-      InputProps={{
-        inputRef: ref,
-        classes: {
-          root: classes.inputRoot,
-          input: classes.inputInput,
+      slotProps={{
+        input: {
+          inputRef: ref,
+          sx: {
+            flexWrap: "wrap",
+            "& input": { width: "auto", flexGrow: 1 },
+          },
+          ...InputProps,
         },
-        ...InputProps,
+        inputLabel: InputLabelProps,
       }}
       {...other}
     />
   );
 }
-
-renderInput.propTypes = {
-  /**
-   * Override or extend the styles applied to the component.
-   */
-  classes: PropTypes.object.isRequired,
-  InputProps: PropTypes.object,
-};
 
 function renderOption(optionProps) {
   const { option, index, itemProps, highlightedIndex, selectedItem } =
@@ -55,57 +48,17 @@ function renderOption(optionProps) {
   );
 }
 
-renderOption.propTypes = {
-  highlightedIndex: PropTypes.oneOfType([
-    PropTypes.oneOf([null]),
-    PropTypes.number,
-  ]).isRequired,
-  index: PropTypes.number.isRequired,
-  itemProps: PropTypes.object.isRequired,
-  selectedItem: PropTypes.string.isRequired,
-  option: PropTypes.shape({
-    value: PropTypes.string.isRequired,
-    label: PropTypes.string,
-  }).isRequired,
-};
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  container: {
-    flexGrow: 1,
-    position: "relative",
-  },
+const styles = {
+  root: { flexGrow: 1 },
+  container: { flexGrow: 1, position: "relative" as const },
   paper: {
-    position: "absolute",
+    position: "absolute" as const,
     zIndex: 1,
-    marginTop: theme.spacing(1),
+    marginTop: 8,
     left: 0,
     right: 0,
   },
-  inputRoot: {
-    flexWrap: "wrap",
-  },
-  inputInput: {
-    width: "auto",
-    flexGrow: 1,
-  },
-  divider: {
-    height: theme.spacing(2),
-  },
-  chips: {
-    display: "flex",
-    flexWrap: "wrap",
-  },
-  chip: {
-    // margin: theme.spacing(0.5, 0.25),
-    margin: 2,
-  },
-  noLabel: {
-    marginTop: theme.spacing(3),
-  },
-}));
+};
 
 // const itemToString = ({ value, label } = {}) => label || value || '';
 const itemToString = (item) => (item ? item.label || item.value || "" : "");
@@ -113,11 +66,15 @@ const getSelectedOption = (options, value) =>
   options.find((option) => option.value === value);
 
 export default function AutoSelect(props) {
-  const classes = useStyles();
-
   const [inputValue, setInputValue] = useState(props.value);
 
-  const { value, options, name, label } = props;
+  const {
+    value,
+    options,
+    name,
+    label = "",
+    placeholder = "Select...",
+  } = props;
   const selectedOption = getSelectedOption(options, value);
   const isControlled = value !== undefined;
 
@@ -174,7 +131,7 @@ export default function AutoSelect(props) {
   };
 
   return (
-    <div className={classes.root}>
+    <div style={styles.root}>
       <Downshift
         id={name}
         inputValue={inputValue}
@@ -198,7 +155,7 @@ export default function AutoSelect(props) {
           closeMenu,
         }) => {
           const { onBlur, onFocus, ...inputProps } = getInputProps({
-            placeholder: props.placeholder,
+            placeholder,
             onFocus: openMenu,
             onClick: openMenu,
             onKeyDown: (event) => {
@@ -225,10 +182,9 @@ export default function AutoSelect(props) {
           //  inputValue: '${inputValue}', isMatch? ${isMatch}, isOpen? ${isOpen}, ==> value: '${displayValue}'`);
 
           return (
-            <div className={classes.container}>
+            <div style={styles.container}>
               {renderInput({
                 fullWidth: true,
-                classes,
                 label,
                 InputLabelProps: getLabelProps({ shrink: true, htmlFor: name }),
                 InputProps: { onBlur, onFocus },
@@ -239,7 +195,7 @@ export default function AutoSelect(props) {
 
               <div {...getMenuProps()}>
                 {isOpen ? (
-                  <Paper className={classes.paper} square>
+                  <Paper sx={styles.paper} square>
                     {getOptions(inputValue).map((option, index) =>
                       renderOption({
                         option,
@@ -259,24 +215,6 @@ export default function AutoSelect(props) {
     </div>
   );
 }
-
-AutoSelect.propTypes = {
-  options: PropTypes.array.isRequired,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  placeholder: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
-  onInputChange: PropTypes.func,
-  label: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  isClearable: PropTypes.bool,
-  allowNoSelection: PropTypes.bool,
-};
-
-AutoSelect.defaultProps = {
-  label: "",
-  placeholder: "Select...",
-  isClearable: false,
-};
 
 export const MuiSelect = ({
   options,

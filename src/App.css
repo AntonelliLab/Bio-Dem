@@ -52,6 +52,10 @@ a, strong {
 }
 
 .sub-section {
+  /* MUI Grid v2 containers no longer default to width:100% (Grid v4 did), and
+     the parent .section uses align-items:center, so without this the row
+     shrinks to its content width — collapsing the map section in particular. */
+  width: 100%;
   max-width: 1300px;
 }
 

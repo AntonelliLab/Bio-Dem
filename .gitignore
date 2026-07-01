@@ -12,6 +12,7 @@ vdem_variables.csv
 
 # production
 /build
+/dist
 /.Rproj.user
 .Rhistory
 Bio-Dem.Rproj

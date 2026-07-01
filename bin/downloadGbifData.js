@@ -1,5 +1,6 @@
 import { fetchRecordsPerCountryPerYear } from "../src/api/gbif";
 import getTaxonKeys from "./getTaxonKeys";
+import minimist from "minimist";
 import fs from "fs";
 import util from "util";
 const writeFile = util.promisify(fs.writeFile);
@@ -153,7 +154,7 @@ export async function downloadRecordsByTaxons(
 }
 
 export default async function run(argv) {
-  const cli = require("minimist")(argv);
+  const cli = minimist(argv);
 
   const taxonFilters = cli._;
   const addDomestic = cli["add-domestic"];
