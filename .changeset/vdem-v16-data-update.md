@@ -21,7 +21,7 @@ Update V-Dem data from v10 to v16 and make all app data reproducible from a sing
 
 - Year selectors and valid-year logic now extend to 2025 (centralized in a single `MAX_YEAR` constant).
 - Fixed the GDP-per-capita scatter axis: `e_gdppc` uses a ~0.7–265 (thousands USD) scale, so the hardcoded log-axis bounds were retuned (previously tuned to the old Maddison ~200–200000 range, which collapsed all bubbles to the bottom).
-- Added a hover tooltip on the record-per-year bars (year, record count, democracy value, conflict).
+- Added hover tooltips showing the year and record count on the year-scrubber histogram (used by the scatterplot and world map) and on the dual-chart record bars; the histogram tooltip reads the year from the band scale so edge years (e.g. 2025) are labelled correctly.
 - Conflict wording (bars note, README, `conf` explanation) updated to reflect the UCDP organized-violence source.
 - Guarded "records per area" against missing country areas, and the GBIF-participation label against unknown join years.
 - About page and README updated for V-Dem v16 and the new data pipeline.
