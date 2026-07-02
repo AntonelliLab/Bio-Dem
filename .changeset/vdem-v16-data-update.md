@@ -14,11 +14,14 @@ Update V-Dem data from v10 to v16 and make all app data reproducible from a sing
 
 **Tooling**
 
-- New R scripts `bin/generate_vdem_data.R` and `bin/generate_colonial_ties.R`, an R dependency installer `bin/install_r_deps.R`, and a `Makefile` (`make deps`, `make data`, `make vdem`/`gbif`/`colonial`) that regenerate every file in `public/data/`.
+- New R scripts `bin/generate_vdem_data.R` and `bin/generate_colonial_ties.R`, a GBIF participation script `bin/downloadGbifParticipation.js`, an R dependency installer `bin/install_r_deps.R`, and a `Makefile` (`make deps`, `make data`, `make vdem`/`gbif`/`colonial`/`gbif-participation`) that regenerate every file in `public/data/`. Only `vdem_variables_explanations.csv` stays hand-maintained (curated descriptions). GBIF join years (`member_since`) aren't in the GBIF API, so they're preserved from the existing file.
 - The generated data files are now committed to the repo (previously git-ignored) so the app builds and deploys without the data toolchain.
 
 **App**
 
 - Year selectors and valid-year logic now extend to 2025 (centralized in a single `MAX_YEAR` constant).
-- Guarded "records per area" against missing country areas.
+- Fixed the GDP-per-capita scatter axis: `e_gdppc` uses a ~0.7–265 (thousands USD) scale, so the hardcoded log-axis bounds were retuned (previously tuned to the old Maddison ~200–200000 range, which collapsed all bubbles to the bottom).
+- Added a hover tooltip on the record-per-year bars (year, record count, democracy value, conflict).
+- Conflict wording (bars note, README, `conf` explanation) updated to reflect the UCDP organized-violence source.
+- Guarded "records per area" against missing country areas, and the GBIF-participation label against unknown join years.
 - About page and README updated for V-Dem v16 and the new data pipeline.

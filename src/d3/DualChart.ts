@@ -75,6 +75,18 @@ export default function DualChart(el, properties) {
   const grouped = props.grouped && stackKeys.length > 1;
 
   const anchorElement = d3.select(el);
+
+  // Tooltip lives outside the <svg> (which is wiped on every render), so create
+  // it once and reuse it. Absolute-positioned relative to the chart container.
+  anchorElement.style("position", "relative");
+  let tooltip = anchorElement.select("div.tooltip");
+  if (tooltip.empty()) {
+    tooltip = anchorElement
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+  }
+
   let svg = anchorElement.select("svg");
 
   // Create svg if not already created
@@ -587,4 +599,44 @@ export default function DualChart(el, properties) {
         .text(props.verticalLineLabel);
     }
   }
+
+  // Transparent full-column hover targets (on top of everything) that show a
+  // tooltip with the year, record count and — when present — the democracy
+  // value and any conflict for that year.
+  const countFmt = d3.format(",");
+  const columnLeft = (d) =>
+    x(props.x(d)) -
+    (0.5 * x.paddingInner() * x.bandwidth()) / (1 - x.paddingInner());
+  const columnWidth = x.bandwidth() / (1 - x.paddingInner());
+
+  g.append("g")
+    .attr("class", "hover-targets")
+    .selectAll("rect")
+    .data(data)
+    .join("rect")
+    .attr("x", columnLeft)
+    .attr("width", columnWidth)
+    .attr("y", -props.top)
+    .attr("height", height + props.top)
+    .style("fill", "transparent")
+    .style("pointer-events", "all")
+    .on("mouseover", () => tooltip.style("opacity", 1))
+    .on("mousemove", (event, d) => {
+      const [mx, my] = d3.pointer(event, anchorElement.node());
+      const rows = [
+        `<strong>${props.x(d)}</strong>`,
+        `${props.yLabel}: ${countFmt(props.y(d))}`,
+      ];
+      const y2v = props.y2(d);
+      if (!Number.isNaN(y2v)) {
+        rows.push(`${props.y2Label}: ${d3.format(".3~f")(y2v)}`);
+      }
+      if (props.aux && props.aux(d)) rows.push(props.auxLabel);
+      if (props.aux2 && props.aux2(d)) rows.push(props.aux2Label);
+      tooltip
+        .html(rows.join("<br/>"))
+        .style("left", `${mx + 14}px`)
+        .style("top", `${my + 14}px`);
+    })
+    .on("mouseout", () => tooltip.style("opacity", 0));
 }

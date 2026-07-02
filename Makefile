@@ -25,12 +25,12 @@ DATA_DIR ?= public/data
 RSCRIPT ?= $(shell [ -x /usr/local/bin/Rscript ] && echo /usr/local/bin/Rscript || echo Rscript)
 PNPM    ?= pnpm
 
-.PHONY: all data vdem gbif colonial deps r-deps node-deps \
+.PHONY: all data vdem gbif colonial gbif-participation deps r-deps node-deps \
         download-taxon-data download-taxon-data-split-by-domestic-records help
 
 all: data
 
-data: vdem gbif colonial
+data: vdem gbif colonial gbif-participation
 
 vdem:
 	$(RSCRIPT) bin/generate_vdem_data.R --max-year=$(MAX_YEAR) --out=$(DATA_DIR)
@@ -40,6 +40,12 @@ colonial:
 
 gbif:
 	$(PNPM) exec tsx downloadGbifData.js --max-year=$(MAX_YEAR)
+
+# GBIF participation status per country. Join years (member_since) aren't exposed
+# by the GBIF API, so existing years in the CSV are preserved; new participants
+# are written with an empty year (see the script's warning) to fill in by hand.
+gbif-participation:
+	$(PNPM) exec tsx bin/downloadGbifParticipation.js
 
 deps: r-deps node-deps
 

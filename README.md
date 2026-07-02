@@ -18,7 +18,7 @@ Bio-Dem is an open-source web-app, available at http://bio-dem.surge.sh. The cor
 
 The first plot is a scatterplot of data bubble for each country on Earth. The size of the bubbles indicates the number of occurrence record available from GBIF from this country and the colour of each bubble shows the time-aggregated political regime type. Drop down menus customize the x- and y-axis with different dimensions of democracy as provided by V-Dem, as well as the colouring scheme. Values for each country are aggregated by median over a user-selected time period. This plot reveals the number of collection records in a two dimensional democracy space. Four example specifications highlighting particularly exciting results can be selected directly via special highlight buttons next to the plot.
 
-The second plot focusses on the evolution of species occurrence recording through time in individual countries. A bar chart shows the number of occurrence records collected from the selected country each year on a logarithmic scale (fetched live via the GBIF API). The overlaid line shows the development of a selected democracy indicator. Red blocks at the bottom of the bars indicate years with armed conflict on the country territory. Users can chose any country and democracy indicator of interest with the drop-down menus, customize the record count to include only records from domestic institutions or records associated with pictures using the tick boxes and filter to certain taxa using the free text field.
+The second plot focusses on the evolution of species occurrence recording through time in individual countries. A bar chart shows the number of occurrence records collected from the selected country each year on a logarithmic scale (fetched live via the GBIF API). The overlaid line shows the development of a selected democracy indicator. Red blocks at the bottom of the bars indicate years with major or minor organized violence (armed conflict) on the country territory. Users can chose any country and democracy indicator of interest with the drop-down menus, customize the record count to include only records from domestic institutions or records associated with pictures using the tick boxes and filter to certain taxa using the free text field.
 
 Documentation and background information on Bio-Dem, the data used and the theoretical links between biologic collection activity and political variables are also provided at http://bio-dem.surge.sh, together with two video tutorials.
 
@@ -39,7 +39,8 @@ make data    # regenerate all data (or: make vdem / make gbif / make colonial)
 | `vdem_variables.csv`, `country_data.csv` | V-Dem (`vdemdata` package) + Natural Earth areas | `bin/generate_vdem_data.R` |
 | `gbif_data.csv` | GBIF occurrence API | `bin/downloadGbifData.js` |
 | `colonial_ties.csv` | ICOW Colonial History Data Set | `bin/generate_colonial_ties.R` |
-| `vdem_variables_explanations.csv`, `gbif_participating_countries.csv` | hand-maintained | — (not regenerated) |
+| `gbif_participating_countries.csv` | GBIF node API | `bin/downloadGbifParticipation.js` |
+| `vdem_variables_explanations.csv` | hand-maintained (curated variable descriptions) | — (not regenerated) |
 
 Notes:
 
@@ -50,6 +51,9 @@ Notes:
   `MAX_YEAR` in `src/App.tsx`.
 - On macOS use the official CRAN R (`/usr/local/bin/Rscript`); Homebrew's R
   cannot install the prebuilt geospatial packages. See `bin/install_r_deps.R`.
+- GBIF's API does not expose participation join years, so
+  `download-gbif-participation` preserves the `member_since` values already in the
+  CSV and lists any new participants whose year must be filled in by hand.
 
 
 # Team members

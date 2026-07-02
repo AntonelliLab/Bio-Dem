@@ -366,7 +366,9 @@ const vdemScaleMax = {
   v2x_corr: 1,
   v2x_clphy: 1,
   e_peaveduc: 15,
-  e_migdppc: 2e5,
+  // e_migdppc now comes from V-Dem's e_gdppc (GDP/capita in thousands of USD,
+  // range ~0.7–265); the old Maddison series used a ~200–200000 range.
+  e_migdppc: 3e2,
   records: 1e8,
   recordsPerArea: 1e3,
   yearsSinceIndependence: 240,
@@ -382,7 +384,7 @@ const vdemScaleMin = {
   v2x_corr: 0,
   v2x_clphy: 0,
   e_peaveduc: 0,
-  e_migdppc: 2e2,
+  e_migdppc: 5e-1,
   records: 1e2,
   recordsPerArea: 1e-2,
   yearsSinceIndependence: 0,
@@ -980,9 +982,11 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       if (gbifParticipation !== undefined) {
         d["gbifParticipationStatus"] = gbifParticipation.status;
         d["gbifParticipationSince"] = gbifParticipation.since;
-        d[
-          "gbifParticipationText"
-        ] = `${gbifParticipation.status} (since ${gbifParticipation.since})`;
+        // The GBIF API does not expose the join year, so it may be unknown for
+        // recently added participants — only append "(since YYYY)" when we have it.
+        d["gbifParticipationText"] = gbifParticipation.since
+          ? `${gbifParticipation.status} (since ${gbifParticipation.since})`
+          : gbifParticipation.status;
       } else {
         d["gbifParticipationStatus"] = "Not a participant";
         d["gbifParticipationText"] = "Not a participant";
@@ -2363,8 +2367,9 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                   the selected country each year on a logarithmic scale (left
                   y-axis). The overlaid line shows the development of a selected
                   democracy indicator (right y axis). Red blocks at the bottom
-                  of the bars indicate years with armed conflict on the country
-                  territory. Chose any country and democracy indicator with the
+                  of the bars indicate years with major or minor organized
+                  violence (armed conflict) on the country territory. Chose any
+                  country and democracy indicator with the
                   drop-down menus, customize the record count to include only
                   records from domestic institutions or records associated with
                   pictures using the tick boxes and filter to certain taxa using

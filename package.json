@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "download-gbif-data": "tsx downloadGbifData.js",
+    "download-gbif-participation": "tsx bin/downloadGbifParticipation.js",
     "get-taxon-keys": "tsx getTaxonKeys.js",
     "changeset": "changeset",
     "version-packages": "changeset version",
