@@ -28,6 +28,7 @@ import {
   queryGBIFCountryFacet,
   queryAutocompletesGBIF,
   queryGBIFFacetPerYear,
+  queryPublisherOrigin,
 } from "./api/gbif";
 import About from "./About";
 import DualChart from "./d3/DualChart";
@@ -1577,14 +1578,18 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     );
   }
 
-  generateWorldMapData() {
+  async generateWorldMapData() {
     const {
       vdemData,
-      gbifData,
       mapColorBy,
       worldYearMin,
       worldYearMax,
       regionFilter,
+      country,
+      onlyWithImage,
+      taxonFilter,
+      onlyDomestic,
+      onlyPreservedSpecimen,
     } = this.state;
     if (vdemData.length === 0) {
       return;
@@ -1597,24 +1602,34 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       worldYearMax,
     );
     if (mapColorBy === "publishingCountry") {
+      // Where were the selected country's records published? One aggregate
+      // facet=publishingCountry request over the selected year range; each
+      // country is coloured by its overall share of the records.
+      const result = await queryPublisherOrigin(
+        countryCodes.alpha3ToAlpha2(country),
+        {
+          yearMin: worldYearMin,
+          yearMax: worldYearMax,
+          taxonFilter,
+          onlyWithImage,
+          onlyDomestic,
+          onlyPreservedSpecimen,
+        },
+      );
+      if (result.error) {
+        return;
+      }
+      const grandTotal = result.response.data.count || 0;
+      const publisherFacet = (result.response.data.facets || []).find(
+        (d) => d.field === "PUBLISHING_COUNTRY",
+      );
       const worldMapData = new Map();
-      const numYears = worldYearMax - worldYearMin + 1;
-      (gbifData || []).forEach((yearData) => {
-        if (yearData.year < worldYearMin || yearData.year > worldYearMax) {
-          return;
-        }
-        yearData.facets
-          .find((d) => d.field === "PUBLISHING_COUNTRY")
-          .counts.forEach(({ name, count }) => {
-            const country = countryCodes.alpha2ToAlpha3(name);
-            const countryCount = worldMapData.get(country) || {
-              count: 0,
-              proportion: 0,
-            };
-            countryCount.count += count;
-            countryCount.proportion += count / yearData.count / numYears;
-            worldMapData.set(country, countryCount);
-          });
+      (publisherFacet?.counts || []).forEach(({ name, count }) => {
+        const alpha3 = countryCodes.alpha2ToAlpha3(name);
+        worldMapData.set(alpha3, {
+          count,
+          proportion: grandTotal > 0 ? count / grandTotal : 0,
+        });
       });
       worldMapDataScaleMin = 1e-4;
       worldMapDataScaleMax = 1;

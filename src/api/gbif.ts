@@ -2,7 +2,6 @@ import axios from "axios";
 import countryCodes from "../helpers/countryCodes";
 import { countries } from "./data";
 import sortyBy from "lodash/sortBy";
-import { range } from "d3";
 
 axios.defaults.headers.post["Content-Type"] = "application/json;charset=utf-8";
 axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
@@ -49,40 +48,51 @@ export const queryGBIFYearFacetOld = async (
     });
 };
 
-const queryFacetByCountryAndYear = async (
+// Query GBIF for record counts per year for a country (facet=year over the
+// [yearMin, yearMax] range), with optional extra filters. GBIF returns facet
+// buckets ordered by count rather than year, and omits years with no records,
+// so the caller reindexes by year and fills gaps with 0. Returns a Map of
+// year -> count.
+const fetchYearCounts = async (
   country,
-  year,
-  {
-    onlyWithImage = false,
-    taxonFilter = "",
-    onlyPreservedSpecimen = false,
-    onlyDomestic = false,
-  } = {},
+  { taxonFilter = "", onlyWithImage = false, yearMin, yearMax, extraParams = {} },
 ) => {
-  let url = `${baseURL}${occ}?`;
-  url += [
-    `country=${encodeURIComponent(country)}`,
-    `year=${encodeURIComponent(year)}`,
-    `limit=0`,
-    `facet=publishingCountry`,
-    `facet=basisOfRecord`,
-  ].join("&");
+  const url = `${baseURL}${occ}`;
+  const params = {
+    country,
+    limit: 0,
+    facet: "year",
+    // Bound the result set to the range of interest server-side, and allow
+    // enough facet buckets to cover every distinct year in that range.
+    year: `${yearMin},${yearMax}`,
+    "year.facetLimit": Math.max(200, yearMax - yearMin + 1),
+    ...extraParams,
+  };
   if (taxonFilter) {
-    url += `&taxonKey=${encodeURIComponent(taxonFilter)}`;
+    params.taxonKey = taxonFilter;
   }
   if (onlyWithImage) {
-    url += `&mediaType=StillImage`;
-  }
-  if (onlyPreservedSpecimen) {
-    url += `&basisOfRecord=PRESERVED_SPECIMEN`;
-  }
-  if (onlyDomestic) {
-    url += `&publishingCountry=${country}`;
+    params.mediaType = "StillImage";
   }
 
-  return fetch(url).then((response) => response.json());
+  const response = await axios.get(url, { params });
+  const counts = new Map();
+  const yearFacet =
+    response.data.facets?.find((f) => f.field === "YEAR") ??
+    response.data.facets?.[0];
+  yearFacet?.counts.forEach((c) => counts.set(+c.name, c.count));
+  return counts;
 };
 
+/**
+ * Records per year for a country, broken down by publisher origin (domestic /
+ * former coloniser / rest) and basis of record (preserved specimen).
+ *
+ * GBIF facets are one-dimensional (no cross-tabulation), so rather than one
+ * request per year — which fired ~60 parallel requests and tripped the rate
+ * limiter (HTTP 429) — this issues one facet=year request per breakdown
+ * dimension (3-4 requests total) and combines them by year.
+ */
 export const queryGBIFFacetPerYear = async (
   country,
   {
@@ -95,50 +105,104 @@ export const queryGBIFFacetPerYear = async (
     otherCountry = null,
   },
 ) => {
-  // Construct the GBIF occurrences API url with facets for year counts
-  const years = range(yearMin, yearMax + 1);
-  const queries = years.map((year) =>
-    queryFacetByCountryAndYear(country, year, {
-      onlyWithImage,
-      taxonFilter,
-      onlyPreservedSpecimen,
-      onlyDomestic,
-    }),
-  );
   try {
-    const result = await Promise.all(queries);
-    const data = result.map(({ count, facets }, i) => {
-      const countPreserved =
-        facets
-          .find((d) => d.field === "BASIS_OF_RECORD")
-          .counts.find((d) => d.name === "PRESERVED_SPECIMEN")?.count || 0;
+    const base = { taxonFilter, onlyWithImage, yearMin, yearMax };
+    // Filters reflecting the user's active toggles, applied to every query.
+    const baseParams = {};
+    if (onlyDomestic) {
+      baseParams.publishingCountry = country;
+    }
+    if (onlyPreservedSpecimen) {
+      baseParams.basisOfRecord = "PRESERVED_SPECIMEN";
+    }
 
-      const countDomestic = facets
-        .find((d) => d.field === "PUBLISHING_COUNTRY")
-        .counts.find((d) => d.name === country);
+    const [totalCounts, preservedCounts, domesticCounts, otherCounts] =
+      await Promise.all([
+        fetchYearCounts(country, { ...base, extraParams: baseParams }),
+        fetchYearCounts(country, {
+          ...base,
+          extraParams: { ...baseParams, basisOfRecord: "PRESERVED_SPECIMEN" },
+        }),
+        fetchYearCounts(country, {
+          ...base,
+          extraParams: { ...baseParams, publishingCountry: country },
+        }),
+        // When already restricted to domestic publishers there is, by
+        // definition, no "other country" share, so skip that request.
+        otherCountry && !onlyDomestic
+          ? fetchYearCounts(country, {
+              ...base,
+              extraParams: { ...baseParams, publishingCountry: otherCountry },
+            })
+          : Promise.resolve(new Map()),
+      ]);
 
-      const data = {
-        year: years[i],
+    const data = [];
+    for (let year = yearMin; year <= yearMax; year += 1) {
+      const count = totalCounts.get(year) || 0;
+      const countPreserved = preservedCounts.get(year) || 0;
+      const countDomestic = domesticCounts.get(year) || 0;
+      const countOther = otherCounts.get(year) || 0;
+      data.push({
+        year,
         count,
         countPreserved,
         countNotPreserved: count - countPreserved,
-        facets,
-        countDomestic: countDomestic ? countDomestic.count : 0,
-      };
-      if (otherCountry) {
-        const countOther = facets
-          .find((d) => d.field === "PUBLISHING_COUNTRY")
-          .counts.find((d) => d.name === otherCountry);
-        data.countOther = countOther ? countOther.count : 0;
-      }
-      data.countRest = data.count - data.countDomestic - (data.countOther || 0);
-      return data;
-    });
+        countDomestic,
+        countOther,
+        countRest: count - countDomestic - countOther,
+      });
+    }
     return { data };
   } catch (error) {
     console.log("Error in fetching results from the GBIF API", error.message);
     return { error };
   }
+};
+
+// Aggregate publisher-origin breakdown for a country over a year range: which
+// countries published the selected country's records (facet=publishingCountry).
+// Used to colour the world map in "publisher origin" mode. Returns the raw
+// response; response.data.count is the grand total for computing shares.
+export const queryPublisherOrigin = async (
+  country,
+  {
+    yearMin = 1960,
+    yearMax = 2019,
+    taxonFilter = "",
+    onlyWithImage = false,
+    onlyDomestic = false,
+    onlyPreservedSpecimen = false,
+  } = {},
+) => {
+  const url = `${baseURL}${occ}`;
+  const params = {
+    country,
+    limit: 0,
+    facet: "publishingCountry",
+    "publishingCountry.facetLimit": 400,
+    year: `${yearMin},${yearMax}`,
+  };
+  if (taxonFilter) {
+    params.taxonKey = taxonFilter;
+  }
+  if (onlyWithImage) {
+    params.mediaType = "StillImage";
+  }
+  if (onlyDomestic) {
+    params.publishingCountry = country;
+  }
+  if (onlyPreservedSpecimen) {
+    params.basisOfRecord = "PRESERVED_SPECIMEN";
+  }
+
+  return axios
+    .get(url, { params })
+    .then((response) => ({ response }))
+    .catch((error) => {
+      console.log("Error in fetching results from the GBIF API", error.message);
+      return { error };
+    });
 };
 
 export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = 2019) => {
