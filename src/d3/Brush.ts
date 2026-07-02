@@ -172,11 +172,19 @@ export default function Brush(el, properties) {
   brushG
     .on("mousemove.tooltip", (event) => {
       const [ax, ay] = d3.pointer(event, anchorElement.node());
-      const mx = Math.max(0, Math.min(width, ax - props.left));
-      const year = Math.max(
-        xExtent[0],
-        Math.min(xExtent[1], x.invert(mx).getFullYear()),
+      const mx = ax - props.left;
+      // Map the cursor to a bar using the band scale that positions the bars
+      // (the time scale used for the brush is offset from the bands and would
+      // mislabel the edge years).
+      const yearDomain = xBar.domain();
+      const idx = Math.max(
+        0,
+        Math.min(
+          yearDomain.length - 1,
+          Math.round((mx - xBar(yearDomain[0])) / xBar.step()),
+        ),
       );
+      const year = yearDomain[idx];
       const count = countByYear.get(year);
       if (count === undefined) {
         tooltip.style("opacity", 0);
