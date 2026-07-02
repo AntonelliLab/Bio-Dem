@@ -14,6 +14,10 @@ const baseURL = "https://api.gbif.org/v1/";
 const occ = "occurrence/search";
 const autoc = "species/suggest";
 
+// Default upper bound for year ranges: the current year, so queries aren't
+// silently capped at a hard-coded past year as the app data is extended.
+const CURRENT_YEAR = new Date().getFullYear();
+
 export const queryGBIFYearFacetOld = async (
   country,
   { onlyDomestic = false, onlyWithImage = false, taxonFilter = "" },
@@ -101,7 +105,7 @@ export const queryGBIFFacetPerYear = async (
     onlyPreservedSpecimen = false,
     onlyDomestic = false,
     yearMin = 1960,
-    yearMax = 2019,
+    yearMax = CURRENT_YEAR,
     otherCountry = null,
   },
 ) => {
@@ -168,7 +172,7 @@ export const queryPublisherOrigin = async (
   country,
   {
     yearMin = 1960,
-    yearMax = 2019,
+    yearMax = CURRENT_YEAR,
     taxonFilter = "",
     onlyWithImage = false,
     onlyDomestic = false,
@@ -205,7 +209,7 @@ export const queryPublisherOrigin = async (
     });
 };
 
-export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = 2019) => {
+export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = CURRENT_YEAR) => {
   // Construct the GBIF occurrences API url with facets for country counts
   const url = `${baseURL}${occ}`;
   const params = {
@@ -247,12 +251,13 @@ async function mapWithConcurrency(items, limit, task) {
 }
 
 // GBIF returns HTTP 429 when too many requests arrive at once. Retry the
-// rate-limited ones with exponential backoff.
-const queryGBIFYearFacetWithRetry = async (country, options, retries = 4) => {
+// rate-limited ones with exponential backoff plus a little jitter so a burst of
+// workers doesn't line up and re-trigger the limiter in lockstep.
+const queryGBIFYearFacetWithRetry = async (country, options, retries = 7) => {
   for (let attempt = 0; ; attempt++) {
     const res = await queryGBIFYearFacetOld(country, options);
     if (res.error?.response?.status === 429 && attempt < retries) {
-      await sleep(500 * 2 ** attempt);
+      await sleep(Math.min(500 * 2 ** attempt, 8000) + Math.random() * 500);
       continue;
     }
     return res;
@@ -261,7 +266,7 @@ const queryGBIFYearFacetWithRetry = async (country, options, retries = 4) => {
 
 export const fetchRecordsPerCountryPerYear = async ({
   yearMin = 1960,
-  yearMax = 2019,
+  yearMax = CURRENT_YEAR,
   taxonFilter = "",
   onlyDomestic = false,
 } = {}) => {
@@ -269,8 +274,9 @@ export const fetchRecordsPerCountryPerYear = async ({
   let result = [];
 
   // Limit concurrency (and retry 429s) so the bulk download isn't rejected by
-  // the GBIF API rate limiter.
-  const responses = await mapWithConcurrency(countriesFiltered, 6, (country) =>
+  // the GBIF API rate limiter. Concurrency of 3 keeps well under the limit; a
+  // full ~175-country run then completes without dropping countries.
+  const responses = await mapWithConcurrency(countriesFiltered, 3, (country) =>
     queryGBIFYearFacetWithRetry(countryCodes.alpha3ToAlpha2(country), {
       taxonFilter,
       onlyDomestic,

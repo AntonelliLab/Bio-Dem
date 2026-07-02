@@ -1,0 +1,42 @@
+name: Release
+
+# When changesets land on master, the changesets action opens (or updates) a
+# "Version Packages" pull request that bumps the version and updates the
+# CHANGELOG. The app is private (not published to npm), so this only manages
+# versioning/changelog — deployment stays manual (`pnpm run deploy`).
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Create Version Packages pull request
+        uses: changesets/action@v1
+        with:
+          version: pnpm run version-packages
+          title: "Version Packages"
+          commit: "Version Packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -340,10 +340,17 @@ const countryLabelWithGbifParticipation = (d) =>
   }`;
 
 // Some external variables lack data for all countries before or after a certain year
+// Latest year covered by the V-Dem democracy indices (see bin/generate_vdem_data.R).
+// Bump this together with the data when a newer V-Dem release extends coverage.
+const MAX_YEAR = 2025;
+
 const customStartYear = {};
+// Per-variable coverage overrides: some V-Dem external covariates stop earlier
+// than the democracy indices. e_peaveduc (education) ends 2010; e_migdppc (GDP
+// per capita, sourced from V-Dem's e_gdppc) ends 2019.
 const customStopYear = {
   e_peaveduc: 2010,
-  e_migdppc: 2016,
+  e_migdppc: 2019,
 };
 
 const yAxisLabelGap = {
@@ -359,7 +366,9 @@ const vdemScaleMax = {
   v2x_corr: 1,
   v2x_clphy: 1,
   e_peaveduc: 15,
-  e_migdppc: 2e5,
+  // e_migdppc now comes from V-Dem's e_gdppc (GDP/capita in thousands of USD,
+  // range ~0.7–265); the old Maddison series used a ~200–200000 range.
+  e_migdppc: 3e2,
   records: 1e8,
   recordsPerArea: 1e3,
   yearsSinceIndependence: 240,
@@ -375,7 +384,7 @@ const vdemScaleMin = {
   v2x_corr: 0,
   v2x_clphy: 0,
   e_peaveduc: 0,
-  e_migdppc: 2e2,
+  e_migdppc: 5e-1,
   records: 1e2,
   recordsPerArea: 1e-2,
   yearsSinceIndependence: 0,
@@ -585,7 +594,7 @@ class App extends Component {
       data: null,
       countries: [],
       yearMin: 1960,
-      yearMax: 2020,
+      yearMax: MAX_YEAR,
       // yearMin: 1990,
       // yearMax: 1995,
       // ScatterPlot:
@@ -593,9 +602,9 @@ class App extends Component {
       vdemY: v2x_frassoc_thick,
       vdemZ: "records",
       xyYearMin: 1960,
-      xyYearMax: 2019,
+      xyYearMax: MAX_YEAR,
       worldYearMin: 1960,
-      worldYearMax: 2019,
+      worldYearMax: MAX_YEAR,
       worldMapDataScaleMin: 0,
       worldMapDataScaleMax: 1,
       colorBy: "regime",
@@ -973,9 +982,11 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       if (gbifParticipation !== undefined) {
         d["gbifParticipationStatus"] = gbifParticipation.status;
         d["gbifParticipationSince"] = gbifParticipation.since;
-        d[
-          "gbifParticipationText"
-        ] = `${gbifParticipation.status} (since ${gbifParticipation.since})`;
+        // The GBIF API does not expose the join year, so it may be unknown for
+        // recently added participants — only append "(since YYYY)" when we have it.
+        d["gbifParticipationText"] = gbifParticipation.since
+          ? `${gbifParticipation.status} (since ${gbifParticipation.since})`
+          : gbifParticipation.status;
       } else {
         d["gbifParticipationStatus"] = "Not a participant";
         d["gbifParticipationText"] = "Not a participant";
@@ -1055,7 +1066,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       // Some vdem countries (e.g. historical states like DDR, YMD) have no
       // reference entry in country_data.csv and therefore no area.
       const countryInfo = this.countryMap[d.country];
-      d.recordsPerArea = countryInfo ? numRecords / countryInfo.area : 0;
+      d.recordsPerArea =
+        countryInfo && countryInfo.area ? numRecords / countryInfo.area : 0;
     });
 
     this.setState(
@@ -1480,7 +1492,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
    * @param {Number} defaultStartYear default value if not constrained
    * @returns {Array<Number>} an array with [startYear, endYear]
    */
-  getValidYears(dimension, defaultStartYear = 1960, defaultEndYear = 2019) {
+  getValidYears(dimension, defaultStartYear = 1960, defaultEndYear = MAX_YEAR) {
     const dim = Array.isArray(dimension) ? dimension : [dimension];
     return [
       d3.max([...dim.map((d) => customStartYear[d]), defaultStartYear]),
@@ -1794,7 +1806,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     if (vdemData.length === 0) {
       return;
     }
-    const [startYear, stopYear] = [1960, 2019];
+    const [startYear, stopYear] = [1960, MAX_YEAR];
     const recordsPerYear = Array.from(
       d3.rollup(
         vdemData.filter(
@@ -2110,9 +2122,9 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       variableExplanations,
       mapColorBy,
     } = this.state;
-    const xyValidYears = this.getValidYears([vdemX, vdemY], 1960, 2018);
+    const xyValidYears = this.getValidYears([vdemX, vdemY], 1960, MAX_YEAR);
     const xyYearIntervalLimited =
-      xyYearMin < xyValidYears[0] || xyValidYears[1] < 2016;
+      xyYearMin < xyValidYears[0] || xyValidYears[1] < MAX_YEAR;
 
     const enabledCurves = this.getEnabledExtraCurves();
     const dualChartShowProportionsFiltered =
@@ -2355,8 +2367,9 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
                   the selected country each year on a logarithmic scale (left
                   y-axis). The overlaid line shows the development of a selected
                   democracy indicator (right y axis). Red blocks at the bottom
-                  of the bars indicate years with armed conflict on the country
-                  territory. Chose any country and democracy indicator with the
+                  of the bars indicate years with major or minor organized
+                  violence (armed conflict) on the country territory. Chose any
+                  country and democracy indicator with the
                   drop-down menus, customize the record count to include only
                   records from domestic institutions or records associated with
                   pictures using the tick boxes and filter to certain taxa using

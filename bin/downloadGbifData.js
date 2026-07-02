@@ -5,12 +5,12 @@ import fs from "fs";
 import util from "util";
 const writeFile = util.promisify(fs.writeFile);
 
-export async function downloadRecords() {
+export async function downloadRecords({ yearMax } = {}) {
   try {
     console.log(
-      "Fetching occurrences records per country per year from gbif...",
+      `Fetching occurrences records per country per year from gbif (up to ${yearMax ?? "default"})...`,
     );
-    const records = await fetchRecordsPerCountryPerYear();
+    const records = await fetchRecordsPerCountryPerYear({ yearMax });
     const lines = records.map((d) => `${d.country},${d.year},${d.records}`);
     const outputFilename = `./public/data/gbif_data.csv`;
     console.log(
@@ -158,9 +158,13 @@ export default async function run(argv) {
 
   const taxonFilters = cli._;
   const addDomestic = cli["add-domestic"];
+  // Upper bound for the yearly record counts. Defaults to the current calendar
+  // year so a plain run fetches everything available; pass --max-year=YYYY to
+  // pin it (the Makefile does this to align GBIF with the V-Dem year range).
+  const yearMax = +cli["max-year"] || new Date().getFullYear();
 
   if (taxonFilters.length === 0) {
-    downloadRecords();
+    downloadRecords({ yearMax });
   } else {
     // If using multiple taxon filters, use 'all' as first to not
     // miss records by the left join

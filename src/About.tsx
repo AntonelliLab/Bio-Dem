@@ -174,7 +174,8 @@ class About extends React.Component {
             is a research project dedicated to the conceptualization and
             collection of data on democracy. It is one of the largest existent
             databases on democracy containing over 18 million data points, where
-            the latest version covers 201 countries and the years 1789 to 2019.
+            the latest version covers over 200 countries and the years 1789 to
+            2025.
             These data enable to work with both aggregated higher-level concepts
             such as "electoral democracy" or disaggregated concepts capturing
             for example women's participation in civil society or freedom of
@@ -185,7 +186,7 @@ class About extends React.Component {
             <a
               target="_blank"
               rel="noopener noreferrer"
-              href="https://www.v-dem.net/en/"
+              href="https://www.v-dem.net/"
             >
               V-Dem's website
             </a>
@@ -201,7 +202,7 @@ class About extends React.Component {
             <a
               target="_blank"
               rel="noopener noreferrer"
-              href="https://www.v-dem.net/en/data/data-version-8/"
+              href="https://www.v-dem.net/data/the-v-dem-dataset/"
             >
               download the data and browse the codebook
             </a>
@@ -211,7 +212,7 @@ class About extends React.Component {
               rel="noopener noreferrer"
               href="https://github.com/AntonelliLab/Bio-Dem/blob/master/public/data/vdem_variables.csv"
             >
-              uses V-Dem version 10
+              uses V-Dem version 16
             </a>{" "}
             and will be updated as new versions are being published. The current
             selected data for the application can be downloaded{" "}

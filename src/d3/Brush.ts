@@ -29,6 +29,7 @@ export default function Brush(el, properties) {
       fillOpacity: (d) => 0.5,
       xLabel: "Year",
       yLabel: "",
+      valueLabel: "records",
       fetching: false,
       onBrush: (domain) => {
         console.log(`Brushed: ${domain}`);
@@ -152,9 +153,52 @@ export default function Brush(el, properties) {
     .attr("y", (d) => height - y(yLogFriendlyAccessor(d)))
     .attr("height", (d) => y(yLogFriendlyAccessor(d)));
 
-  g.append("g").attr("class", "brush").call(brush);
+  const brushG = g.append("g").attr("class", "brush").call(brush);
 
   brush.on("brush end", brushed);
+
+  // Hover tooltip: the brush overlay sits on top of the bars and captures the
+  // pointer, so derive the hovered year from the cursor x and look up its count.
+  anchorElement.style("position", "relative");
+  let tooltip = anchorElement.select("div.tooltip");
+  if (tooltip.empty()) {
+    tooltip = anchorElement
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+  }
+  const countFmt = d3.format(",");
+  const countByYear = new Map(data.map((d) => [props.x(d), props.y(d)]));
+  brushG
+    .on("mousemove.tooltip", (event) => {
+      const [ax, ay] = d3.pointer(event, anchorElement.node());
+      const mx = ax - props.left;
+      // Map the cursor to a bar using the band scale that positions the bars
+      // (the time scale used for the brush is offset from the bands and would
+      // mislabel the edge years).
+      const yearDomain = xBar.domain();
+      const idx = Math.max(
+        0,
+        Math.min(
+          yearDomain.length - 1,
+          Math.round((mx - xBar(yearDomain[0])) / xBar.step()),
+        ),
+      );
+      const year = yearDomain[idx];
+      const count = countByYear.get(year);
+      if (count === undefined) {
+        tooltip.style("opacity", 0);
+        return;
+      }
+      tooltip
+        .style("opacity", 1)
+        .html(
+          `<strong>${year}</strong><br/>${countFmt(count)} ${props.valueLabel}`,
+        )
+        .style("left", `${ax + 12}px`)
+        .style("top", `${ay - 40}px`);
+    })
+    .on("mouseleave.tooltip", () => tooltip.style("opacity", 0));
 
   //create brush function redraw scatterplot with selection
   function brushed({ selection }) {
