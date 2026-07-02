@@ -340,10 +340,17 @@ const countryLabelWithGbifParticipation = (d) =>
   }`;
 
 // Some external variables lack data for all countries before or after a certain year
+// Latest year covered by the V-Dem democracy indices (see bin/generate_vdem_data.R).
+// Bump this together with the data when a newer V-Dem release extends coverage.
+const MAX_YEAR = 2025;
+
 const customStartYear = {};
+// Per-variable coverage overrides: some V-Dem external covariates stop earlier
+// than the democracy indices. e_peaveduc (education) ends 2010; e_migdppc (GDP
+// per capita, sourced from V-Dem's e_gdppc) ends 2019.
 const customStopYear = {
   e_peaveduc: 2010,
-  e_migdppc: 2016,
+  e_migdppc: 2019,
 };
 
 const yAxisLabelGap = {
@@ -585,7 +592,7 @@ class App extends Component {
       data: null,
       countries: [],
       yearMin: 1960,
-      yearMax: 2020,
+      yearMax: MAX_YEAR,
       // yearMin: 1990,
       // yearMax: 1995,
       // ScatterPlot:
@@ -593,9 +600,9 @@ class App extends Component {
       vdemY: v2x_frassoc_thick,
       vdemZ: "records",
       xyYearMin: 1960,
-      xyYearMax: 2019,
+      xyYearMax: MAX_YEAR,
       worldYearMin: 1960,
-      worldYearMax: 2019,
+      worldYearMax: MAX_YEAR,
       worldMapDataScaleMin: 0,
       worldMapDataScaleMax: 1,
       colorBy: "regime",
@@ -1055,7 +1062,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       // Some vdem countries (e.g. historical states like DDR, YMD) have no
       // reference entry in country_data.csv and therefore no area.
       const countryInfo = this.countryMap[d.country];
-      d.recordsPerArea = countryInfo ? numRecords / countryInfo.area : 0;
+      d.recordsPerArea =
+        countryInfo && countryInfo.area ? numRecords / countryInfo.area : 0;
     });
 
     this.setState(
@@ -1480,7 +1488,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
    * @param {Number} defaultStartYear default value if not constrained
    * @returns {Array<Number>} an array with [startYear, endYear]
    */
-  getValidYears(dimension, defaultStartYear = 1960, defaultEndYear = 2019) {
+  getValidYears(dimension, defaultStartYear = 1960, defaultEndYear = MAX_YEAR) {
     const dim = Array.isArray(dimension) ? dimension : [dimension];
     return [
       d3.max([...dim.map((d) => customStartYear[d]), defaultStartYear]),
@@ -1794,7 +1802,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     if (vdemData.length === 0) {
       return;
     }
-    const [startYear, stopYear] = [1960, 2019];
+    const [startYear, stopYear] = [1960, MAX_YEAR];
     const recordsPerYear = Array.from(
       d3.rollup(
         vdemData.filter(
@@ -2110,9 +2118,9 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       variableExplanations,
       mapColorBy,
     } = this.state;
-    const xyValidYears = this.getValidYears([vdemX, vdemY], 1960, 2018);
+    const xyValidYears = this.getValidYears([vdemX, vdemY], 1960, MAX_YEAR);
     const xyYearIntervalLimited =
-      xyYearMin < xyValidYears[0] || xyValidYears[1] < 2016;
+      xyYearMin < xyValidYears[0] || xyValidYears[1] < MAX_YEAR;
 
     const enabledCurves = this.getEnabledExtraCurves();
     const dualChartShowProportionsFiltered =

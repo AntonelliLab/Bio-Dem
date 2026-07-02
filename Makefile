@@ -1,57 +1,62 @@
 # ---------------------------------------------------------------------------
-# App data provisioning
+# Regenerate the Bio-Dem web-app data in public/data.
 #
-# The web app reads these CSVs from public/data/ at runtime. The source of
-# truth is the app-data/ folder in the sibling Vdem-Biodiversity repo (which
-# holds the analysis and its outputs).
+#   make deps      install R + node dependencies (run once)
+#   make data      regenerate everything (vdem + gbif + colonial)  [= make all]
+#   make vdem      vdem_variables.csv + country_data.csv   (V-Dem, via {vdemdata})
+#   make gbif      gbif_data.csv                           (GBIF occurrence API)
+#   make colonial  colonial_ties.csv                       (ICOW Colonial History)
 #
-#   make data   copies any MISSING files from app-data into public/data.
-#               Files already present in public/data are left untouched.
+# Static, hand-maintained files are NOT regenerated here:
+#   vdem_variables_explanations.csv   (curated variable descriptions)
+#   gbif_participating_countries.csv  (GBIF membership snapshot)
+#
+# When a new V-Dem version is released: `make deps` (updates the vdemdata
+# package) then `make data`. Bump MAX_YEAR if the release extends coverage:
+#   make data MAX_YEAR=2026
 # ---------------------------------------------------------------------------
 
-APP_DATA_SRC = ../Vdem-Biodiversity/app-data
-PUBLIC_DATA = public/data
+# Latest year to include (V-Dem covers up to this; GBIF/ICOW use it too).
+MAX_YEAR ?= 2025
+DATA_DIR ?= public/data
 
-APP_DATA_FILES = \
-	vdem_variables.csv \
-	vdem_variables_explanations.csv \
-	country_data.csv \
-	colonial_ties.csv \
-	gbif_data.csv \
-	gbif_participating_countries.csv
+# On macOS prefer the CRAN framework R (has binary package support); see
+# bin/install_r_deps.R. Override with `make ... RSCRIPT=/path/to/Rscript`.
+RSCRIPT ?= $(shell [ -x /usr/local/bin/Rscript ] && echo /usr/local/bin/Rscript || echo Rscript)
+PNPM    ?= pnpm
 
-DATA_TARGETS = $(addprefix $(PUBLIC_DATA)/,$(APP_DATA_FILES))
+.PHONY: all data vdem gbif colonial deps r-deps node-deps \
+        download-taxon-data download-taxon-data-split-by-domestic-records help
 
-.PHONY: data download-gbif-data download-taxon-data download-taxon-data-split-by-domestic-records
+all: data
 
-# Provision public/data with the CSVs the app needs.
-data: $(DATA_TARGETS)
-	@true
+data: vdem gbif colonial
 
-# Copy one data file from Vdem-Biodiversity/app-data into public/data. These
-# targets have no prerequisites, so make only runs the recipe when the file is
-# not already present in public/data — existing files are never overwritten.
-$(DATA_TARGETS): $(PUBLIC_DATA)/%.csv:
-	@if [ ! -f "$(APP_DATA_SRC)/$*.csv" ]; then \
-		echo "ERROR: source not found: $(APP_DATA_SRC)/$*.csv" >&2; \
-		exit 1; \
-	fi
-	@mkdir -p $(dir $@)
-	cp "$(APP_DATA_SRC)/$*.csv" "$@"
-	@echo "Copied $*.csv from app-data -> $@"
+vdem:
+	$(RSCRIPT) bin/generate_vdem_data.R --max-year=$(MAX_YEAR) --out=$(DATA_DIR)
+
+colonial:
+	$(RSCRIPT) bin/generate_colonial_ties.R --out=$(DATA_DIR) --ref-year=$(MAX_YEAR)
+
+gbif:
+	$(PNPM) exec tsx downloadGbifData.js --max-year=$(MAX_YEAR)
+
+deps: r-deps node-deps
+
+r-deps:
+	$(RSCRIPT) bin/install_r_deps.R
+
+node-deps:
+	$(PNPM) install
 
 # ---------------------------------------------------------------------------
-# Regenerate GBIF occurrence data from the live GBIF API (advanced). The Node
-# data scripts import the app's TypeScript modules, so they run via tsx.
+# Optional extra GBIF datasets (merged multi-taxon), written to ./gbif_data.csv.
 # ---------------------------------------------------------------------------
-
-# Base dataset: records per country per year -> public/data/gbif_data.csv
-download-gbif-data:
-	pnpm exec tsx downloadGbifData.js
-
-# Merged multi-taxon dataset (Mammalia/Amphibia/Reptilia) -> ./gbif_data.csv
 download-taxon-data:
-	pnpm exec tsx downloadGbifData.js all Mammalia Amphibia Reptilia
+	$(PNPM) exec tsx downloadGbifData.js all Mammalia Amphibia Reptilia --max-year=$(MAX_YEAR)
 
 download-taxon-data-split-by-domestic-records:
-	pnpm exec tsx downloadGbifData.js all Mammalia Amphibia Reptilia --add-domestic
+	$(PNPM) exec tsx downloadGbifData.js all Mammalia Amphibia Reptilia --add-domestic --max-year=$(MAX_YEAR)
+
+help:
+	@grep -E '^[a-z][a-z-]*:' $(MAKEFILE_LIST) | sed 's/:.*//' | sort -u

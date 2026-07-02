@@ -1,0 +1,114 @@
+iso2,iso3,cow_state,Name,indep_year,timesince,independence_from,cont_ent,cont_suppr
+CA,CAN,20,Canada,1867,158,GB,Americas,Europe
+BS,BHS,31,Bahamas,1973,52,GB,Americas,Europe
+HT,HTI,41,Haiti,1804,221,FR,Americas,Europe
+JM,JAM,51,Jamaica,1962,63,GB,Americas,Europe
+TT,TTO,52,Trinidad & Tobago,1962,63,GB,Americas,Europe
+BB,BRB,53,Barbados,1966,59,GB,Americas,Europe
+DM,DMA,54,Dominica,1978,47,GB,Americas,Europe
+GD,GRD,55,Grenada,1974,51,GB,Americas,Europe
+LC,LCA,56,St. Lucia,1979,46,GB,Americas,Europe
+VC,VCT,57,St. Vincent & Grenadines,1979,46,GB,Americas,Europe
+AG,ATG,58,Antigua & Barbuda,1981,44,GB,Americas,Europe
+KN,KNA,60,St. Kitts & Nevis,1983,42,GB,Americas,Europe
+MX,MEX,70,Mexico,1821,204,ES,Americas,Europe
+BZ,BLZ,80,Belize,1981,44,GB,Americas,Europe
+CO,COL,100,Colombia,1819,206,ES,Americas,Europe
+GY,GUY,110,Guyana,1966,59,GB,Americas,Europe
+SR,SUR,115,Suriname,1975,50,NL,Americas,Europe
+PE,PER,135,Peru,1824,201,ES,Americas,Europe
+BR,BRA,140,Brazil,1822,203,PT,Americas,Europe
+BO,BOL,145,Bolivia,1825,200,ES,Americas,Europe
+PY,PRY,150,Paraguay,1811,214,ES,Americas,Europe
+CL,CHL,155,Chile,1818,207,ES,Americas,Europe
+AR,ARG,160,Argentina,1816,209,ES,Americas,Europe
+CY,CYP,352,Cyprus,1960,65,GB,Asia,Europe
+AM,ARM,371,Armenia,1991,34,RU,Asia,Europe
+GE,GEO,372,Georgia,1991,34,RU,Asia,Europe
+AZ,AZE,373,Azerbaijan,1991,34,RU,Asia,Europe
+CV,CPV,402,Cape Verde,1975,50,PT,Africa,Europe
+ST,STP,403,São Tomé & Príncipe,1975,50,PT,Africa,Europe
+GW,GNB,404,Guinea-Bissau,1974,51,PT,Africa,Europe
+GQ,GNQ,411,Equatorial Guinea,1968,57,ES,Africa,Europe
+GM,GMB,420,Gambia,1965,60,GB,Africa,Europe
+ML,MLI,432,Mali,1960,65,FR,Africa,Europe
+BJ,BEN,434,Benin,1960,65,FR,Africa,Europe
+MR,MRT,435,Mauritania,1960,65,FR,Africa,Europe
+NE,NER,436,Niger,1960,65,FR,Africa,Europe
+CI,CIV,437,Côte d’Ivoire,1960,65,FR,Africa,Europe
+GN,GIN,438,Guinea,1958,67,FR,Africa,Europe
+BF,BFA,439,Burkina Faso,1960,65,FR,Africa,Europe
+SL,SLE,451,Sierra Leone,1961,64,GB,Africa,Europe
+GH,GHA,452,Ghana,1957,68,GB,Africa,Europe
+TG,TGO,461,Togo,1960,65,FR,Africa,Europe
+CM,CMR,471,Cameroon,1960,65,FR,Africa,Europe
+NG,NGA,475,Nigeria,1960,65,GB,Africa,Europe
+GA,GAB,481,Gabon,1960,65,FR,Africa,Europe
+CF,CAF,482,Central African Republic,1960,65,FR,Africa,Europe
+TD,TCD,483,Chad,1960,65,FR,Africa,Europe
+CG,COG,484,Congo - Brazzaville,1960,65,FR,Africa,Europe
+CD,COD,490,Congo - Kinshasa,1960,65,BE,Africa,Europe
+UG,UGA,500,Uganda,1962,63,GB,Africa,Europe
+KE,KEN,501,Kenya,1963,62,GB,Africa,Europe
+TZ,TZA,510,Tanzania,1961,64,GB,Africa,Europe
+BI,BDI,516,Burundi,1962,63,BE,Africa,Europe
+RW,RWA,517,Rwanda,1962,63,BE,Africa,Europe
+SO,SOM,520,Somalia,1960,65,IT,Africa,Europe
+DJ,DJI,522,Djibouti,1977,48,FR,Africa,Europe
+AO,AGO,540,Angola,1975,50,PT,Africa,Europe
+MZ,MOZ,541,Mozambique,1975,50,PT,Africa,Europe
+ZM,ZMB,551,Zambia,1964,61,GB,Africa,Europe
+ZW,ZWE,552,Zimbabwe,1965,60,GB,Africa,Europe
+MW,MWI,553,Malawi,1964,61,GB,Africa,Europe
+ZA,ZAF,560,South Africa,1910,115,GB,Africa,Europe
+LS,LSO,570,Lesotho,1966,59,GB,Africa,Europe
+BW,BWA,571,Botswana,1966,59,GB,Africa,Europe
+SZ,SWZ,572,Eswatini,1968,57,GB,Africa,Europe
+MG,MDG,580,Madagascar,1960,65,FR,Africa,Europe
+KM,COM,581,Comoros,1975,50,FR,Africa,Europe
+MU,MUS,590,Mauritius,1968,57,GB,Africa,Europe
+SC,SYC,591,Seychelles,1976,49,GB,Africa,Europe
+MA,MAR,600,Morocco (postcolonial),1956,69,FR,Africa,Europe
+DZ,DZA,615,Algeria,1962,63,FR,Africa,Europe
+TN,TUN,616,Tunisia (postcolonial),1956,69,FR,Africa,Europe
+LY,LBY,620,Libya,1951,74,GB,Africa,Europe
+SD,SDN,625,Sudan,1956,69,GB,Africa,Europe
+IQ,IRQ,645,Iraq,1932,93,GB,Asia,Europe
+EG,EGY,651,Egypt (postcolonial),1922,103,GB,Africa,Europe
+SY,SYR,652,Syria,1946,79,FR,Asia,Europe
+LB,LBN,660,Lebanon,1943,82,FR,Asia,Europe
+JO,JOR,663,Jordan,1946,79,GB,Asia,Europe
+IL,ISR,666,Israel,1948,77,GB,Asia,Europe
+KW,KWT,690,Kuwait,1961,64,GB,Asia,Europe
+BH,BHR,692,Bahrain,1971,54,GB,Asia,Europe
+QA,QAT,694,Qatar,1971,54,GB,Asia,Europe
+AE,ARE,696,United Arab Emirates,1971,54,GB,Asia,Europe
+AF,AFG,700,Afghanistan,1919,106,GB,Asia,Europe
+TM,TKM,701,Turkmenistan,1991,34,RU,Asia,Europe
+TJ,TJK,702,Tajikistan,1991,34,RU,Asia,Europe
+KG,KGZ,703,Kyrgyzstan,1991,34,RU,Asia,Europe
+UZ,UZB,704,Uzbekistan,1991,34,RU,Asia,Europe
+KZ,KAZ,705,Kazakhstan,1991,34,RU,Asia,Europe
+IN,IND,750,India,1947,78,GB,Asia,Europe
+PK,PAK,770,Pakistan,1947,78,GB,Asia,Europe
+MM,MMR,775,Myanmar (Burma),1948,77,GB,Asia,Europe
+LK,LKA,780,Sri Lanka,1948,77,GB,Asia,Europe
+MV,MDV,781,Maldives,1965,60,GB,Asia,Europe
+KH,KHM,811,Cambodia,1953,72,FR,Asia,Europe
+LA,LAO,812,Laos,1953,72,FR,Asia,Europe
+VN,VNM,816,Vietnam,1954,71,FR,Asia,Europe
+MY,MYS,820,Malaysia,1957,68,GB,Asia,Europe
+BN,BRN,835,Brunei,1984,41,GB,Asia,Europe
+PH,PHL,840,Philippines,1946,79,US,Asia,Americas
+ID,IDN,850,Indonesia,1949,76,NL,Asia,Europe
+AU,AUS,900,Australia,1901,124,GB,Oceania,Europe
+NZ,NZL,920,New Zealand,1907,118,GB,Oceania,Europe
+VU,VUT,935,Vanuatu,1980,45,FR,Oceania,Europe
+SB,SLB,940,Solomon Islands,1978,47,GB,Oceania,Europe
+KI,KIR,946,Kiribati,1979,46,GB,Oceania,Europe
+TV,TUV,947,Tuvalu,1978,47,GB,Oceania,Europe
+FJ,FJI,950,Fiji,1970,55,GB,Oceania,Europe
+TO,TON,955,Tonga,1970,55,GB,Oceania,Europe
+MH,MHL,983,Marshall Islands,1986,39,US,Oceania,Americas
+PW,PLW,986,Palau,1994,31,US,Oceania,Americas
+FM,FSM,987,Micronesia (Federated States of),1986,39,US,Oceania,Americas

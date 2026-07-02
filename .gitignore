@@ -1,8 +1,8 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
-# data file can be generated
-gbif_data.csv
-vdem_variables.csv
+# App data in public/data is generated (see the Makefile / `make data`) but
+# committed to the repo so the app builds and deploys without the R + GBIF
+# toolchain.
 
 # dependencies
 /node_modules
@@ -36,7 +36,6 @@ yarn-error.log*
 /manuscript
 nee_examples/
 output/
-data/
 old/
 input/
 *.pdf
