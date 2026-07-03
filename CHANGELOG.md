@@ -1,5 +1,12 @@
 # v-dem-biodiversity-app
 
+## 1.6.1
+
+### Patch Changes
+
+- a2d30df: Replace the `axios` dependency with the native `fetch` API in the GBIF client and modernise it to async/await with try/catch (no more promise chaining). Request building, 429 retry/backoff, and error handling are consolidated into a single `gbifJson` helper. No behaviour change; removes one runtime dependency.
+- 33f9737: Fix the dual chart failing with "Querying the GBIF API for year facet data failed" when GBIF rate-limits a request (HTTP 429). The live GBIF facet queries (dual chart record bars and the world-map publisher-origin view) now retry rate-limited requests with jittered exponential backoff, matching the offline bulk download — previously they had no retry, so a transient or burst 429 surfaced immediately as an error.
+
 ## 1.6.0
 
 ### Minor Changes
