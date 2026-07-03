@@ -18,6 +18,26 @@ const autoc = "species/suggest";
 // silently capped at a hard-coded past year as the app data is extended.
 const CURRENT_YEAR = new Date().getFullYear();
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// GBIF returns HTTP 429 when too many requests arrive at once. The live charts
+// fire several facet queries in parallel per render, so wrap axios.get to retry
+// rate-limited requests with jittered exponential backoff instead of surfacing
+// the 429 as an error. Kept short so the UI doesn't hang on a hard rate limit.
+const gbifGet = async (url, config = {}, retries = 4) => {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await axios.get(url, config);
+    } catch (error) {
+      if (error?.response?.status === 429 && attempt < retries) {
+        await sleep(Math.min(500 * 2 ** attempt, 4000) + Math.random() * 500);
+        continue;
+      }
+      throw error;
+    }
+  }
+};
+
 export const queryGBIFYearFacetOld = async (
   country,
   { onlyDomestic = false, onlyWithImage = false, taxonFilter = "" },
@@ -79,7 +99,7 @@ const fetchYearCounts = async (
     params.mediaType = "StillImage";
   }
 
-  const response = await axios.get(url, { params });
+  const response = await gbifGet(url, { params });
   const counts = new Map();
   const yearFacet =
     response.data.facets?.find((f) => f.field === "YEAR") ??
@@ -200,8 +220,7 @@ export const queryPublisherOrigin = async (
     params.basisOfRecord = "PRESERVED_SPECIMEN";
   }
 
-  return axios
-    .get(url, { params })
+  return gbifGet(url, { params })
     .then((response) => ({ response }))
     .catch((error) => {
       console.log("Error in fetching results from the GBIF API", error.message);
@@ -229,8 +248,6 @@ export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = CURRENT_YE
       return { error };
     });
 };
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Run async tasks over `items` with at most `limit` running concurrently,
 // preserving input order in the results.
