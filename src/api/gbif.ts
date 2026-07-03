@@ -1,10 +1,6 @@
-import axios from "axios";
 import countryCodes from "../helpers/countryCodes";
 import { countries } from "./data";
-import sortyBy from "lodash/sortBy";
-
-axios.defaults.headers.post["Content-Type"] = "application/json;charset=utf-8";
-axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+import sortBy from "lodash/sortBy";
 
 const countriesFiltered = countries.filter((alpha3) =>
   countryCodes.alpha3ToAlpha2(alpha3),
@@ -20,56 +16,54 @@ const CURRENT_YEAR = new Date().getFullYear();
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// GBIF returns HTTP 429 when too many requests arrive at once. The live charts
-// fire several facet queries in parallel per render, so wrap axios.get to retry
-// rate-limited requests with jittered exponential backoff instead of surfacing
-// the 429 as an error. Kept short so the UI doesn't hang on a hard rate limit.
-const gbifGet = async (url, config = {}, retries = 4) => {
-  for (let attempt = 0; ; attempt++) {
-    try {
-      return await axios.get(url, config);
-    } catch (error) {
-      if (error?.response?.status === 429 && attempt < retries) {
-        await sleep(Math.min(500 * 2 ** attempt, 4000) + Math.random() * 500);
-        continue;
-      }
-      throw error;
+// Fetch JSON from the GBIF API. Params with an empty/undefined value are
+// dropped. GBIF returns HTTP 429 when too many requests arrive at once (the live
+// charts fire several facet queries in parallel, and the bulk download hits
+// ~175 countries), so retry rate-limited requests with jittered exponential
+// backoff. Throws on a non-OK response so callers can handle it in one place.
+const gbifJson = async (path, params = {}, { retries = 4 } = {}) => {
+  const url = new URL(path, baseURL);
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== "") {
+      url.searchParams.set(key, String(value));
     }
+  }
+  for (let attempt = 0; ; attempt++) {
+    const response = await fetch(url);
+    if (response.status === 429 && attempt < retries) {
+      await sleep(Math.min(500 * 2 ** attempt, 4000) + Math.random() * 500);
+      continue;
+    }
+    if (!response.ok) {
+      throw new Error(`GBIF API request failed (${response.status}): ${url}`);
+    }
+    return response.json();
   }
 };
 
 export const queryGBIFYearFacetOld = async (
   country,
-  { onlyDomestic = false, onlyWithImage = false, taxonFilter = "" },
+  { onlyDomestic = false, onlyWithImage = false, taxonFilter = "", retries = 4 } = {},
 ) => {
-  // Construct the GBIF occurrences API url with facets for year counts
-  const url = `${baseURL}${occ}`;
-  const params = {
-    country: country || "SE",
-    limit: 0,
-    facet: "year",
-    "year.facetLimit": 200,
-  };
-  if (onlyDomestic) {
-    params.publishingCountry = country;
+  try {
+    const response = await gbifJson(
+      occ,
+      {
+        country: country || "SE",
+        limit: 0,
+        facet: "year",
+        "year.facetLimit": 200,
+        publishingCountry: onlyDomestic ? country : undefined,
+        taxonKey: taxonFilter || undefined,
+        mediaType: onlyWithImage ? "StillImage" : undefined,
+      },
+      { retries },
+    );
+    return { response };
+  } catch (error) {
+    console.log("Error in fetching results from the GBIF API", error.message);
+    return { error };
   }
-  if (taxonFilter) {
-    params.taxonKey = taxonFilter;
-  }
-  if (onlyWithImage) {
-    params.mediaType = "StillImage";
-  }
-
-  // GET request to the GBIF-API
-  return axios
-    .get(url, { params })
-    .then((response) => {
-      return { response };
-    })
-    .catch((error) => {
-      console.log("Error in fetching results from the GBIF API", error.message);
-      return { error };
-    });
 };
 
 // Query GBIF for record counts per year for a country (facet=year over the
@@ -81,8 +75,7 @@ const fetchYearCounts = async (
   country,
   { taxonFilter = "", onlyWithImage = false, yearMin, yearMax, extraParams = {} },
 ) => {
-  const url = `${baseURL}${occ}`;
-  const params = {
+  const data = await gbifJson(occ, {
     country,
     limit: 0,
     facet: "year",
@@ -90,20 +83,13 @@ const fetchYearCounts = async (
     // enough facet buckets to cover every distinct year in that range.
     year: `${yearMin},${yearMax}`,
     "year.facetLimit": Math.max(200, yearMax - yearMin + 1),
+    taxonKey: taxonFilter || undefined,
+    mediaType: onlyWithImage ? "StillImage" : undefined,
     ...extraParams,
-  };
-  if (taxonFilter) {
-    params.taxonKey = taxonFilter;
-  }
-  if (onlyWithImage) {
-    params.mediaType = "StillImage";
-  }
-
-  const response = await gbifGet(url, { params });
+  });
   const counts = new Map();
   const yearFacet =
-    response.data.facets?.find((f) => f.field === "YEAR") ??
-    response.data.facets?.[0];
+    data.facets?.find((f) => f.field === "YEAR") ?? data.facets?.[0];
   yearFacet?.counts.forEach((c) => counts.set(+c.name, c.count));
   return counts;
 };
@@ -186,8 +172,8 @@ export const queryGBIFFacetPerYear = async (
 
 // Aggregate publisher-origin breakdown for a country over a year range: which
 // countries published the selected country's records (facet=publishingCountry).
-// Used to colour the world map in "publisher origin" mode. Returns the raw
-// response; response.data.count is the grand total for computing shares.
+// Used to colour the world map in "publisher origin" mode. Returns the parsed
+// response; response.count is the grand total for computing shares.
 export const queryPublisherOrigin = async (
   country,
   {
@@ -199,54 +185,41 @@ export const queryPublisherOrigin = async (
     onlyPreservedSpecimen = false,
   } = {},
 ) => {
-  const url = `${baseURL}${occ}`;
-  const params = {
-    country,
-    limit: 0,
-    facet: "publishingCountry",
-    "publishingCountry.facetLimit": 400,
-    year: `${yearMin},${yearMax}`,
-  };
-  if (taxonFilter) {
-    params.taxonKey = taxonFilter;
-  }
-  if (onlyWithImage) {
-    params.mediaType = "StillImage";
-  }
-  if (onlyDomestic) {
-    params.publishingCountry = country;
-  }
-  if (onlyPreservedSpecimen) {
-    params.basisOfRecord = "PRESERVED_SPECIMEN";
-  }
-
-  return gbifGet(url, { params })
-    .then((response) => ({ response }))
-    .catch((error) => {
-      console.log("Error in fetching results from the GBIF API", error.message);
-      return { error };
+  try {
+    const response = await gbifJson(occ, {
+      country,
+      limit: 0,
+      facet: "publishingCountry",
+      "publishingCountry.facetLimit": 400,
+      year: `${yearMin},${yearMax}`,
+      taxonKey: taxonFilter || undefined,
+      mediaType: onlyWithImage ? "StillImage" : undefined,
+      publishingCountry: onlyDomestic ? country : undefined,
+      basisOfRecord: onlyPreservedSpecimen ? "PRESERVED_SPECIMEN" : undefined,
     });
+    return { response };
+  } catch (error) {
+    console.log("Error in fetching results from the GBIF API", error.message);
+    return { error };
+  }
 };
 
-export const queryGBIFCountryFacet = async (yearMin = 1960, yearMax = CURRENT_YEAR) => {
-  // Construct the GBIF occurrences API url with facets for country counts
-  const url = `${baseURL}${occ}`;
-  const params = {
-    year: yearMin === yearMax ? `${yearMin}` : `${yearMin},${yearMax}`,
-    limit: 0,
-    facet: "country",
-    "country.facetLimit": 200,
-  };
-  // GET request to the GBIF-API
-  return axios
-    .get(url, { params })
-    .then((response) => {
-      return { response };
-    })
-    .catch((error) => {
-      console.log("Error in fetching results from the GBIF API", error.message);
-      return { error };
+export const queryGBIFCountryFacet = async (
+  yearMin = 1960,
+  yearMax = CURRENT_YEAR,
+) => {
+  try {
+    const response = await gbifJson(occ, {
+      year: yearMin === yearMax ? `${yearMin}` : `${yearMin},${yearMax}`,
+      limit: 0,
+      facet: "country",
+      "country.facetLimit": 200,
     });
+    return { response };
+  } catch (error) {
+    console.log("Error in fetching results from the GBIF API", error.message);
+    return { error };
+  }
 };
 
 // Run async tasks over `items` with at most `limit` running concurrently,
@@ -267,75 +240,52 @@ async function mapWithConcurrency(items, limit, task) {
   return results;
 }
 
-// GBIF returns HTTP 429 when too many requests arrive at once. Retry the
-// rate-limited ones with exponential backoff plus a little jitter so a burst of
-// workers doesn't line up and re-trigger the limiter in lockstep.
-const queryGBIFYearFacetWithRetry = async (country, options, retries = 7) => {
-  for (let attempt = 0; ; attempt++) {
-    const res = await queryGBIFYearFacetOld(country, options);
-    if (res.error?.response?.status === 429 && attempt < retries) {
-      await sleep(Math.min(500 * 2 ** attempt, 8000) + Math.random() * 500);
-      continue;
-    }
-    return res;
-  }
-};
-
 export const fetchRecordsPerCountryPerYear = async ({
   yearMin = 1960,
   yearMax = CURRENT_YEAR,
   taxonFilter = "",
   onlyDomestic = false,
 } = {}) => {
-  // Construct the GBIF occurrences API url with facets for country counts
-  let result = [];
-
-  // Limit concurrency (and retry 429s) so the bulk download isn't rejected by
-  // the GBIF API rate limiter. Concurrency of 3 keeps well under the limit; a
-  // full ~175-country run then completes without dropping countries.
+  // Limit concurrency (gbifJson retries 429s) so the bulk download isn't
+  // rejected by the GBIF API rate limiter. Concurrency of 3 keeps well under the
+  // limit; a full ~175-country run then completes without dropping countries.
   const responses = await mapWithConcurrency(countriesFiltered, 3, (country) =>
-    queryGBIFYearFacetWithRetry(countryCodes.alpha3ToAlpha2(country), {
+    queryGBIFYearFacetOld(countryCodes.alpha3ToAlpha2(country), {
       taxonFilter,
       onlyDomestic,
+      retries: 7,
     }),
   );
+  const result = [];
   responses.forEach((res, i) => {
     if (res.error) {
-      return { error: res.error };
+      return;
     }
     const country = countriesFiltered[i];
-    res.response.data.facets[0].counts.forEach((d) => {
+    res.response.facets?.[0]?.counts.forEach((d) => {
       const year = +d.name;
       if (year >= yearMin && year <= yearMax) {
         result.push({ country, year, records: d.count });
       }
     });
   });
-  result = sortyBy(result, ["country", "year"]);
-  return result;
+  return sortBy(result, ["country", "year"]);
 };
 
 export const queryAutocompletesGBIF = async (q) => {
-  // Construct the GBIF Autocompletes url with query text
-  const url = `${baseURL}${autoc}`;
-  const params = {
-    q,
-    // Restrict to results from the GBIF taxonomic backbone only (i.e. not from other providers)
-    datasetKey: "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
-    // TODO: One more filter option for this API is by rank, maybe good idea to query for only the higher ranks and Promise all together
-  };
-
-  // GET request to the GBIF-API
-  return axios
-    .get(url, { params })
-    .then((response) => {
-      return { response };
-    })
-    .catch((error) => {
-      console.log(
-        "Error in fetching autocomplete suggestions from GBIF suggest API",
-        error,
-      );
-      return { error };
+  try {
+    const response = await gbifJson(autoc, {
+      q,
+      // Restrict to results from the GBIF taxonomic backbone only (i.e. not from
+      // other providers).
+      datasetKey: "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
     });
+    return { response };
+  } catch (error) {
+    console.log(
+      "Error in fetching autocomplete suggestions from GBIF suggest API",
+      error,
+    );
+    return { error };
+  }
 };

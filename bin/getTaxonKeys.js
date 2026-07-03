@@ -6,7 +6,7 @@ export default async function getTaxonKeys(query) {
     console.error(`Error trying to fetch gbif taxon keys from query '${query}:`, res.error);
     throw new Error(res.error);
   }
-  const { data } = res.response;
+  const data = res.response;
   if (data.length === 0) {
     console.error(`No search result for query ${query}`);
     throw new Error(`No search result for query ${query}`);

@@ -1166,7 +1166,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
     }
     // Transform the result as required for the ScatterPlot
     const gbifCountryFacetData = {};
-    result.response.data.facets[0].counts.map((d) => {
+    result.response.facets[0].counts.map((d) => {
       gbifCountryFacetData[countryCodes.alpha2ToAlpha3(d.name)] = {
         count: d.count,
       };
@@ -1261,7 +1261,7 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       return;
     }
     // Transform the taxa array as required for dropdown menu
-    const taxaAutocompletes = result.response.data.map((t) => ({
+    const taxaAutocompletes = result.response.map((t) => ({
       label: t.canonicalName,
       value: t.nubKey || t.key,
     }));
@@ -1631,8 +1631,8 @@ AGO,AO,"Angola, Republic of",Associate country participant,2019
       if (result.error) {
         return;
       }
-      const grandTotal = result.response.data.count || 0;
-      const publisherFacet = (result.response.data.facets || []).find(
+      const grandTotal = result.response.count || 0;
+      const publisherFacet = (result.response.facets || []).find(
         (d) => d.field === "PUBLISHING_COUNTRY",
       );
       const worldMapData = new Map();

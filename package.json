@@ -30,7 +30,6 @@
     "@visx/scale": "^4.0.0",
     "@visx/tooltip": "^4.0.0",
     "autosuggest-highlight": "^3.3.4",
-    "axios": "^1.18.1",
     "classnames": "^2.5.1",
     "d3": "^7.9.0",
     "d3-array": "^3.2.4",
